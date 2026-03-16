@@ -6,25 +6,25 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 220 20% 7%;
+    --foreground: 210 40% 96%;
 
-    --card: 210 40% 98%;
-    --card-foreground: 222 47% 11%;
+    --card: 220 18% 11%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 220 18% 11%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 210 40% 96%;
+    --primary-foreground: 220 20% 7%;
 
-    --secondary: 210 40% 98%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 220 16% 16%;
+    --secondary-foreground: 210 40% 96%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 220 14% 18%;
+    --muted-foreground: 215 16% 57%;
 
-    --accent: 239 84% 67%;
+    --accent: 260 80% 62%;
     --accent-foreground: 0 0% 100%;
 
     --cta: 160 84% 39%;
@@ -33,20 +33,22 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 239 84% 67%;
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 260 80% 62%;
 
     --radius: 0.75rem;
 
-    --section-alt: 210 40% 98%;
+    --section-alt: 220 18% 10%;
 
     --font-display: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', sans-serif;
 
-    --gradient-accent: linear-gradient(135deg, hsl(239 84% 67%), hsl(260 84% 67%));
-    --shadow-card: 0 4px 24px -4px hsl(222 47% 11% / 0.08);
-    --shadow-elevated: 0 12px 40px -8px hsl(222 47% 11% / 0.15);
+    --gradient-accent: linear-gradient(135deg, hsl(260 80% 62%), hsl(180 70% 50%));
+    --gradient-hero: linear-gradient(135deg, hsl(260 80% 62% / 0.15), hsl(180 70% 50% / 0.08));
+    --shadow-card: 0 4px 24px -4px hsl(0 0% 0% / 0.4);
+    --shadow-elevated: 0 12px 40px -8px hsl(260 80% 62% / 0.25);
+    --glow-accent: 0 0 40px hsl(260 80% 62% / 0.3);
   }
 }
 
@@ -72,5 +74,18 @@
 
   .container-narrow {
     @apply max-w-7xl mx-auto;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-accent);
+  }
+
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-xl border border-border/50 rounded-2xl;
+  }
+
+  .glow-border {
+    box-shadow: var(--glow-accent), var(--shadow-card);
   }
 }

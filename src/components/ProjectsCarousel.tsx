@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, TrendingUp } from "lucide-react";
 import restaurantImg from "@/assets/project-restaurant.jpg";
 import leadsImg from "@/assets/project-leads.jpg";
 import chatbotImg from "@/assets/project-chatbot.jpg";
@@ -59,15 +59,18 @@ const ProjectsCarousel = () => {
   const project = projects[current];
 
   return (
-    <section id="projects" className="bg-background">
-      <div className="container-narrow section-padding">
+    <section id="projects" className="bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_hsl(260_80%_62%_/_0.06),_transparent_60%)]" />
+      <div className="container-narrow section-padding relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <span className="font-display font-semibold text-accent text-sm tracking-widest uppercase">Nos réalisations</span>
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 font-display font-semibold text-accent text-xs tracking-widest uppercase mb-4">
+            Nos réalisations
+          </span>
           <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-foreground mt-3">Nos Projets</h2>
         </motion.div>
 
@@ -81,15 +84,19 @@ const ProjectsCarousel = () => {
               transition={{ duration: 0.5 }}
               className="grid lg:grid-cols-2 gap-8 items-center"
             >
-              <div className="rounded-2xl overflow-hidden shadow-[var(--shadow-elevated)]">
-                <img src={project.image} alt={project.title} className="w-full h-64 sm:h-80 object-cover" />
+              <div className="rounded-2xl overflow-hidden glow-border relative group">
+                <img src={project.image} alt={project.title} className="w-full h-64 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
               </div>
               <div>
-                <span className="font-body text-sm text-accent font-medium">{project.client}</span>
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cta/10 border border-cta/20 font-body text-xs text-cta font-medium mb-3">
+                  {project.client}
+                </span>
                 <h3 className="font-display font-bold text-2xl text-foreground mt-2 mb-4">{project.title}</h3>
-                <p className="font-body text-muted-foreground mb-4">{project.description}</p>
-                <div className="inline-block bg-cta/10 text-cta font-body font-semibold text-sm px-4 py-2 rounded-lg">
-                  📈 {project.impact}
+                <p className="font-body text-muted-foreground mb-6 leading-relaxed">{project.description}</p>
+                <div className="inline-flex items-center gap-2 glass-card px-5 py-3 border-cta/20">
+                  <TrendingUp className="text-cta" size={18} />
+                  <span className="text-cta font-body font-semibold text-sm">{project.impact}</span>
                 </div>
               </div>
             </motion.div>
@@ -98,23 +105,26 @@ const ProjectsCarousel = () => {
           {/* Controls */}
           <div className="flex items-center justify-between mt-8">
             <div className="flex gap-2">
-              <button onClick={prev} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors text-foreground">
+              <button onClick={prev} className="w-10 h-10 rounded-full border border-border/50 flex items-center justify-center hover:bg-secondary hover:border-accent/30 transition-all text-foreground">
                 <ChevronLeft size={18} />
               </button>
-              <button onClick={next} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors text-foreground">
+              <button onClick={next} className="w-10 h-10 rounded-full border border-border/50 flex items-center justify-center hover:bg-secondary hover:border-accent/30 transition-all text-foreground">
                 <ChevronRight size={18} />
               </button>
             </div>
 
-            {/* Progress dots */}
             <div className="flex gap-2 items-center">
               {projects.map((_, i) => (
-                <div key={i} className="relative w-12 h-1 bg-border rounded-full overflow-hidden">
+                <button
+                  key={i}
+                  onClick={() => { setCurrent(i); setProgress(0); }}
+                  className="relative w-12 h-1.5 bg-border/50 rounded-full overflow-hidden cursor-pointer"
+                >
                   {i === current && (
                     <div className="absolute inset-y-0 left-0 bg-accent rounded-full transition-all" style={{ width: `${progress}%` }} />
                   )}
-                  {i < current && <div className="absolute inset-0 bg-accent rounded-full" />}
-                </div>
+                  {i < current && <div className="absolute inset-0 bg-accent/60 rounded-full" />}
+                </button>
               ))}
             </div>
           </div>

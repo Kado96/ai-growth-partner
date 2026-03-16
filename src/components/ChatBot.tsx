@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, FileText, Mail } from "lucide-react";
+import { MessageCircle, X, FileText, Mail, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ChatBot = () => {
@@ -34,34 +34,35 @@ const ChatBot = () => {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button with glow */}
       <motion.button
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 1, type: "spring" }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-accent text-accent-foreground shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-accent text-accent-foreground flex items-center justify-center hover:scale-110 transition-transform"
+        style={{ boxShadow: "0 0 30px hsl(260 80% 62% / 0.5)" }}
       >
         {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
       </motion.button>
 
-      {/* Chat window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-background rounded-2xl shadow-[var(--shadow-elevated)] border border-border overflow-hidden"
+            className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 glass-card overflow-hidden"
+            style={{ boxShadow: "0 0 40px hsl(260 80% 62% / 0.15), 0 12px 40px hsl(0 0% 0% / 0.4)" }}
           >
             {/* Header */}
-            <div className="bg-accent text-accent-foreground p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-accent-foreground/20 flex items-center justify-center font-display font-bold text-sm">
-                A
+            <div className="bg-gradient-to-r from-accent to-cta p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-accent-foreground/20 flex items-center justify-center">
+                <Bot size={20} className="text-accent-foreground" />
               </div>
               <div>
-                <h4 className="font-display font-semibold text-sm">Alexa</h4>
-                <p className="text-xs opacity-80">Assistante IA — Kora Agency</p>
+                <h4 className="font-display font-semibold text-sm text-accent-foreground">Alexa</h4>
+                <p className="text-xs text-accent-foreground/80">Assistante IA — Kora Agency</p>
               </div>
             </div>
 
