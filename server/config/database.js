@@ -2,12 +2,10 @@ const { Sequelize } = require('sequelize');
 const path = require('path');
 require('dotenv').config();
 
-const environment = process.env.NODE_ENV || 'development';
-
 let sequelize;
 
-if (environment === 'production' || process.env.DATABASE_URL) {
-  // Production (Supabase Postgres)
+if (process.env.DATABASE_URL) {
+  // Production with Postgres (Supabase)
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     dialectOptions: {
@@ -18,13 +16,15 @@ if (environment === 'production' || process.env.DATABASE_URL) {
     },
     logging: false
   });
+  console.log('[DB] Connexion PostgreSQL (Supabase) configurée.');
 } else {
-  // Local (SQLite)
+  // Fallback SQLite (Local ou Prod sans DATABASE_URL)
   sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: path.join(__dirname, '../database.sqlite3'),
     logging: false
   });
+  console.log('[DB] Connexion SQLite locale configurée.');
 }
 
 module.exports = sequelize;

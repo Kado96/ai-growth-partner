@@ -28,7 +28,7 @@ const uploadMedia = async (file, generatedUuid) => {
     if (!supabase) throw new Error('Supabase Client not initialized pour Production.');
     // Mettre sur Supabase
     const { data, error } = await supabase.storage
-      .from('kora-media')
+      .from('media')
       .upload(fileName, file.buffer, {
         contentType: file.mimetype,
         upsert: true
@@ -38,7 +38,7 @@ const uploadMedia = async (file, generatedUuid) => {
     
     // Obtenir l'URL Publique
     const { data: publicUrlData } = supabase.storage
-      .from('kora-media')
+      .from('media')
       .getPublicUrl(fileName);
 
     return publicUrlData.publicUrl;
@@ -60,7 +60,7 @@ const deleteMedia = async (filePath) => {
   if (filePath.startsWith('http')) {
     if (!supabase) return;
     const fileName = filePath.split('/').pop();
-    await supabase.storage.from('kora-media').remove([fileName]);
+    await supabase.storage.from('media').remove([fileName]);
   } else {
     // Local
     const fileName = filePath.split('/').pop();

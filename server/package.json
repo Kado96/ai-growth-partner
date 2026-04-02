@@ -18,7 +18,9 @@
     "nodemailer": "^6.9.7",
     "sequelize": "^6.37.8",
     "sqlite3": "^6.0.1",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "pg": "^8.13.0",
+    "pg-hstore": "^2.3.4"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
