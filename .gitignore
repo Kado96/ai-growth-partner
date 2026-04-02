@@ -12,6 +12,27 @@ dist
 dist-ssr
 *.local
 
+# Secrets & Environment
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+# Database files
+*.sqlite3
+*.sqlite
+database.sqlite3
+
+# Media uploads (local only)
+server/media/
+
+# Sensitive notes
+supabase+email.txt
+devis_logic.txt
+astuce.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,0 +1,146 @@
+{
+  "branding": {
+    "name": "Kora Agency",
+    "motto": "Kora Agency au service de votre succès",
+    "description": "Expertise en Marketing Digital et Automatisation IA pour propulser votre croissance au Burundi et au-delà."
+  },
+  "hero": {
+    "badge": "Marketing Digital & Kora Agency",
+    "title": "Kora Agency au service de votre succès.",
+    "description": "Propulsez votre entreprise avec nos solutions d'automatisation IA et de marketing digital. Spécialistes de la visibilité en ligne et de l'acquisition client pour booster vos revenus.",
+    "stats": [
+      { "value": "500K+", "label": "Audience atteinte" },
+      { "value": "98%", "label": "Satisfaction client" },
+      { "value": "24/7", "label": "Support Expert" }
+    ]
+  },
+  "services": {
+    "title": "Nos Solutions Marketing",
+    "subtitle": "Tarifs & Expertise",
+    "description": "Des services professionnels adaptés à votre budget pour une visibilité maximale sur tous vos canaux.",
+    "items": [
+      {
+        "id": "visuels",
+        "title": "Création de visuels professionnels",
+        "description": "Conception de posts et affiches publicitaires uniques pour capter l'attention de votre audience.",
+        "icon": "Palette",
+        "price": 300000,
+        "questions": ["Quel est le thème de votre campagne ?", "Voulez-vous des formats spécifiques (Story, Feed) ?"]
+      },
+      {
+        "id": "publications",
+        "title": "Gestion des publications (Facebook, IG, TikTok)",
+        "description": "Rédaction et publication de contenus attrayants sur vos réseaux sociaux principaux.",
+        "icon": "MessageSquare",
+        "price": 500000,
+        "questions": ["Quels réseaux sociaux ciblez-vous ?", "Quelle est la fréquence souhaitée ?"]
+      },
+      {
+        "id": "calendrier",
+        "title": "Plan de publication (Calendrier 7j)",
+        "description": "Stratégie complète de contenu sur une semaine pour une présence régulière.",
+        "icon": "Calendar",
+        "price": 200000,
+        "questions": ["Quelle est votre ligne éditoriale ?"]
+      },
+      {
+        "id": "hashtags",
+        "title": "Séléction de Hashtags Pertinents",
+        "description": "Optimisation de votre portée organique grâce à des tags ciblés.",
+        "icon": "Hash",
+        "price": 50000,
+        "questions": ["Qui est votre audience cible ?"]
+      },
+      {
+        "id": "whatsapp",
+        "title": "Réponses Automatiques WhatsApp",
+        "description": "Script et configuration de votre assistant WhatsApp pour ne rater aucun client.",
+        "icon": "Smartphone",
+        "price": 200000,
+        "questions": ["Quelles sont les questions les plus fréquentes de vos clients ?"]
+      },
+      {
+        "id": "google",
+        "title": "Optimisation Google Business",
+        "description": "Amélioration de votre fiche pour apparaître en haut des recherches locales.",
+        "icon": "MapPin",
+        "price": 100000,
+        "questions": ["Votre établissement est-il déjà référencé sur Maps ?"]
+      },
+      {
+        "id": "airbnb",
+        "title": "Descriptions Airbnb & Booking",
+        "description": "Rédaction persuasive pour transformer les curieux en voyageurs réservés.",
+        "icon": "Home",
+        "price": 150000,
+        "questions": ["Combien de chambres proposez-vous ?", "Quels sont les atouts majeurs (Wifi, Piscine, Vue) ?"]
+      },
+      {
+        "id": "tiktok",
+        "title": "Scripts Vidéos TikTok / Reels",
+        "description": "Idées créatives et scripts complets pour vos contenus vidéos viraux.",
+        "icon": "Video",
+        "price": 200000,
+        "questions": ["Quel type d'humour ou de ton préférez-vous ?"]
+      },
+      {
+        "id": "bundle",
+        "title": "Pack Agence : Site Vitrine + Marketing",
+        "description": "Création d'un site vitrine inclus avec TOUS nos services marketing + 6 mois de suivi gratuit.",
+        "icon": "Rocket",
+        "price": 2000000,
+        "questions": ["Décrivez votre activité en 3 phrases.", "Avez-vous déjà un nom de domaine ?"]
+      },
+      {
+        "id": "ia_assistant",
+        "title": "Assistant IA (Auto-Post 30j)",
+        "description": "Publication automatisée pendant 1 mois grâce à notre technologie Kora AI.",
+        "icon": "Zap",
+        "price": 300000,
+        "questions": ["Préférez-vous l'IA créative ou informative ?"]
+      },
+      {
+        "id": "maintenance",
+        "title": "Maintenance Mensuelle",
+        "description": "Mise à jour régulière de vos contenus (Site, WhatsApp, Réseaux).",
+        "icon": "Settings",
+        "price": 150000,
+        "questions": ["Avez-vous déjà un site en ligne ?"]
+      },
+      {
+        "id": "affiche",
+        "title": "Affiche Publicitaire",
+        "description": "Design d'affiches grand format pour vos événements ou promotions.",
+        "icon": "FileText",
+        "price": 150000,
+        "questions": ["Quel est l'objectif principal de l'affiche (Vente, Notoriété) ?"]
+      }
+    ]
+  },
+  "news": [
+    "KORA AGENCY : Nouveau Pack Agence (Site + Marketing) à 2.000.000 FBU disponible.",
+    "EN DIRECT : Automatisez votre WhatsApp pour seulement 200.000 FBU.",
+    "INFOS : Rédaction Airbnb & Booking à 150.000 FBU pour booster vos réservations.",
+    "CONSEIL : Optimisation Google Business - Votre visibilité locale commence ici."
+  ],
+  "about": {
+    "title": "Notre Vision",
+    "motto": "Convertir les clics en croissance.",
+    "text": "Kora Agency est une agence de marketing digital nouvelle génération qui utilise l'intelligence artificielle pour automatiser la réussite de nos clients. Nous croyons que chaque interaction digitale est une opportunité de croissance infinie.",
+    "methodology": [
+      { "title": "Audit & Analyse", "desc": "Nous étudions votre marché et vos concurrents." },
+      { "title": "Stratégie IA", "desc": "Mise en place de solutions automatisées." },
+      { "title": "Exécution Créative", "desc": "Production de contenus impactants." },
+      { "title": "Suivi & Rapports", "desc": "Analyse rigoureuse de vos performances." }
+    ]
+  },
+  "footer": {
+    "text": "© 2026 Kora Agency. Votre succès est notre mission.",
+    "links": [
+      { "label": "Accueil", "href": "#" },
+      { "label": "Services", "href": "#services" },
+      { "label": "Devis", "href": "#devis" },
+      { "label": "Contact", "href": "#contact" }
+    ]
+  }
+}
