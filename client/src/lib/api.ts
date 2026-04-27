@@ -1,12 +1,22 @@
-// Détection dynamique de l'URL API (Utilise le Proxy Vite en dev)
 const getBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  // En dev, on utilise le proxy relatif. En prod, window.location.origin
+  // En dev local, on utilise le proxy relatif pour éviter les problèmes CORS.
   return import.meta.env.DEV ? '' : window.location.origin;
 };
 
-const API_URL = getBaseUrl();
-console.log(`[KORA-API] Tentative de connexion sur : ${API_URL}`);
+export const API_URL = getBaseUrl();
+console.log(`[KORA-API] Mode: ${import.meta.env.DEV ? 'DEV' : 'PROD'} | BaseURL: ${API_URL}`);
+
+/**
+ * Construit l'URL complète d'un média à partir de son chemin relatif ou absolu.
+ * - Si le chemin commence par 'http', il est déjà absolu → retourné tel quel.
+ * - Sinon, on préfixe avec API_URL pour pointer vers le bon serveur (local ou prod).
+ */
+export const getMediaUrl = (path: string): string => {
+  if (!path || path === '') return '';
+  if (path.startsWith('http')) return path;
+  return `${API_URL}${path}`;
+};
 
 export const fetchConfig = async () => {
   try {

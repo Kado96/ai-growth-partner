@@ -8,8 +8,17 @@ import NewsTicker from "@/components/NewsTicker";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Admin from "./pages/Admin.tsx";
+import BlogDetail from "./pages/BlogDetail.tsx";
 
-import { QuoteProvider } from "@/hooks/use-quote";
+import { QuoteProvider, useQuote } from "@/hooks/use-quote";
+
+import QuoteWizard from "@/components/QuoteWizard";
+import ChatBot from "@/components/ChatBot";
+
+const GlobalQuoteWizard = () => {
+  const { isOpen, closeQuote } = useQuote();
+  return <QuoteWizard isOpen={isOpen} onClose={closeQuote} />;
+};
 
 const queryClient = new QueryClient();
 
@@ -20,15 +29,18 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/blog/:serviceId" element={<BlogDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
           <NewsTicker />
+          <GlobalQuoteWizard />
+          <ChatBot />
         </TooltipProvider>
       </QuoteProvider>
     </ConfigProvider>

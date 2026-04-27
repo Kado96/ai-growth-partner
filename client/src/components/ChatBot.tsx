@@ -8,8 +8,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useQuote } from "@/hooks/use-quote";
-import { submitChatSummary, chatWithAlexa } from "@/lib/api";
+import { submitChatSummary, chatWithAlexa, getMediaUrl } from "@/lib/api";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import { Link } from "react-router-dom";
 
 const ChatBot = () => {
   const { openQuote } = useQuote();
@@ -155,7 +157,7 @@ const ChatBot = () => {
                         ? "bg-white/5 text-slate-200 rounded-bl-sm border border-white/5"
                         : "bg-accent text-white rounded-br-sm shadow-lg shadow-accent/10"
                     }`}>
-                      {msg.text}
+                      <MessageContent content={msg.text} from={msg.from} />
                     </div>
                   </motion.div>
                 ))}
@@ -209,6 +211,49 @@ const ChatBot = () => {
         )}
       </AnimatePresence>
     </>
+  );
+};
+
+const MessageContent = ({ content, from }: { content: string; from: string }) => {
+  // Détection des images [IMAGE:path]
+  const imageRegex = /\[IMAGE:(.*?)\]/g;
+  const parts = content.split(imageRegex);
+  const images = [...content.matchAll(imageRegex)].map(match => match[1]);
+
+  if (from === "user") return <span>{content}</span>;
+
+  return (
+    <div className="space-y-4 prose prose-invert prose-sm max-w-none">
+      <ReactMarkdown
+        components={{
+          a: ({ node, ...props }) => {
+            const isInternal = props.href?.startsWith("/");
+            if (isInternal) {
+              return <Link to={props.href!} className="text-accent font-bold hover:underline" {...props} />;
+            }
+            return <a target="_blank" rel="noopener noreferrer" className="text-accent font-bold hover:underline" {...props} />;
+          },
+          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>
+        }}
+      >
+        {content.replace(imageRegex, "")}
+      </ReactMarkdown>
+
+      {images.map((path, idx) => (
+        <motion.div 
+          key={idx}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900 aspect-video"
+        >
+          <img 
+            src={getMediaUrl(path)} 
+            alt="Suggestion Alexa" 
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
+      ))}
+    </div>
   );
 };
 

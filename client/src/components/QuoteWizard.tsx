@@ -119,6 +119,12 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden border-white/10 bg-slate-950/95 backdrop-blur-xl shadow-2xl">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Assistant Devis Kora Agency</DialogTitle>
+          <DialogDescription>
+            Configurez votre solution marketing personnalisée et obtenez une estimation immédiate.
+          </DialogDescription>
+        </DialogHeader>
         {/* Animated Progress Bar */}
         <div className="absolute top-0 left-0 w-full h-[3px] bg-white/5 z-50">
           <motion.div 
@@ -206,11 +212,12 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto pr-2 custom-scrollbar max-h-[380px]">
-                        {services.map((s: any) => {
+                        {(services || []).map((s: any, idx: number) => {
                           const Icon = IconMap[s.icon] || Briefcase;
+                          const sId = s.id || `quote-service-${idx}`;
                           return (
                             <button
-                              key={s.id}
+                              key={sId}
                               onClick={() => handleServiceSelect(s)}
                               className="group relative flex flex-col items-start p-4 rounded-2xl border border-white/5 bg-white/5 hover:bg-accent/10 hover:border-accent/30 transition-all text-left overflow-hidden h-[120px]"
                             >
@@ -283,6 +290,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                             <Input 
                               id="contact-name"
                               name="name"
+                              autoComplete="name"
                               className="h-12 bg-white/5 border-white/10 text-white rounded-xl" 
                               placeholder="Kora Agency / Jean Dupont"
                               value={contact.name}
@@ -296,6 +304,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                               <Input 
                                 id="contact-whatsapp"
                                 name="whatsapp"
+                                autoComplete="tel"
                                 className="h-12 bg-white/5 border-white/10 text-white pl-14 rounded-xl" 
                                 placeholder="69 ...."
                                 value={contact.whatsapp}

@@ -1,11 +1,13 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Brain, Cog, Lightbulb, Palette, MessageSquare, 
   Calendar, Hash, Smartphone, MapPin, Home, 
-  Video, Rocket, Zap, FileText, Check 
+  Video, Rocket, Zap, FileText, ChevronRight 
 } from "lucide-react";
 import { useConfig } from "@/hooks/use-config";
 import { useQuote } from "@/hooks/use-quote";
+import { API_URL } from "@/lib/api";
 
 const IconMap: Record<string, any> = {
   Brain, Cog, Lightbulb, Palette, MessageSquare, 
@@ -46,13 +48,14 @@ const Services = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.items.map((service: any, i: number) => {
+          {(services.items || []).map((service: any, i: number) => {
             const Icon = IconMap[service.icon] || Brain;
             const isPremium = service.price >= 1000000;
+            const sId = service.id || `service-${i}`;
             
             return (
               <motion.div
-                key={service.id || service.title}
+                key={sId}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -65,11 +68,11 @@ const Services = () => {
                   </div>
                 )}
                 
-                <div className="relative z-10 flex-grow">
+                <Link to={`/blog/${sId}`} className="relative z-10 flex-grow block">
                   {service.imagePath && service.imagePath !== '' ? (
                     <div className="w-full h-40 rounded-2xl overflow-hidden mb-6 group-hover:scale-105 transition-transform duration-300 shadow-lg">
                       <img 
-                        src={service.imagePath.startsWith('http') ? service.imagePath : `http://localhost:5001${service.imagePath}`} 
+                        src={service.imagePath.startsWith('http') ? service.imagePath : `${API_URL}${service.imagePath}`} 
                         alt={service.title} 
                         className="w-full h-full object-cover" 
                       />
@@ -79,22 +82,19 @@ const Services = () => {
                       <Icon className={isPremium ? "text-accent" : "text-slate-400"} size={28} />
                     </div>
                   )}
-                  <h3 className="font-display font-bold text-xl text-foreground mb-3">{service.title}</h3>
+                  <h3 className="font-display font-bold text-xl text-foreground mb-3 group-hover:text-accent transition-colors flex items-center gap-2">
+                    {service.title}
+                    <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                  </h3>
                   <p className="font-body text-sm text-muted-foreground leading-relaxed mb-6">{service.description}</p>
-                </div>
+                </Link>
 
-                <div className="relative z-10 mt-6 pt-6 border-t border-border/30">
-                  <div className="flex items-end gap-1 mb-4">
-                    <span className="font-display font-bold text-2xl text-foreground">
-                      {service.price.toLocaleString('fr-FR')}
-                    </span>
-                    <span className="text-xs text-muted-foreground mb-1 uppercase font-semibold">FBU</span>
-                  </div>
+                <div className="relative z-10 mt-auto pt-6 border-t border-white/5">
                   <button 
-                    onClick={() => openQuote(service.id)}
-                    className={`w-full py-3 rounded-xl font-display font-bold text-sm transition-all ${isPremium ? 'bg-accent text-white hover:bg-accent/90' : 'bg-secondary text-foreground hover:bg-secondary/80'}`}
+                    onClick={() => openQuote(sId)}
+                    className={`w-full py-4 rounded-xl font-display font-bold text-sm transition-all ${isPremium ? 'bg-accent text-white hover:bg-accent/90 shadow-[0_10px_20px_-5px_rgba(0,255,255,0.3)]' : 'bg-secondary text-foreground hover:bg-secondary/80'}`}
                   >
-                    Choisir ce service
+                    Demander l'expertise
                   </button>
                 </div>
               </motion.div>
@@ -105,4 +105,5 @@ const Services = () => {
     </section>
   );
 };
+
 export default Services;

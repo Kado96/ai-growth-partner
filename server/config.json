@@ -2,7 +2,9 @@
   "branding": {
     "name": "Kora Agency",
     "motto": "Kora Agency au service de votre succès",
-    "description": "Expertise en Marketing Digital et Automatisation IA pour propulser votre croissance au Burundi et au-delà."
+    "description": "Expertise en Marketing Digital et Automatisation IA pour propulser votre croissance au Burundi et au-delà.",
+    "email": "kandekedonald@gmail.com",
+    "phone": "+257 79 92 88 64"
   },
   "hero": {
     "badge": "Marketing Digital & Kora Agency",
@@ -24,6 +26,8 @@
         "title": "Création de visuels professionnels",
         "description": "Conception de posts et affiches publicitaires uniques pour capter l'attention de votre audience.",
         "icon": "Palette",
+        "category": "Marketing",
+        "imagePath": "/media/visuels.jpg",
         "price": 300000,
         "questions": ["Quel est le thème de votre campagne ?", "Voulez-vous des formats spécifiques (Story, Feed) ?"]
       },
@@ -32,6 +36,8 @@
         "title": "Gestion des publications (Facebook, IG, TikTok)",
         "description": "Rédaction et publication de contenus attrayants sur vos réseaux sociaux principaux.",
         "icon": "MessageSquare",
+        "category": "Social",
+        "imagePath": "/media/social-posts.jpg",
         "price": 500000,
         "questions": ["Quels réseaux sociaux ciblez-vous ?", "Quelle est la fréquence souhaitée ?"]
       },
@@ -40,6 +46,8 @@
         "title": "Plan de publication (Calendrier 7j)",
         "description": "Stratégie complète de contenu sur une semaine pour une présence régulière.",
         "icon": "Calendar",
+        "category": "Social",
+        "imagePath": "/media/content-plan.jpg",
         "price": 200000,
         "questions": ["Quelle est votre ligne éditoriale ?"]
       },
@@ -48,6 +56,8 @@
         "title": "Séléction de Hashtags Pertinents",
         "description": "Optimisation de votre portée organique grâce à des tags ciblés.",
         "icon": "Hash",
+        "category": "Social",
+        "imagePath": "/media/hashtags.jpg",
         "price": 50000,
         "questions": ["Qui est votre audience cible ?"]
       },
@@ -56,6 +66,8 @@
         "title": "Réponses Automatiques WhatsApp",
         "description": "Script et configuration de votre assistant WhatsApp pour ne rater aucun client.",
         "icon": "Smartphone",
+        "category": "IA & Automation",
+        "imagePath": "/media/whatsapp-bot.jpg",
         "price": 200000,
         "questions": ["Quelles sont les questions les plus fréquentes de vos clients ?"]
       },
@@ -64,6 +76,8 @@
         "title": "Optimisation Google Business",
         "description": "Amélioration de votre fiche pour apparaître en haut des recherches locales.",
         "icon": "MapPin",
+        "category": "Référencement & Local",
+        "imagePath": "/media/google-maps.jpg",
         "price": 100000,
         "questions": ["Votre établissement est-il déjà référencé sur Maps ?"]
       },
@@ -72,6 +86,8 @@
         "title": "Descriptions Airbnb & Booking",
         "description": "Rédaction persuasive pour transformer les curieux en voyageurs réservés.",
         "icon": "Home",
+        "category": "Référencement & Local",
+        "imagePath": "/media/airbnb-expert.jpg",
         "price": 150000,
         "questions": ["Combien de chambres proposez-vous ?", "Quels sont les atouts majeurs (Wifi, Piscine, Vue) ?"]
       },
@@ -80,6 +96,8 @@
         "title": "Scripts Vidéos TikTok / Reels",
         "description": "Idées créatives et scripts complets pour vos contenus vidéos viraux.",
         "icon": "Video",
+        "category": "Marketing",
+        "imagePath": "/media/tiktok-viral.jpg",
         "price": 200000,
         "questions": ["Quel type d'humour ou de ton préférez-vous ?"]
       },
@@ -88,6 +106,8 @@
         "title": "Pack Agence : Site Vitrine + Marketing",
         "description": "Création d'un site vitrine inclus avec TOUS nos services marketing + 6 mois de suivi gratuit.",
         "icon": "Rocket",
+        "category": "Bundle",
+        "imagePath": "/media/agency-pack.jpg",
         "price": 2000000,
         "questions": ["Décrivez votre activité en 3 phrases.", "Avez-vous déjà un nom de domaine ?"]
       },
@@ -96,6 +116,8 @@
         "title": "Assistant IA (Auto-Post 30j)",
         "description": "Publication automatisée pendant 1 mois grâce à notre technologie Kora AI.",
         "icon": "Zap",
+        "category": "IA & Automation",
+        "imagePath": "/media/ai-assistant.jpg",
         "price": 300000,
         "questions": ["Préférez-vous l'IA créative ou informative ?"]
       },
@@ -104,6 +126,8 @@
         "title": "Maintenance Mensuelle",
         "description": "Mise à jour régulière de vos contenus (Site, WhatsApp, Réseaux).",
         "icon": "Settings",
+        "category": "Service",
+        "imagePath": "/media/tech-support.jpg",
         "price": 150000,
         "questions": ["Avez-vous déjà un site en ligne ?"]
       },
@@ -112,6 +136,8 @@
         "title": "Affiche Publicitaire",
         "description": "Design d'affiches grand format pour vos événements ou promotions.",
         "icon": "FileText",
+        "category": "Marketing",
+        "imagePath": "/media/ads-poster.jpg",
         "price": 150000,
         "questions": ["Quel est l'objectif principal de l'affiche (Vente, Notoriété) ?"]
       }

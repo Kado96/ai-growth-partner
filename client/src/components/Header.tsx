@@ -11,7 +11,7 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-2xl border-b border-border/50">
       <div className="container-narrow section-padding !py-0">
         <div className="flex items-center justify-between h-16 sm:h-20">
-          <a href="#" className="font-display font-extrabold text-xl sm:text-2xl text-foreground">
+          <a href="/" className="font-display font-extrabold text-xl sm:text-2xl text-foreground">
             Kora<span className="gradient-text">Agency</span>
           </a>
 
@@ -19,7 +19,7 @@ const Header = () => {
             {["Nos Services", "Nos Projets", "À Propos", "Vidéos", "Contact"].map((item) => {
               const id = item === "Nos Services" ? "services" : item === "Nos Projets" ? "projects" : item === "À Propos" ? "about" : item === "Vidéos" ? "videos" : "contact";
               return (
-                <a key={id} href={`#${id}`} className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors relative group">
+                <a key={id} href={`/#${id}`} className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors relative group">
                   {item}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300 rounded-full" />
                 </a>
@@ -45,7 +45,7 @@ const Header = () => {
               { label: "Vidéos", id: "videos" },
               { label: "Contact", id: "contact" },
             ].map((item) => (
-              <a key={item.id} href={`#${item.id}`} className="font-body text-sm text-muted-foreground py-2 hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
+              <a key={item.id} href={`/#${item.id}`} className="font-body text-sm text-muted-foreground py-2 hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
                 {item.label}
               </a>
             ))}

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Search, Cpu, PenTool, BarChart3, Quote } from "lucide-react";
 import { useConfig } from "@/hooks/use-config";
+import { API_URL } from "@/lib/api";
 
 const MethodIconMap: Record<string, any> = {
   "Audit & Analyse": Search,

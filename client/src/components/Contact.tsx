@@ -56,6 +56,7 @@ const Contact = () => {
                 id="form-name"
                 name="name"
                 type="text"
+                autoComplete="name"
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -69,6 +70,7 @@ const Contact = () => {
                 id="form-email"
                 name="email"
                 type="email"
+                autoComplete="email"
                 required
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}

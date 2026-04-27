@@ -4,6 +4,7 @@ import heroImg from "@/assets/hero-ai.jpg";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { useConfig } from "@/hooks/use-config";
 import { useQuote } from "@/hooks/use-quote";
+import { API_URL } from "@/lib/api";
 
 const Hero = () => {
   const { config, loading } = useConfig();
@@ -96,7 +97,7 @@ const Hero = () => {
           >
             <div className="relative rounded-3xl overflow-hidden glow-border shadow-2xl shadow-accent/20">
               <img 
-                src={hero.imagePath && hero.imagePath !== '' ? (hero.imagePath.startsWith('http') ? hero.imagePath : `http://localhost:5001${hero.imagePath}`) : heroImg} 
+                src={hero.imagePath && hero.imagePath !== '' ? (hero.imagePath.startsWith('http') ? hero.imagePath : `${API_URL}${hero.imagePath}`) : heroImg} 
                 alt={hero.title} 
                 className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700" 
               />

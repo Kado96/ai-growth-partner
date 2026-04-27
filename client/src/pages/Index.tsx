@@ -6,7 +6,6 @@ import About from "@/components/About";
 import VideoGallery from "@/components/VideoGallery";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import ChatBot from "@/components/ChatBot";
 import QuoteWizard from "@/components/QuoteWizard";
 import { useQuote } from "@/hooks/use-quote";
 
@@ -23,8 +22,6 @@ const Index = () => {
       <VideoGallery />
       <Contact />
       <Footer />
-      <ChatBot />
-      <QuoteWizard isOpen={isOpen} onClose={closeQuote} />
     </div>
   );
 };

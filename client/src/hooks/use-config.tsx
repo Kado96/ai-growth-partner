@@ -38,8 +38,9 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
 export const useConfig = () => {
   const context = useContext(ConfigContext);
+  // Au lieu de planter, on renvoie un état de chargement par défaut si le contexte est absent
   if (context === undefined) {
-    throw new Error('useConfig must be used within a ConfigProvider');
+    return { config: null, loading: true, refresh: async () => {} };
   }
   return context;
 };
