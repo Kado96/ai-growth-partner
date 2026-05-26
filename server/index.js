@@ -12,6 +12,8 @@ require('dotenv').config({ path: path.join(__dirname, envFile) });
 
 console.log(`[INIT] Environment: ${NODE_ENV} (Loaded ${envFile})`);
 
+const app = express();
+
 // -- Security Headers --
 app.use((req, res, next) => {
     if (NODE_ENV === 'production') {
@@ -35,7 +37,7 @@ sequelize.sync({ alter: false }).then(() => {
     console.error("[CRITICAL] Erreur de synchronisation DB:", err);
 });
 
-const app = express();
+
 const PORT = process.env.PORT || 5001;
 
 // Configuration CORS pour autoriser Netlify + Dev local
