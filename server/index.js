@@ -12,6 +12,16 @@ require('dotenv').config({ path: path.join(__dirname, envFile) });
 
 console.log(`[INIT] Environment: ${NODE_ENV} (Loaded ${envFile})`);
 
+// -- Security Headers --
+app.use((req, res, next) => {
+    if (NODE_ENV === 'production') {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'ALLOWALL'); // Autorise les frames pour éviter l'erreur de l'utilisateur
+    next();
+});
+
 // -- Database & Media config --
 const sequelize = require('./config/database');
 const mediaRoutes = require('./routes/mediaRoutes');
