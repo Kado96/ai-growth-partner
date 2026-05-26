@@ -37,14 +37,12 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.log(`[CORS] Origine bloquée: ${origin}`);
-            callback(null, true); // Permissif pour le moment
-        }
-    },
+    origin: [
+        'http://koraagency.wuaze.com',
+        'https://ai-growth-partner.onrender.com',
+        'http://localhost:5173',
+        'http://localhost:3000'
+    ],
     credentials: true
 }));
 app.use(express.json());
