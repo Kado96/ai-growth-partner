@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useQuote } from "@/hooks/use-quote";
+import { useConfig } from "@/hooks/use-config";
+import { API_URL } from "@/lib/api";
 
 const Header = () => {
+  const { config } = useConfig();
   const { openQuote } = useQuote();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -11,8 +14,18 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-2xl border-b border-border/50">
       <div className="container-narrow section-padding !py-0">
         <div className="flex items-center justify-between h-16 sm:h-20">
-          <a href="/" className="font-display font-extrabold text-xl sm:text-2xl text-foreground">
-            Kora<span className="gradient-text">Agency</span>
+          <a href="/" className="flex items-center gap-2 group">
+            {config?.branding?.logoPath ? (
+              <img
+                src={config.branding.logoPath.startsWith('http') ? config.branding.logoPath : `${API_URL}${config.branding.logoPath}`}
+                alt={config?.branding?.name || "Logo"}
+                className="h-8 sm:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <span className="font-display font-extrabold text-xl sm:text-2xl text-foreground">
+                Kora<span className="gradient-text">Agency</span>
+              </span>
+            )}
           </a>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -28,7 +41,7 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="cta" size="sm" onClick={openQuote}>Demander un Devis</Button>
+            <Button variant="cta" size="sm" onClick={() => openQuote()}>Demander un Devis</Button>
           </div>
 
           <button className="md:hidden text-foreground" onClick={() => setIsOpen(!isOpen)}>

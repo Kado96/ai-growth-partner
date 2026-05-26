@@ -1,16 +1,29 @@
 import { useQuote } from "@/hooks/use-quote";
+import { useConfig } from "@/hooks/use-config";
+import { API_URL } from "@/lib/api";
 
 const Footer = () => {
   const { openQuote } = useQuote();
-  
+  const { config } = useConfig();
+
   return (
     <footer className="bg-card border-t border-border/50">
       <div className="container-narrow section-padding !py-12">
         <div className="grid sm:grid-cols-3 gap-8">
           <div>
-            <h3 className="font-display font-extrabold text-xl mb-3 text-foreground">
-              Kora<span className="gradient-text">Agency</span>
-            </h3>
+            <div className="mb-3">
+              {config?.branding?.logoPath ? (
+                <img
+                  src={config.branding.logoPath.startsWith('http') ? config.branding.logoPath : `${API_URL}${config.branding.logoPath}`}
+                  alt={config?.branding?.name || "Logo"}
+                  className="h-10 w-auto object-contain"
+                />
+              ) : (
+                <h3 className="font-display font-extrabold text-xl text-foreground">
+                  Kora<span className="gradient-text">Agency</span>
+                </h3>
+              )}
+            </div>
             <p className="font-body text-sm text-muted-foreground">
               Marketing Automation & IA
             </p>
@@ -18,7 +31,7 @@ const Footer = () => {
           <div>
             <h4 className="font-display font-semibold text-sm uppercase tracking-wider mb-3 text-muted-foreground">Contact</h4>
             <ul className="space-y-2 font-body text-sm text-muted-foreground">
-              <li><a href="mailto:koraagency05@gmail.com" className="hover:text-accent transition-colors">koraagency05@gmail.com</a></li>
+              <li><a href="mailto:contact@kora-agency.com" className="hover:text-accent transition-colors">contact@kora-agency.com</a></li>
               <li><a href="tel:+25769725535" className="hover:text-accent transition-colors">+257 69 725 535</a></li>
               <li>Bujumbura, Burundi</li>
             </ul>
@@ -28,7 +41,7 @@ const Footer = () => {
             <ul className="space-y-2 font-body text-sm text-muted-foreground">
               <li><a href="/" className="hover:text-accent transition-colors">Accueil</a></li>
               <li><a href="/#services" className="hover:text-accent transition-colors">Nos Services</a></li>
-              <li><button onClick={openQuote} className="hover:text-accent transition-colors text-left">Obtenir un Devis</button></li>
+              <li><button onClick={() => openQuote()} className="hover:text-accent transition-colors text-left">Obtenir un Devis</button></li>
               <li><a href="/#about" className="hover:text-accent transition-colors">À Propos</a></li>
               <li><a href="/#contact" className="hover:text-accent transition-colors">Contact</a></li>
             </ul>

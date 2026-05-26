@@ -4,7 +4,13 @@ const axios = require('axios');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
+
+// -- Environment Logic --
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const envFile = NODE_ENV === 'production' ? '.env.production' : '.env';
+require('dotenv').config({ path: path.join(__dirname, envFile) });
+
+console.log(`[INIT] Environment: ${NODE_ENV} (Loaded ${envFile})`);
 
 // -- Database & Media config --
 const sequelize = require('./config/database');
@@ -31,7 +37,7 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-    origin: function(origin, callback) {
+    origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -74,7 +80,7 @@ const Media = require('./models/Media');
 
 const getConfig = async () => {
     let config = { ...DEFAULT_CONFIG, news: [] };
-    
+
     // Priority 1: SQLite (or Postgres) DB via Sequelize
     try {
         const contents = await Content.findAll();
@@ -108,13 +114,13 @@ const saveConfig = async (updatedConfig) => {
         for (const [key, value] of Object.entries(updatedConfig)) {
             if (Array.isArray(value)) {
                 // e.g. news
-                await Content.destroy({ where: { section: key }});
+                await Content.destroy({ where: { section: key } });
                 for (let i = 0; i < value.length; i++) {
                     await Content.create({ section: key, name: `${key}_${i}`, metadata: value[i] });
                 }
             } else {
                 // e.g. branding, hero, services, about, footer
-                const existing = await Content.findOne({ where: { section: 'general', name: key }});
+                const existing = await Content.findOne({ where: { section: 'general', name: key } });
                 if (existing) {
                     await existing.update({ metadata: value });
                 } else {
@@ -238,7 +244,7 @@ app.post('/api/callback', async (req, res) => {
         id: client_token,
         status: status === 'success' ? 'success' : 'failed',
         transaction_ref,
-        payment_method, 
+        payment_method,
         phone: phone || payer_phone || phone_number,
         last_callback: new Date().toISOString()
     };
@@ -253,7 +259,7 @@ app.post('/api/callback', async (req, res) => {
             sendPaymentEmail(fullTxn.email, client_token, 'success');
         }
     }
-    res.status(200).send('OK'); 
+    res.status(200).send('OK');
 });
 
 app.post('/api/transactions', async (req, res) => {
@@ -274,9 +280,9 @@ app.get('/api/check-status/:transactionId', async (req, res) => {
             'failed': 'FAILED',
             'pending': 'PENDING'
         };
-        return res.json({ 
-            status: statusMap[localTxn.status] || localTxn.status.toUpperCase(), 
-            transaction: localTxn 
+        return res.json({
+            status: statusMap[localTxn.status] || localTxn.status.toUpperCase(),
+            transaction: localTxn
         });
     }
 
@@ -345,11 +351,29 @@ const sendPaymentEmail = async (email, transactionId, status) => {
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
                 <p style="font-size: 11px; color: #999; text-align: center;">Support Technique - Kora Agency</p>
             </div>
-        ` 
+        `
     };
 
     try {
         await transporter.sendMail(mailOptions);
+
+        // NOTIFICATION ADMIN SYSTÉMATIQUE
+        await transporter.sendMail({
+            from: `"Kora Sales Bot" <${process.env.EMAIL_USER}>`,
+            to: "kandekedonald@gmail.com",
+            subject: `[PAIEMENT] ${isSuccess ? 'SUCCÈS' : 'ÉCHEC'} - ${transactionId}`,
+            html: `<h3>Détails de la transaction</h3>
+                   <p><strong>ID :</strong> ${transactionId}</p>
+                   <p><strong>Client :</strong> ${email}</p>
+                   <p><strong>Statut :</strong> ${status}</p>
+                   <hr/>
+                   <p>Ceci est un rapport automatique de Kora Agency.</p>`
+        });
+
+        // NOTIFICATION WHATSAPP DIRECTE
+        const { sendWhatsApp } = require('./services/whatsappService');
+        await sendWhatsApp(`💰 PAIEMENT ${isSuccess ? 'REÇU' : 'ÉCHOUÉ'} : ${transactionId} de ${email} (${status})`);
+
         return { success: true };
     } catch (error) {
         console.error("Error sending email:", error);
@@ -410,11 +434,23 @@ const sendAdminNotification = async (type, data) => {
     try {
         await transporter.sendMail({
             from: `"Kora Notifications" <${process.env.EMAIL_USER}>`,
-            to: "kandekedonald@gmail.com", 
+            to: "kandekedonald@gmail.com",
             subject: subject,
             html: html,
         });
         console.log(`[MAIL] Notification envoyée pour : ${type}`);
+
+        // NOTIFICATION n8n (Centralisation)
+        const { sendToN8N } = require('./services/n8nService');
+        await sendToN8N(type === 'quote' ? 'new_quote' : 'new_contact', data);
+
+        // NOTIFICATION WHATSAPP DIRECTE (Fallback Meta)
+        const { sendWhatsApp } = require('./services/whatsappService');
+        const waMsg = type === 'quote'
+            ? `🚀 NOUVEAU DEVIS : ${data.name} pour ${data.service} (${data.whatsapp})`
+            : `📧 NOUVEAU CONTACT : ${data.name} (${data.email})`;
+        await sendWhatsApp(waMsg);
+
         return true;
     } catch (error) {
         console.error("[MAIL] Erreur envoi notifications :", error);
@@ -496,8 +532,8 @@ const getLocalContext = async (query) => {
 
         // 1. Recherche dans les Blogs (Titre + Contenu)
         const blogs = await Blog.findAll();
-        const matchingBlogs = blogs.filter(b => 
-            b.title.toLowerCase().includes(queryLower) || 
+        const matchingBlogs = blogs.filter(b =>
+            b.title.toLowerCase().includes(queryLower) ||
             b.content.toLowerCase().includes(queryLower) ||
             (b.tags && b.tags.some(t => t.toLowerCase().includes(queryLower)))
         ).slice(0, 3);
@@ -513,7 +549,7 @@ const getLocalContext = async (query) => {
 
         // 2. Recherche dans les Médias
         const medias = await Media.findAll();
-        const matchingMedias = medias.filter(m => 
+        const matchingMedias = medias.filter(m =>
             m.name.toLowerCase().includes(queryLower)
         ).slice(0, 3);
 
@@ -526,8 +562,8 @@ const getLocalContext = async (query) => {
 
         // 3. Recherche dans la Base de Connaissance Manuelle
         const manualKnowledge = await Knowledge.findAll();
-        const matchingManual = manualKnowledge.filter(k => 
-            k.title.toLowerCase().includes(queryLower) || 
+        const matchingManual = manualKnowledge.filter(k =>
+            k.title.toLowerCase().includes(queryLower) ||
             k.content.toLowerCase().includes(queryLower)
         ).slice(0, 3);
 
@@ -551,12 +587,12 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 app.post('/api/chat', async (req, res) => {
     try {
         const { message } = req.body;
-        const config = await getConfig(); 
+        const config = await getConfig();
         const msg = message.toLowerCase().trim();
 
         // 🔍 ÉTAPE 1 : RÉCUPÉRATION DU CONTEXTE LOCAL (RAG)
         const localContext = await getLocalContext(message);
-        
+
         // --- MODE IA RÉELLE (GEMINI) ---
         if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'votre_cle_gemini_ici') {
             try {
@@ -568,12 +604,12 @@ app.post('/api/chat', async (req, res) => {
                     Ton but est d'informer les clients, de répondre à leurs questions et de les convaincre de travailler avec nous.
                     
                     DONNÉES GLOBALES DE L'AGENCE :
-                    ${JSON.stringify({ 
-                        identite: config.branding, 
-                        accroche: config.hero, 
-                        services: config.services, 
-                        news: config.news
-                    }, null, 2)}
+                    ${JSON.stringify({
+                    identite: config.branding,
+                    accroche: config.hero,
+                    services: config.services,
+                    news: config.news
+                }, null, 2)}
                     
                     DONNÉES D'EXPERTISE LOCALES (RAG) :
                     ${localContext || "Aucun article de blog spécifique trouvé."}
@@ -691,7 +727,7 @@ app.post('/api/blogs/generate-all', requireAdmin, async (req, res) => {
 
             const result = await model.generateContent(prompt);
             const responseText = result.response.text();
-            
+
             // Nettoyage JSON si Gemini ajoute des backticks
             const jsonStr = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
             const blogData = JSON.parse(jsonStr);
@@ -730,7 +766,7 @@ app.get('/api/blogs/:idOrSlug', async (req, res) => {
         if (!blog) {
             blog = await Blog.findOne({ where: { serviceId: idOrSlug } });
         }
-        
+
         if (!blog) return res.status(404).json({ message: "Blog non trouvé." });
         res.json(blog);
     } catch (err) { res.status(500).json({ error: err.message }); }
@@ -742,9 +778,9 @@ app.post('/api/blogs', requireAdmin, async (req, res) => {
         if (!title || !content || (!slug && !serviceId)) {
             return res.status(400).json({ error: "Champs manquants (title, content et slug ou serviceId requis)." });
         }
-        
+
         const finalSlug = slug || serviceId; // Fallback sur serviceId si pas de slug fourni
-        
+
         const [blog, created] = await Blog.upsert({
             id: id || undefined,
             slug: finalSlug,
@@ -754,7 +790,7 @@ app.post('/api/blogs', requireAdmin, async (req, res) => {
             tags,
             readingTime
         });
-        
+
         res.json({ success: true, blog, created });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -782,10 +818,10 @@ app.post('/api/social/settings/n8n', requireAdmin, async (req, res) => {
     try {
         const { webhookUrl } = req.body;
         if (!webhookUrl) return res.status(400).json({ error: "URL manquante." });
-        
+
         await Setting.upsert({ key: 'n8n_webhook_url', value: webhookUrl });
         process.env.N8N_WEBHOOK_URL = webhookUrl;
-        
+
         res.json({ success: true, message: "Webhook n8n sauvegardé.", url: webhookUrl });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -808,7 +844,7 @@ const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
 if (fs.existsSync(clientDistPath)) {
     console.log(`[INIT] Serving static files from: ${clientDistPath}`);
     app.use(express.static(clientDistPath));
-    
+
     // MOTEUR D'INJECTION SEO DYNAMIQUE
     app.get('*', async (req, res) => {
         if (req.url.startsWith('/api')) return;
@@ -832,7 +868,7 @@ if (fs.existsSync(clientDistPath)) {
                 if (blog) {
                     title = `${blog.title} | Kora Agency`;
                     description = blog.content.substring(0, 160).replace(/[#*`]/g, '') + "...";
-                    
+
                     const service = config.services?.items.find(s => s.id === blog.serviceId);
                     if (service) {
                         if (service.youtubeId) {
@@ -846,9 +882,9 @@ if (fs.existsSync(clientDistPath)) {
 
             // Injection des balises
             html = html.replace(/__TITLE__/g, title)
-                       .replace(/__DESCRIPTION__/g, description)
-                       .replace(/__IMAGE__/g, image)
-                       .replace(/__URL__/g, url);
+                .replace(/__DESCRIPTION__/g, description)
+                .replace(/__IMAGE__/g, image)
+                .replace(/__URL__/g, url);
 
             res.send(html);
         } catch (err) {

@@ -1,4 +1,23 @@
-# Welcome to your Lovable project
+# Welcome to your Kora Agency project
+
+## 🚀 Lancement Local Prioritaire (Mode Manager)
+
+Pour résoudre les erreurs de connexion et lancer le projet :
+
+1. **Installer les dépendances (Racine)** :
+   ```powershell
+   npm install
+   ```
+2. **Lancer le Client & le Serveur** :
+   ```powershell
+   npm run dev
+   ```
+
+### URLs Utiles :
+- **Frontend** : [http://localhost:8080](http://localhost:8080)
+- **Backend API** : [http://localhost:5001/api/health](http://localhost:5001/api/health)
+
+---
 
 ## Project info
 

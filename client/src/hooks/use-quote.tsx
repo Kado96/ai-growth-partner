@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface QuoteContextType {
   isOpen: boolean;
+  serviceId?: string;
   openQuote: (serviceId?: string) => void;
   closeQuote: () => void;
 }
@@ -10,17 +11,20 @@ const QuoteContext = createContext<QuoteContextType | undefined>(undefined);
 
 export const QuoteProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [serviceId, setServiceId] = useState<string | undefined>(undefined);
 
-  const openQuote = () => {
+  const openQuote = (id?: string) => {
+    setServiceId(id);
     setIsOpen(true);
   };
 
   const closeQuote = () => {
     setIsOpen(false);
+    setServiceId(undefined);
   };
 
   return (
-    <QuoteContext.Provider value={{ isOpen, openQuote, closeQuote }}>
+    <QuoteContext.Provider value={{ isOpen, serviceId, openQuote, closeQuote }}>
       {children}
     </QuoteContext.Provider>
   );
@@ -33,3 +37,4 @@ export const useQuote = () => {
   }
   return context;
 };
+

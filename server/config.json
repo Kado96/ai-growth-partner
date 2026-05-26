@@ -3,6 +3,7 @@
     "name": "Kora Agency",
     "motto": "Kora Agency au service de votre succès",
     "description": "Expertise en Marketing Digital et Automatisation IA pour propulser votre croissance au Burundi et au-delà.",
+    "logoPath": "/logo.PNG",
     "email": "kandekedonald@gmail.com",
     "phone": "+257 79 92 88 64"
   },
@@ -11,9 +12,18 @@
     "title": "Kora Agency au service de votre succès.",
     "description": "Propulsez votre entreprise avec nos solutions d'automatisation IA et de marketing digital. Spécialistes de la visibilité en ligne et de l'acquisition client pour booster vos revenus.",
     "stats": [
-      { "value": "500K+", "label": "Audience atteinte" },
-      { "value": "98%", "label": "Satisfaction client" },
-      { "value": "24/7", "label": "Support Expert" }
+      {
+        "value": "500K+",
+        "label": "Audience atteinte"
+      },
+      {
+        "value": "98%",
+        "label": "Satisfaction client"
+      },
+      {
+        "value": "24/7",
+        "label": "Support Expert"
+      }
     ]
   },
   "services": {
@@ -29,7 +39,10 @@
         "category": "Marketing",
         "imagePath": "/media/visuels.jpg",
         "price": 300000,
-        "questions": ["Quel est le thème de votre campagne ?", "Voulez-vous des formats spécifiques (Story, Feed) ?"]
+        "questions": [
+          "Quel est le thème de votre campagne ?",
+          "Voulez-vous des formats spécifiques (Story, Feed) ?"
+        ]
       },
       {
         "id": "publications",
@@ -39,7 +52,10 @@
         "category": "Social",
         "imagePath": "/media/social-posts.jpg",
         "price": 500000,
-        "questions": ["Quels réseaux sociaux ciblez-vous ?", "Quelle est la fréquence souhaitée ?"]
+        "questions": [
+          "Quels réseaux sociaux ciblez-vous ?",
+          "Quelle est la fréquence souhaitée ?"
+        ]
       },
       {
         "id": "calendrier",
@@ -49,7 +65,9 @@
         "category": "Social",
         "imagePath": "/media/content-plan.jpg",
         "price": 200000,
-        "questions": ["Quelle est votre ligne éditoriale ?"]
+        "questions": [
+          "Quelle est votre ligne éditoriale ?"
+        ]
       },
       {
         "id": "hashtags",
@@ -59,7 +77,9 @@
         "category": "Social",
         "imagePath": "/media/hashtags.jpg",
         "price": 50000,
-        "questions": ["Qui est votre audience cible ?"]
+        "questions": [
+          "Qui est votre audience cible ?"
+        ]
       },
       {
         "id": "whatsapp",
@@ -69,7 +89,9 @@
         "category": "IA & Automation",
         "imagePath": "/media/whatsapp-bot.jpg",
         "price": 200000,
-        "questions": ["Quelles sont les questions les plus fréquentes de vos clients ?"]
+        "questions": [
+          "Quelles sont les questions les plus fréquentes de vos clients ?"
+        ]
       },
       {
         "id": "google",
@@ -79,7 +101,9 @@
         "category": "Référencement & Local",
         "imagePath": "/media/google-maps.jpg",
         "price": 100000,
-        "questions": ["Votre établissement est-il déjà référencé sur Maps ?"]
+        "questions": [
+          "Votre établissement est-il déjà référencé sur Maps ?"
+        ]
       },
       {
         "id": "airbnb",
@@ -89,7 +113,10 @@
         "category": "Référencement & Local",
         "imagePath": "/media/airbnb-expert.jpg",
         "price": 150000,
-        "questions": ["Combien de chambres proposez-vous ?", "Quels sont les atouts majeurs (Wifi, Piscine, Vue) ?"]
+        "questions": [
+          "Combien de chambres proposez-vous ?",
+          "Quels sont les atouts majeurs (Wifi, Piscine, Vue) ?"
+        ]
       },
       {
         "id": "tiktok",
@@ -99,7 +126,9 @@
         "category": "Marketing",
         "imagePath": "/media/tiktok-viral.jpg",
         "price": 200000,
-        "questions": ["Quel type d'humour ou de ton préférez-vous ?"]
+        "questions": [
+          "Quel type d'humour ou de ton préférez-vous ?"
+        ]
       },
       {
         "id": "bundle",
@@ -109,7 +138,10 @@
         "category": "Bundle",
         "imagePath": "/media/agency-pack.jpg",
         "price": 2000000,
-        "questions": ["Décrivez votre activité en 3 phrases.", "Avez-vous déjà un nom de domaine ?"]
+        "questions": [
+          "Décrivez votre activité en 3 phrases.",
+          "Avez-vous déjà un nom de domaine ?"
+        ]
       },
       {
         "id": "ia_assistant",
@@ -119,7 +151,9 @@
         "category": "IA & Automation",
         "imagePath": "/media/ai-assistant.jpg",
         "price": 300000,
-        "questions": ["Préférez-vous l'IA créative ou informative ?"]
+        "questions": [
+          "Préférez-vous l'IA créative ou informative ?"
+        ]
       },
       {
         "id": "maintenance",
@@ -129,7 +163,9 @@
         "category": "Service",
         "imagePath": "/media/tech-support.jpg",
         "price": 150000,
-        "questions": ["Avez-vous déjà un site en ligne ?"]
+        "questions": [
+          "Avez-vous déjà un site en ligne ?"
+        ]
       },
       {
         "id": "affiche",
@@ -139,7 +175,9 @@
         "category": "Marketing",
         "imagePath": "/media/ads-poster.jpg",
         "price": 150000,
-        "questions": ["Quel est l'objectif principal de l'affiche (Vente, Notoriété) ?"]
+        "questions": [
+          "Quel est l'objectif principal de l'affiche (Vente, Notoriété) ?"
+        ]
       }
     ]
   },
@@ -154,19 +192,43 @@
     "motto": "Convertir les clics en croissance.",
     "text": "Kora Agency est une agence de marketing digital nouvelle génération qui utilise l'intelligence artificielle pour automatiser la réussite de nos clients. Nous croyons que chaque interaction digitale est une opportunité de croissance infinie.",
     "methodology": [
-      { "title": "Audit & Analyse", "desc": "Nous étudions votre marché et vos concurrents." },
-      { "title": "Stratégie IA", "desc": "Mise en place de solutions automatisées." },
-      { "title": "Exécution Créative", "desc": "Production de contenus impactants." },
-      { "title": "Suivi & Rapports", "desc": "Analyse rigoureuse de vos performances." }
+      {
+        "title": "Audit & Analyse",
+        "desc": "Nous étudions votre marché et vos concurrents."
+      },
+      {
+        "title": "Stratégie IA",
+        "desc": "Mise en place de solutions automatisées."
+      },
+      {
+        "title": "Exécution Créative",
+        "desc": "Production de contenus impactants."
+      },
+      {
+        "title": "Suivi & Rapports",
+        "desc": "Analyse rigoureuse de vos performances."
+      }
     ]
   },
   "footer": {
     "text": "© 2026 Kora Agency. Votre succès est notre mission.",
     "links": [
-      { "label": "Accueil", "href": "#" },
-      { "label": "Services", "href": "#services" },
-      { "label": "Devis", "href": "#devis" },
-      { "label": "Contact", "href": "#contact" }
+      {
+        "label": "Accueil",
+        "href": "#"
+      },
+      {
+        "label": "Services",
+        "href": "#services"
+      },
+      {
+        "label": "Devis",
+        "href": "#devis"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact"
+      }
     ]
   }
 }

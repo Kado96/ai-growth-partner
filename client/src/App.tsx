@@ -16,8 +16,8 @@ import QuoteWizard from "@/components/QuoteWizard";
 import ChatBot from "@/components/ChatBot";
 
 const GlobalQuoteWizard = () => {
-  const { isOpen, closeQuote } = useQuote();
-  return <QuoteWizard isOpen={isOpen} onClose={closeQuote} />;
+  const { isOpen, serviceId, closeQuote } = useQuote();
+  return <QuoteWizard isOpen={isOpen} onClose={closeQuote} initialServiceId={serviceId} />;
 };
 
 const queryClient = new QueryClient();

@@ -29,6 +29,12 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     loadConfig();
   }, []);
 
+  useEffect(() => {
+    if (config?.branding?.name) {
+      document.title = `${config.branding.name} | ${config.branding.motto || 'AI Growth Partner'}`;
+    }
+  }, [config]);
+
   return (
     <ConfigContext.Provider value={{ config, loading, refresh: loadConfig }}>
       {children}
@@ -40,7 +46,7 @@ export const useConfig = () => {
   const context = useContext(ConfigContext);
   // Au lieu de planter, on renvoie un état de chargement par défaut si le contexte est absent
   if (context === undefined) {
-    return { config: null, loading: true, refresh: async () => {} };
+    return { config: null, loading: true, refresh: async () => { } };
   }
   return context;
 };

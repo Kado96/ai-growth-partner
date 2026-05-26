@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  X, FileText, Mail, Bot, Send, 
-  Sparkles, MessageSquare, Briefcase, Zap, 
+import {
+  X, FileText, Mail, Bot, Send,
+  Sparkles, MessageSquare, Briefcase, Zap,
   Terminal, ShieldCheck, HeartPulse
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,9 +54,9 @@ const ChatBot = () => {
       setMessages(prev => [...prev, { from: "alexa", text: data.response }]);
     } catch (err) {
       console.error("[ALEXA_ERROR] Échec de la connexion Kora-Brain :", err);
-      setMessages(prev => [...prev, { 
-        from: "alexa", 
-        text: "Désolée, j'ai une petite perte de connexion. Veuillez rafraîchir la page (F5) ou réessayez dans un instant. Sinon, contactez mon responsable au +25779928864." 
+      setMessages(prev => [...prev, {
+        from: "alexa",
+        text: "Désolée, j'ai une petite perte de connexion. Veuillez rafraîchir la page (F5) ou réessayez dans un instant. Sinon, contactez mon responsable au +25779928864."
       }]);
     } finally {
       setIsTyping(false);
@@ -102,7 +102,7 @@ const ChatBot = () => {
         {isOpen && (
           <div className="fixed inset-0 z-[60] flex justify-end">
             {/* Backdrop */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -132,7 +132,7 @@ const ChatBot = () => {
                     <p className="text-[10px] text-accent font-black uppercase tracking-widest">IA Strategic Partner</p>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={handleClose}
                   className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"
                 >
@@ -141,33 +141,32 @@ const ChatBot = () => {
               </div>
 
               {/* Chat Area */}
-              <div 
+              <div
                 ref={scrollRef}
                 className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"
               >
                 {messages.map((msg, i) => (
-                  <motion.div 
+                  <motion.div
                     key={i}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={`flex ${msg.from === "alexa" ? "justify-start" : "justify-end"}`}
                   >
-                    <div className={`max-w-[85%] p-4 rounded-3xl text-sm leading-relaxed shadow-sm ${
-                      msg.from === "alexa"
+                    <div className={`max-w-[85%] p-4 rounded-3xl text-sm leading-relaxed shadow-sm ${msg.from === "alexa"
                         ? "bg-white/5 text-slate-200 rounded-bl-sm border border-white/5"
                         : "bg-accent text-white rounded-br-sm shadow-lg shadow-accent/10"
-                    }`}>
+                      }`}>
                       <MessageContent content={msg.text} from={msg.from} />
                     </div>
                   </motion.div>
                 ))}
-                
+
                 {isTyping && (
                   <div className="flex justify-start">
                     <div className="bg-white/5 border border-white/5 rounded-3xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
-                       <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                       <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
-                       <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "400ms" }} />
+                      <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
+                      <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "400ms" }} />
                     </div>
                   </div>
                 )}
@@ -186,15 +185,18 @@ const ChatBot = () => {
               {/* Input Footer */}
               <div className="p-6 mt-auto border-t border-white/5 bg-slate-900/30">
                 <form onSubmit={handleSend} className="relative">
-                  <Input 
+                  <label htmlFor="chatbot-input" className="sr-only">Message pour Alexa</label>
+                  <Input
+                    id="chatbot-input"
+                    name="chatbot-input"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder="Écrivez à Alexa ici..."
                     className="h-14 bg-white/5 border-white/10 rounded-2xl pr-14 text-white placeholder:text-slate-600 focus:border-accent/40 transition-all"
                   />
-                  <button 
+                  <button
                     type="submit"
-                    disabled={!inputValue.trim()}
+                    aria-label="Envoyer"
                     className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-accent text-white flex items-center justify-center disabled:opacity-50 disabled:grayscale transition-all hover:scale-105 active:scale-95"
                   >
                     <Send size={18} />
@@ -240,15 +242,15 @@ const MessageContent = ({ content, from }: { content: string; from: string }) =>
       </ReactMarkdown>
 
       {images.map((path, idx) => (
-        <motion.div 
+        <motion.div
           key={idx}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900 aspect-video"
         >
-          <img 
-            src={getMediaUrl(path)} 
-            alt="Suggestion Alexa" 
+          <img
+            src={getMediaUrl(path)}
+            alt="Suggestion Alexa"
             className="w-full h-full object-cover"
           />
         </motion.div>

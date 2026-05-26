@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Dialog, DialogContent, DialogHeader, DialogTitle, 
-  DialogDescription, DialogFooter 
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+  DialogDescription, DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,15 +10,15 @@ import { Label } from "@/components/ui/label";
 import { useConfig } from "@/hooks/use-config";
 import { submitQuote } from "@/lib/api";
 import { toast } from "sonner";
-import { 
-  Check, ArrowRight, ArrowLeft, Send, Sparkles, 
-  Palette, MessageSquare, Calendar, Hash, Smartphone, 
+import {
+  Check, ArrowRight, ArrowLeft, Send, Sparkles,
+  Palette, MessageSquare, Calendar, Hash, Smartphone,
   MapPin, Home, Video, Rocket, Zap, Settings, FileText,
   CreditCard, Briefcase, ZapIcon
 } from "lucide-react";
 
 const IconMap: Record<string, any> = {
-  Palette, MessageSquare, Calendar, Hash, Smartphone, 
+  Palette, MessageSquare, Calendar, Hash, Smartphone,
   MapPin, Home, Video, Rocket, Zap, Settings, FileText,
   Briefcase, ZapIcon
 };
@@ -26,9 +26,10 @@ const IconMap: Record<string, any> = {
 interface QuoteWizardProps {
   isOpen: boolean;
   onClose: () => void;
+  initialServiceId?: string;
 }
 
-const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
+const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) => {
   const { config } = useConfig();
   const [step, setStep] = useState(1);
   const [selectedService, setSelectedService] = useState<any>(null);
@@ -37,9 +38,22 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Reset when closed
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      if (initialServiceId) {
+        const found = config?.services?.items?.find((s: any) => s.id === initialServiceId);
+        if (found) {
+          setSelectedService(found);
+          setStep(2); // Allez directement à l'étape 2 (formulaire de questions)
+        } else {
+          setSelectedService(null);
+          setStep(1);
+        }
+      } else {
+        setSelectedService(null);
+        setStep(1);
+      }
+    } else {
       const timer = setTimeout(() => {
         setStep(1);
         setSelectedService(null);
@@ -49,7 +63,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
       }, 400);
       return () => clearTimeout(timer);
     }
-  }, [isOpen]);
+  }, [isOpen, initialServiceId, config]);
 
   const handleServiceSelect = (service: any) => {
     setSelectedService(service);
@@ -68,7 +82,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
     setIsSubmitting(true);
     try {
       const quoteDetails = Object.entries(answers).map(([q, a]) => `• ${q} : ${a}`).join('\n');
-      
+
       const quoteData = {
         service: selectedService.title,
         name: contact.name,
@@ -89,10 +103,10 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
         `*DÉTAILS DU PROJET :*\n${quoteDetails}\n\n` +
         `✅ Merci de confirmer la réception de ma demande.`
       );
-      
+
       // On redirige vers votre numéro pour que le client vous envoie les infos directement
       const waLink = `https://wa.me/25779928864?text=${waText}`;
-      
+
       setIsSuccess(true);
 
       // 3. Redirection automatique après 1.5s (laisse le temps de voir l'animation de succès)
@@ -118,7 +132,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden border-white/10 bg-slate-950/95 backdrop-blur-xl shadow-2xl">
+      <DialogContent aria-describedby={undefined} className="sm:max-w-[700px] p-0 overflow-hidden border-white/10 bg-slate-950/95 backdrop-blur-xl shadow-2xl">
         <DialogHeader className="sr-only">
           <DialogTitle>Assistant Devis Kora Agency</DialogTitle>
           <DialogDescription>
@@ -127,14 +141,14 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
         </DialogHeader>
         {/* Animated Progress Bar */}
         <div className="absolute top-0 left-0 w-full h-[3px] bg-white/5 z-50">
-          <motion.div 
+          <motion.div
             className="h-full bg-gradient-to-r from-accent via-cta to-accent"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ type: "spring", stiffness: 50, damping: 15 }}
           />
         </div>
-        
+
         <div className="relative p-0 h-full flex flex-col sm:flex-row min-h-[550px]">
           {/* Sidebar - Visual Context */}
           <div className="hidden sm:flex w-1/3 bg-gradient-to-b from-slate-900 to-black p-8 flex-col justify-between border-r border-white/5">
@@ -151,9 +165,8 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
             <div className="space-y-4">
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center gap-3">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${
-                    step >= s ? "bg-accent border-accent text-white" : "border-white/20 text-slate-500"
-                  }`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${step >= s ? "bg-accent border-accent text-white" : "border-white/20 text-slate-500"
+                    }`}>
                     {step > s ? <Check size={12} /> : s}
                   </div>
                   <span className={`text-[11px] font-medium transition-colors ${step >= s ? "text-white" : "text-slate-600"}`}>
@@ -176,7 +189,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                   className="h-full flex flex-col items-center justify-center text-center py-10"
                 >
                   <div className="relative mb-8">
-                    <motion.div 
+                    <motion.div
                       className="absolute inset-0 bg-accent/20 blur-3xl rounded-full"
                       animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
                       transition={{ duration: 3, repeat: Infinity }}
@@ -187,7 +200,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                   </div>
                   <h2 className="text-3xl font-display font-bold text-white mb-4">Parfait, {contact.name.split(' ')[0]} !</h2>
                   <p className="text-slate-400 mb-10 max-w-sm mx-auto leading-relaxed">
-                    Votre demande de devis pour <span className="text-accent font-semibold">{selectedService?.title}</span> a été transmise à nos experts. 
+                    Votre demande de devis pour <span className="text-accent font-semibold">{selectedService?.title}</span> a été transmise à nos experts.
                     Nous vous recontacterons sur WhatsApp très prochainement.
                   </p>
                   <Button variant="hero" onClick={onClose} className="w-full sm:w-auto px-12 group">
@@ -253,10 +266,10 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                         {selectedService.questions.map((q: string, i: number) => (
                           <div key={i} className="space-y-3">
                             <Label htmlFor={`q-${i}`} className="text-slate-300 font-medium text-sm">{q}</Label>
-                            <Input 
+                            <Input
                               id={`q-${i}`}
                               name={`question-${i}`}
-                              className="h-12 bg-white/5 border-white/10 text-white focus:border-accent/50 focus:ring-accent/20 transition-all rounded-xl placeholder:text-slate-600" 
+                              className="h-12 bg-white/5 border-white/10 text-white focus:border-accent/50 focus:ring-accent/20 transition-all rounded-xl placeholder:text-slate-600"
                               placeholder="Votre réponse précise..."
                               value={answers[q] || ""}
                               onChange={(e) => handleAnswerChange(q, e.target.value)}
@@ -267,7 +280,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
 
                       <div className="flex gap-3 mt-10 pt-4 border-t border-white/5">
                         <Button variant="outline" className="flex-1 h-12 border-white/10 text-white rounded-xl hover:bg-white/5" onClick={() => setStep(1)}>
-                           Retour
+                          Retour
                         </Button>
                         <Button variant="hero" className="flex-1 h-12 rounded-xl group" onClick={() => setStep(3)} disabled={Object.keys(answers).length < selectedService.questions.length}>
                           Finaliser <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
@@ -287,11 +300,11 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                         <div className="grid grid-cols-1 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="contact-name" className="text-slate-300 text-xs uppercase tracking-wider font-bold">Nom complet / Entreprise</Label>
-                            <Input 
+                            <Input
                               id="contact-name"
                               name="name"
                               autoComplete="name"
-                              className="h-12 bg-white/5 border-white/10 text-white rounded-xl" 
+                              className="h-12 bg-white/5 border-white/10 text-white rounded-xl"
                               placeholder="Kora Agency / Jean Dupont"
                               value={contact.name}
                               onChange={(e) => handleContactChange("name", e.target.value)}
@@ -301,11 +314,11 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                             <Label htmlFor="contact-whatsapp" className="text-slate-300 text-xs uppercase tracking-wider font-bold">Numéro WhatsApp</Label>
                             <div className="relative">
                               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">+257</span>
-                              <Input 
+                              <Input
                                 id="contact-whatsapp"
                                 name="whatsapp"
                                 autoComplete="tel"
-                                className="h-12 bg-white/5 border-white/10 text-white pl-14 rounded-xl" 
+                                className="h-12 bg-white/5 border-white/10 text-white pl-14 rounded-xl"
                                 placeholder="69 ...."
                                 value={contact.whatsapp}
                                 onChange={(e) => handleContactChange("whatsapp", e.target.value)}
@@ -329,11 +342,11 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
 
                       <div className="flex gap-3 mt-auto">
                         <Button variant="outline" className="flex-1 h-12 border-white/10 text-white rounded-xl" onClick={() => setStep(2)}>
-                           Retour
+                          Retour
                         </Button>
-                        <Button 
-                          variant="cta" 
-                          className="flex-[2] h-12 shadow-lg shadow-accent/20 rounded-xl font-display font-bold group relative overflow-hidden" 
+                        <Button
+                          variant="cta"
+                          className="flex-[2] h-12 shadow-lg shadow-accent/20 rounded-xl font-display font-bold group relative overflow-hidden"
                           onClick={handleSubmit}
                           disabled={!contact.name || !contact.whatsapp || isSubmitting}
                         >
@@ -341,7 +354,7 @@ const QuoteWizard = ({ isOpen, onClose }: QuoteWizardProps) => {
                             {isSubmitting ? "Initialisation..." : "Générer mon Devis"}
                             {!isSubmitting && <Send size={18} className="ml-2 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />}
                           </span>
-                          <motion.div 
+                          <motion.div
                             className="absolute inset-0 bg-white/20"
                             initial={{ x: "-100%" }}
                             whileHover={{ x: "0%" }}

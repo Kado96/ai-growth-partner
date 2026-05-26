@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { 
   Brain, Cog, Lightbulb, Palette, MessageSquare, 
   Calendar, Hash, Smartphone, MapPin, Home, 
-  Video, Rocket, Zap, FileText, ChevronRight 
+  Video, Rocket, Zap, FileText, Settings, ChevronRight 
 } from "lucide-react";
 import { useConfig } from "@/hooks/use-config";
 import { useQuote } from "@/hooks/use-quote";
@@ -12,7 +12,7 @@ import { API_URL } from "@/lib/api";
 const IconMap: Record<string, any> = {
   Brain, Cog, Lightbulb, Palette, MessageSquare, 
   Calendar, Hash, Smartphone, MapPin, Home, 
-  Video, Rocket, Zap, FileText
+  Video, Rocket, Zap, FileText, Settings
 };
 
 const Services = () => {
