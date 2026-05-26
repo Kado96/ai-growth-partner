@@ -38,7 +38,6 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: [
-        'http://koraagency.wuaze.com',
         'https://ai-growth-partner.onrender.com',
         'http://localhost:5173',
         'http://localhost:3000'
