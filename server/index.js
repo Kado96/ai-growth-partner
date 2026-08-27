@@ -18,6 +18,25 @@ const app = express();
 app.use((req, res, next) => {
     if (NODE_ENV === 'production') {
         res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        // No 'unsafe-eval': blocks eval()/new Function()/string timers.
+        // Metricool loads from /metricool-init.js + tracker.metricool.com (no inline script).
+        res.setHeader(
+            'Content-Security-Policy',
+            [
+                "default-src 'self'",
+                "script-src 'self' https://tracker.metricool.com",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                "font-src 'self' https://fonts.gstatic.com data:",
+                "img-src 'self' data: blob: https:",
+                "media-src 'self' blob: https:",
+                "frame-src https://www.youtube.com https://youtube.com",
+                "connect-src 'self' https: wss:",
+                "object-src 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
+                "frame-ancestors *",
+            ].join('; ')
+        );
     }
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'ALLOWALL'); // Autorise les frames pour éviter l'erreur de l'utilisateur
