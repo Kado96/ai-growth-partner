@@ -16,10 +16,19 @@ Pour résoudre les erreurs de connexion et lancer le projet :
 ### URLs Utiles :
 - **Frontend (local)** : [http://localhost:8080](http://localhost:8080)
 - **Backend API (local)** : [http://localhost:5001/api/health](http://localhost:5001/api/health)
-- **Production** : [https://ai-growth-partner.onrender.com](https://ai-growth-partner.onrender.com)
+- **Frontend (Netlify)** : [https://koragency.netlify.app](https://koragency.netlify.app)
+- **Backend (Render)** : [https://ai-growth-partner.onrender.com](https://ai-growth-partner.onrender.com)
 
-> Le site Netlify `koragency.netlify.app` est abandonné (404). Ne plus l’utiliser.
-> En local, laissez `VITE_API_URL` vide dans `client/.env` pour passer par le proxy Vite (`/api` → `:5001`).
+> En local, laissez `VITE_API_URL` vide dans `client/.env` (proxy Vite `/api` → `:5001`).
+> Sur Netlify, `VITE_API_URL` pointe vers Render (voir `netlify.toml`).
+
+### Redeploy Netlify (corriger le 404)
+```powershell
+npx netlify login
+npx netlify link
+npx netlify deploy --prod --build
+```
+Ou dans le dashboard Netlify : Site → Deploys → Trigger deploy (repo GitHub `Kado96/ai-growth-partner`, base `client`, publish `dist`).
 
 ---
 

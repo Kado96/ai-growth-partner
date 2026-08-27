@@ -1,7 +1,7 @@
 const getBaseUrl = () => {
   const envUrl = (import.meta.env.VITE_API_URL || '').trim();
-  // Ne jamais pointer vers l'ancien Netlify (404). En dev: proxy Vite relatif.
-  if (envUrl && !envUrl.includes('netlify.app')) return envUrl;
+  // Dev: proxy Vite. Prod Netlify: VITE_API_URL = Render (netlify.toml).
+  if (envUrl) return envUrl;
   return import.meta.env.DEV ? '' : window.location.origin;
 };
 

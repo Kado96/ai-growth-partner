@@ -59,9 +59,10 @@ sequelize.sync({ alter: false }).then(() => {
 
 const PORT = process.env.PORT || 5001;
 
-// Configuration CORS (Render + Dev local) — Netlify retiré (site 404)
+// Configuration CORS (Render + Netlify + Dev local)
 const allowedOrigins = [
     'https://ai-growth-partner.onrender.com',
+    'https://koragency.netlify.app',
     'http://localhost:8080',
     'http://localhost:8081',
     'http://localhost:5173',

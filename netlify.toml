@@ -1,0 +1,13 @@
+[build]
+  base = "client"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  VITE_API_URL = "https://ai-growth-partner.onrender.com"
+
+# SPA fallback — avoid Netlify 404 on client routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
