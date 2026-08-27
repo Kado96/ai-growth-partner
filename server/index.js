@@ -59,20 +59,21 @@ sequelize.sync({ alter: false }).then(() => {
 
 const PORT = process.env.PORT || 5001;
 
-// Configuration CORS pour autoriser Netlify + Dev local
+// Configuration CORS (Render + Dev local) — Netlify retiré (site 404)
 const allowedOrigins = [
-    'https://koragency.netlify.app',
+    'https://ai-growth-partner.onrender.com',
     'http://localhost:8080',
+    'http://localhost:8081',
     'http://localhost:5173',
+    'http://localhost:3000',
     process.env.FRONTEND_URL
 ].filter(Boolean);
 
 app.use(cors({
-    origin: [
-        'https://ai-growth-partner.onrender.com',
-        'http://localhost:5173',
-        'http://localhost:3000'
-    ],
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(null, false);
+    },
     credentials: true
 }));
 app.use(express.json());
@@ -212,9 +213,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', (req, res) => {
-    res.status(200).send('Proxy Backend Kora Agency : OK');
-});
+// Health: utiliser /api/health (déjà défini plus bas).
+// Ne pas répondre sur `/` ici — ça bloquerait le SPA servi depuis client/dist en prod.
 
 // --- Media Routes & Static Server ---
 app.use('/api/media', mediaRoutes);

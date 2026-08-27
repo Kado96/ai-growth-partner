@@ -29,7 +29,7 @@ const sendToN8N = async (topic, data) => {
             data: {
                 ...data,
                 source: "Kora Agency Core",
-                siteUrl: process.env.FRONTEND_URL || "https://koragency.netlify.app"
+                siteUrl: process.env.FRONTEND_URL || "https://ai-growth-partner.onrender.com"
             }
         };
 

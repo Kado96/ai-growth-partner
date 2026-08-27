@@ -14,8 +14,12 @@ Pour résoudre les erreurs de connexion et lancer le projet :
    ```
 
 ### URLs Utiles :
-- **Frontend** : [http://localhost:8080](http://localhost:8080)
-- **Backend API** : [http://localhost:5001/api/health](http://localhost:5001/api/health)
+- **Frontend (local)** : [http://localhost:8080](http://localhost:8080)
+- **Backend API (local)** : [http://localhost:5001/api/health](http://localhost:5001/api/health)
+- **Production** : [https://ai-growth-partner.onrender.com](https://ai-growth-partner.onrender.com)
+
+> Le site Netlify `koragency.netlify.app` est abandonné (404). Ne plus l’utiliser.
+> En local, laissez `VITE_API_URL` vide dans `client/.env` pour passer par le proxy Vite (`/api` → `:5001`).
 
 ---
 

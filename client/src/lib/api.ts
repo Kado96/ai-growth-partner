@@ -1,6 +1,7 @@
 const getBaseUrl = () => {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  // En dev local, on utilise le proxy relatif pour éviter les problèmes CORS.
+  const envUrl = (import.meta.env.VITE_API_URL || '').trim();
+  // Ne jamais pointer vers l'ancien Netlify (404). En dev: proxy Vite relatif.
+  if (envUrl && !envUrl.includes('netlify.app')) return envUrl;
   return import.meta.env.DEV ? '' : window.location.origin;
 };
 
