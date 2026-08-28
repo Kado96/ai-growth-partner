@@ -568,7 +568,7 @@ const getLocalContext = async (query) => {
         ).slice(0, 3);
 
         if (matchingBlogs.length > 0) {
-            context += "\n--- ARTICLES D'EXPERTISE TROUVÉS ---\n";
+            context += "\nInfos blog utiles :\n";
             matchingBlogs.forEach(b => {
                 context += `Service: ${b.serviceId} | Titre: ${b.title}\n`;
                 context += `Contenu (Extrait): ${b.content.substring(0, 1000)}...\n`;
@@ -583,7 +583,7 @@ const getLocalContext = async (query) => {
         ).slice(0, 3);
 
         if (matchingMedias.length > 0) {
-            context += "\n--- VISUELS RÉELS DISPONIBLES ---\n";
+            context += "\nVisuels disponibles :\n";
             matchingMedias.forEach(m => {
                 context += `Nom: ${m.name} | Path: ${m.path}\n`;
             });
@@ -597,7 +597,7 @@ const getLocalContext = async (query) => {
         ).slice(0, 3);
 
         if (matchingManual.length > 0) {
-            context += "\n--- SAVOIR SPÉCIFIQUE (CERVEAU ALEXA) ---\n";
+            context += "\nNotes internes utiles :\n";
             matchingManual.forEach(k => {
                 context += `Sujet: ${k.title}\n`;
                 context += `Détails: ${k.content}\n\n`;
@@ -629,30 +629,36 @@ app.post('/api/chat', async (req, res) => {
                 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
                 const systemPrompt = `
-                    Tu es Alexa, l'assistante IA experte de l'agence digitale "Kora Agency".
-                    Ton but est d'informer les clients, de répondre à leurs questions et de les convaincre de travailler avec nous.
-                    
-                    DONNÉES GLOBALES DE L'AGENCE :
-                    ${JSON.stringify({
-                    identite: config.branding,
+Tu es Alexa, consultante digitale chez Kora Agency (Burundi et au-delà).
+Tu parles AU CLIENT comme une vraie experte : naturelle, claire, professionnelle et chaleureuse.
+
+CONNAISSANCES INTERNES (ne jamais citer leur origine, ni parler de "base de données", "RAG", "articles trouvés", "savoir spécifique", "système" ou "extraction") :
+${JSON.stringify({
+                    agence: config.branding,
                     accroche: config.hero,
-                    services: config.services,
-                    news: config.news
+                    services: config.services?.items?.map(s => ({
+                        titre: s.title,
+                        description: s.description,
+                        categorie: s.category,
+                        prix: s.price,
+                        id: s.id
+                    })),
+                    actualites: config.news
                 }, null, 2)}
-                    
-                    DONNÉES D'EXPERTISE LOCALES (RAG) :
-                    ${localContext || "Aucun article de blog spécifique trouvé."}
 
-                    DIRECTIVES DE COMPORTEMENT :
-                    1. IDENTITÉ : Tu es Alexa, l'assistante IA de Kora Agency. Tu es amicale, proactive et tu as une personnalité chaleureuse (comme ChatGPT mais experte marketing).
-                    2. BAVARDAGE (SMALL TALK) : Si l'utilisateur te salue, te demande comment tu vas ou qui tu es, RÉPONDS avec enthousiasme et humour avant d'orienter vers le business. Ne sois pas un robot froid.
-                    3. PRIORITÉ LOCALE : Utilise nos Services, Blogs et Savoirs pour donner des conseils concrets.
-                    4. DÉMONSTRATION : Si tu cites un service, propose un lien (/blog/id) ou un visuel ([IMAGE:PATH]).
-                    5. WHATSAPP : Utilise-le uniquement pour la prise de rendez-vous finale.
-                    6. Ton : Professionnel, "bavard" (donne des détails), persuasif. Toujours en français.
-                `;
+${localContext ? `Infos utiles pour cette question (à reformuler en langage client, jamais coller brut) :\n${localContext}` : ''}
 
-                const result = await model.generateContent([systemPrompt, `Question du client : ${message}`]);
+RÈGLES :
+1. Réponds en français, comme une conseillère face au client — jamais de jargon technique interne.
+2. Ne dis JAMAIS que tu "tires" ou "extrais" des infos d'une base, d'un site ou d'un fichier.
+3. Présente les services comme ton expertise d'agence ("Chez Kora Agency, nous proposons…").
+4. Si le client salue : sois accueillante, puis oriente vers son besoin.
+5. Si tu recommandes un service, tu peux suggérer /blog/{id} ou un visuel [IMAGE:chemin] sans expliquer le mécanisme.
+6. WhatsApp uniquement pour finaliser un rendez-vous ou un devis.
+7. Sois concise mais utile : 2–4 phrases + une question de relance.
+`;
+
+                const result = await model.generateContent([systemPrompt, `Message du client : ${message}`]);
                 const response = result.response.text();
                 return res.json({ response });
             } catch (aiErr) {
@@ -666,15 +672,28 @@ app.post('/api/chat', async (req, res) => {
 
         let response = "";
         if (isGreeting) {
-            response = `Bonjour ! Je suis **Alexa**, votre consultante en stratégie digitale chez Kora Agency. Je suis à votre entière disposition pour optimiser votre présence en ligne.\n\nQue souhaitez-vous explorer aujourd'hui ? Nos solutions de Social Media, votre visibilité sur Google, ou nos automatisations ?`;
+            response = `Bonjour ! Je suis **Alexa**, consultante en stratégie digitale chez Kora Agency. Je suis là pour vous aider à renforcer votre présence en ligne et à attirer plus de clients.\n\nQu’aimeriez-vous travailler en priorité : réseaux sociaux, visibilité Google, ou automatisation WhatsApp ?`;
         } else {
-            response = `En tant qu'experte digitale, voici les analyses et recommandations que je peux extraire pour votre demande :\n\n`;
-            if (localContext.includes("--- ARTICLES D'EXPERTISE TROUVÉS ---") || localContext.includes("--- SAVOIR SPÉCIFIQUE ---")) {
-                response += `${localContext}`;
+            const services = config.services?.items || [];
+            // Réponse naturelle : ne jamais exposer le contexte RAG brut ni parler de "base de données"
+            const matched = services.filter(s =>
+                msg.includes((s.title || '').toLowerCase()) ||
+                msg.includes((s.id || '').toLowerCase()) ||
+                (s.category && msg.includes(s.category.toLowerCase())) ||
+                (s.description && s.description.toLowerCase().split(/\s+/).some(w => w.length > 5 && msg.includes(w)))
+            ).slice(0, 3);
+
+            if (matched.length === 1) {
+                const s = matched[0];
+                response = `Chez Kora Agency, **${s.title}** fait partie de nos expertises clés. ${s.description || ''}\n\nSouhaitez-vous que je vous détaille l’approche, le délai, ou un devis adapté à votre activité ?`;
+            } else if (matched.length > 1) {
+                const list = matched.map(s => `• **${s.title}** — ${s.description || 'accompagnement sur mesure'}`).join('\n');
+                response = `Voici ce que je vous recommande selon votre demande :\n\n${list}\n\nLequel souhaitez-vous explorer en premier ?`;
+            } else if (services.length > 0) {
+                const list = services.slice(0, 6).map(s => `• **${s.title}**`).join('\n');
+                response = `Avec plaisir. Chez Kora Agency, nous accompagnons les entreprises sur notamment :\n\n${list}\n\nDites-moi votre objectif (plus de clients, meilleure image, automatisation…) et je vous oriente vers la meilleure option.`;
             } else {
-                const services = config.services?.items || [];
-                const list = services.map(s => s.title).join(", ");
-                response += `Mes bases de données indiquent que nous maîtrisons parfaitement les domaines suivants : **${list}**.\n\nLequel de ces services souhaitez-vous voir dynamiser votre chiffre d'affaires aujourd'hui ?`;
+                response = `Je suis à votre écoute. Expliquez-moi brièvement votre activité et votre objectif (visibilité, ventes, automatisation…), et je vous proposerai la solution Kora Agency la plus adaptée.`;
             }
         }
 
