@@ -12,6 +12,8 @@ require('dotenv').config({ path: path.join(__dirname, envFile) });
 
 console.log(`[INIT] Environment: ${NODE_ENV} (Loaded ${envFile})`);
 
+const ASSISTANT_NAME = 'Kukasoko';
+
 const app = express();
 
 // -- Security Headers --
@@ -518,28 +520,28 @@ app.post('/api/chat-summary', async (req, res) => {
         const { transcript, name } = req.body;
         const html = `
             <div style="font-family: sans-serif; max-width: 600px; border: 1px solid #eee; padding: 20px;">
-                <h2 style="color: #2F2F2F;">Transcription Conversation Alexa</h2>
+                <h2 style="color: #2F2F2F;">Transcription — Assistant ${ASSISTANT_NAME}</h2>
                 <hr/>
                 <p><strong>Session de :</strong> ${name || 'Visiteur Anonyme'}</p>
                 <hr/>
                 <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
                     ${transcript.map(m => `
                         <p style="margin-bottom: 10px;">
-                            <strong style="color: ${m.from === 'alexa' ? '#6366f1' : '#22c55e'};">
-                                ${m.from === 'alexa' ? 'Alexa' : 'Client'} :
+                            <strong style="color: ${m.from === 'assistant' || m.from === 'alexa' ? '#6366f1' : '#22c55e'};">
+                                ${m.from === 'assistant' || m.from === 'alexa' ? ASSISTANT_NAME : 'Client'} :
                             </strong> 
                             ${m.text}
                         </p>
                     `).join('')}
                 </div>
-                <p style="font-size: 12px; color: #666; margin-top: 20px;">Envoyé automatiquement par Alexa — Kora Agency</p>
+                <p style="font-size: 12px; color: #666; margin-top: 20px;">Envoyé automatiquement par ${ASSISTANT_NAME} — Kora Agency</p>
             </div>
         `;
 
         await transporter.sendMail({
-            from: `"Alexa Kora" <${process.env.EMAIL_USER}>`,
+            from: `"${ASSISTANT_NAME} — Kora Agency" <${process.env.EMAIL_USER}>`,
             to: "kandekedonald@gmail.com",
-            subject: `[ALEXA] Nouveau Résumé de Conversation`,
+            subject: `[${ASSISTANT_NAME}] Nouveau résumé de conversation`,
             html: html,
         });
 
@@ -553,7 +555,6 @@ app.get('/api/health', (req, res) => {
     res.json({ status: "OK", serverTime: new Date().toISOString() });
 });
 
-// --- MOTEUR RAG + INTENTION POUR ALEXA ---
 const SERVICE_INTENTS = [
     { ids: ['bundle'], keywords: ['site web', 'site internet', 'vitrine', 'créer un site', 'faire un site', 'website', 'création site'] },
     { ids: ['publications'], keywords: ['réseaux sociaux', 'facebook', 'instagram', 'tiktok', 'publication', 'community manager', 'poster'] },
@@ -663,7 +664,16 @@ const getLocalContext = async (query, config) => {
     }
 };
 
-const buildAlexaPrompt = (config, localContext, matchedServices, history = []) => {
+const findServiceFromHistory = (history, services = []) => {
+    const assistantMsgs = history.filter(m => m.from === 'assistant' || m.from === 'alexa').reverse();
+    for (const msg of assistantMsgs) {
+        const found = services.find(s => s.title && msg.text.includes(s.title));
+        if (found) return found;
+    }
+    return null;
+};
+
+const buildKukasokoPrompt = (config, localContext, matchedServices, history = []) => {
     const servicesCatalog = (config.services?.items || []).map(s => ({
         id: s.id,
         titre: s.title,
@@ -673,33 +683,36 @@ const buildAlexaPrompt = (config, localContext, matchedServices, history = []) =
     }));
 
     const historyText = history.length > 0
-        ? history.map(m => `${m.from === 'user' ? 'Client' : 'Alexa'}: ${m.text}`).join('\n')
+        ? history.map(m => `${m.from === 'user' ? 'Client' : ASSISTANT_NAME}: ${m.text}`).join('\n')
         : '';
 
-    return `Tu es Alexa, assistante commerciale de Kora Agency (marketing digital & IA, Burundi).
-Réponds comme ChatGPT : naturel, conversationnel, utile, en français. Tu connais l'agence par cœur.
+    return `Tu es ${ASSISTANT_NAME}, l'assistant digital de Kora Agency (marketing digital & IA, Burundi).
+
+TON : comme un humain en conversation (WhatsApp / ChatGPT). Phrases naturelles, chaleureuses, professionnelles. Tu PARTICIPES au fil de la discussion — tu reformules, tu relances, tu conseilles.
+
+INTERDIT :
+- Listes à puces (•), catalogues, "Voici ce qui correspond le mieux", ton robotique
+- Dire "base de données", "RAG", "système", "extraction", "selon mes infos"
+- Te présenter comme "Alexa"
+
+OBLIGATOIRE :
+- Répondre en français, en prose fluide (2 à 5 phrases)
+- Une question de relance naturelle à la fin
+- Si le client demande "comment faire", explique les étapes simplement en t'appuyant sur le sujet déjà évoqué dans l'historique
+- Citer un prix seulement si utile ; lien /blog/{id} ou visuel [IMAGE:chemin] si pertinent
+- Si tu ne sais pas : propose ${CONTACT_FALLBACK}
 
 AGENCE :
 ${JSON.stringify({ branding: config.branding, hero: config.hero, actualites: config.news }, null, 2)}
 
-CATALOGUE SERVICES (utilise ces infos pour conseiller — ne liste jamais tout sauf si le client le demande) :
+SERVICES (conseille le plus adapté, sans tout lister) :
 ${JSON.stringify(servicesCatalog, null, 2)}
 
-${localContext ? `CONTEXTE PERTINENT POUR CETTE QUESTION :\n${localContext}` : 'Aucune info très spécifique trouvée pour cette question.'}
+${localContext ? `INFOS UTILES (reformule, ne copie pas) :\n${localContext}` : ''}
 
-${matchedServices.length > 0
-            ? `PRIORITÉ : oriente la réponse vers "${matchedServices[0].title}" si c'est le meilleur fit.`
-            : `Si tu ne trouves pas de service adapté dans le catalogue, dis-le honnêtement et propose : ${CONTACT_FALLBACK}`}
+${matchedServices.length > 0 ? `PRIORITÉ : "${matchedServices[0].title}" si c'est le meilleur choix.` : ''}
 
-${historyText ? `HISTORIQUE RÉCENT :\n${historyText}\n` : ''}
-
-RÈGLES STRICTES :
-- Parle comme une humaine, jamais "base de données", "RAG", "système", "extraction".
-- Réponds DIRECTEMENT à la question (ex: "créer un site" → Pack Agence Site Vitrine + Marketing).
-- 2 à 5 phrases max + une question de relance.
-- Cite prix/détails seulement si pertinents.
-- Lien article : /blog/{id}. Visuel : [IMAGE:chemin].
-- WhatsApp/devis seulement pour conclure ou si info manquante.`;
+${historyText ? `HISTORIQUE :\n${historyText}` : ''}`;
 };
 
 const generateWithGemini = async (systemPrompt, message) => {
@@ -724,25 +737,37 @@ const generateWithGemini = async (systemPrompt, message) => {
     throw lastError || new Error('Aucun modèle Gemini disponible');
 };
 
-const buildOfflineReply = (message, config, matchedServices) => {
+const buildOfflineReply = (message, config, matchedServices, history = []) => {
     const msg = message.toLowerCase().trim();
+    const services = config.services?.items || [];
     const greetings = ['bonjour', 'salut', 'hello', 'coucou', 'qui es-tu', 'ca va', 'ça va'];
+    const isFollowUp = /comment|explique|dis[- ]moi|dites[- ]moi|comment faire|ça marche|la marche|et ensuite|la suite|comment procéder/.test(msg);
+
     if (greetings.some(g => msg.includes(g))) {
-        return `Bonjour ! Je suis **Alexa**, votre assistante chez Kora Agency. Je peux vous conseiller sur nos services : site web, réseaux sociaux, WhatsApp, Google, et plus.\n\nQuel est votre objectif aujourd'hui ?`;
+        return `Bonjour ! Moi c'est **${ASSISTANT_NAME}**, votre assistant chez Kora Agency. Racontez-moi un peu ce que vous voulez accomplir en ligne — site web, réseaux sociaux, visibilité Google — et on voit ensemble la meilleure option pour vous.`;
+    }
+
+    if (isFollowUp && history.length > 0) {
+        const topic = findServiceFromHistory(history, services) || matchedServices[0];
+        if (topic) {
+            const price = topic.price ? ` On démarre à partir de **${topic.price.toLocaleString('fr-FR')} FBU**.` : '';
+            return `Avec plaisir ! Pour **${topic.title}**, on commence par comprendre votre activité et vos objectifs. Ensuite, ${topic.description?.toLowerCase() || 'on met en place une solution sur mesure'}.${price} Si ça vous va, je peux vous orienter vers un devis ou un échange rapide sur WhatsApp — qu'est-ce qui vous arrange ?`;
+        }
     }
 
     if (matchedServices.length === 1) {
         const s = matchedServices[0];
-        const price = s.price ? ` (à partir de **${s.price.toLocaleString('fr-FR')} FBU**)` : '';
-        return `Parfait ! Pour votre demande, je vous recommande **${s.title}**${price}.\n\n${s.description || ''}\n\nSouhaitez-vous un devis ou plus de détails sur la mise en place ?`;
+        const price = s.price ? ` Le tarif commence à **${s.price.toLocaleString('fr-FR')} FBU**.` : '';
+        return `Pour ce que vous décrivez, je pense que **${s.title}** serait le plus adapté : ${s.description || 'un accompagnement pensé pour votre croissance.'}${price} Vous voulez qu'on en parle plus en détail ?`;
     }
 
-    if (matchedServices.length > 1) {
-        const list = matchedServices.slice(0, 3).map(s => `• **${s.title}** — ${s.description || ''}`).join('\n');
-        return `Voici ce qui correspond le mieux à votre besoin :\n\n${list}\n\nLequel vous intéresse le plus ?`;
+    if (matchedServices.length >= 2) {
+        const a = matchedServices[0];
+        const b = matchedServices[1];
+        return `Je vois deux directions possibles : **${a.title}** (${a.description}) ou plutôt **${b.title}**. Dites-moi ce qui compte le plus pour vous en ce moment — visibilité, ventes, automatisation ?`;
     }
 
-    return `Merci pour votre message. Je n'ai pas assez d'éléments pour vous conseiller précisément sur ce point.\n\n${CONTACT_FALLBACK}`;
+    return `Merci pour votre message. Pour vous répondre précisément, j'aurais besoin d'un peu plus de contexte sur votre activité. Sinon, ${CONTACT_FALLBACK}`;
 };
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -755,7 +780,7 @@ app.post('/api/chat', async (req, res) => {
         const config = await getConfig();
         const { context: localContext, matchedServices } = await getLocalContext(message, config);
         const recentHistory = Array.isArray(history) ? history.slice(-8) : [];
-        const systemPrompt = buildAlexaPrompt(config, localContext, matchedServices, recentHistory);
+        const systemPrompt = buildKukasokoPrompt(config, localContext, matchedServices, recentHistory);
 
         const hasGemini = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'votre_cle_gemini_ici';
 
@@ -767,10 +792,10 @@ app.post('/api/chat', async (req, res) => {
                 console.error('[GEMINI_ERROR]', aiErr.message);
             }
         } else {
-            console.warn('[ALEXA] GEMINI_API_KEY absente — mode hors-ligne');
+            console.warn(`[${ASSISTANT_NAME}] GEMINI_API_KEY absente — mode hors-ligne`);
         }
 
-        const response = buildOfflineReply(message, config, matchedServices);
+        const response = buildOfflineReply(message, config, matchedServices, recentHistory);
         res.json({ response, mode: 'offline' });
     } catch (err) {
         console.error('[CHAT_ERROR]', err);

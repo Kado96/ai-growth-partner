@@ -153,7 +153,7 @@ const Admin = () => {
       await axios.post('/api/knowledge', newKnowledge, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success("Savoir ajouté au cerveau d'Alexa !");
+      toast.success("Savoir ajouté au cerveau de Kukasoko !");
       setNewKnowledge({ title: '', content: '' });
       fetchKnowledge();
     } catch (e) { toast.error("Échec de l'ajout."); }
@@ -423,7 +423,7 @@ const Admin = () => {
             { id: 'news', label: 'Notifications Ticker', icon: MessageSquare },
             { id: 'medias', label: 'Médiathèque', icon: ImageIcon },
             { id: 'social', label: 'Automatisations n8n', icon: Zap },
-            { id: 'alexa-brain', label: 'Cerveau Alexa', icon: Brain },
+            { id: 'alexa-brain', label: 'Cerveau Kukasoko', icon: Brain },
             { id: 'expertise', label: 'Expertise (Blogs)', icon: BookOpen },
           ].map((tab) => (
             <button
@@ -1222,8 +1222,8 @@ const Admin = () => {
                     <Brain size={24} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-display font-bold text-white leading-tight">Centre d'Apprentissage Alexa</h2>
-                    <p className="text-slate-400 text-sm">Éduquez Alexa avec vos propres informations, brochures et FAQ privées.</p>
+                    <h2 className="text-2xl font-display font-bold text-white leading-tight">Centre d'apprentissage Kukasoko</h2>
+                    <p className="text-slate-400 text-sm">Enrichissez Kukasoko avec vos informations, brochures et FAQ.</p>
                   </div>
                 </div>
 
@@ -1252,7 +1252,7 @@ const Admin = () => {
                           name="brain-content"
                           value={newKnowledge.content}
                           onChange={(e) => setNewKnowledge({ ...newKnowledge, content: e.target.value })}
-                          placeholder="Collez ici le texte que vous voulez qu'Alexa apprenne..."
+                          placeholder="Collez ici le texte que vous voulez que Kukasoko apprenne..."
                           className="w-full h-48 bg-slate-900 border border-white/10 rounded-xl p-4 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-accent"
                         />
                       </div>
@@ -1274,7 +1274,7 @@ const Admin = () => {
                     <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                       {knowledgeItems.length === 0 ? (
                         <div className="border border-dashed border-white/5 rounded-3xl p-10 text-center text-slate-500">
-                          Alexa n'a pas encore de savoir spécifique. Ajoutez-en un !
+                          Kukasoko n'a pas encore de savoir spécifique. Ajoutez-en un !
                         </div>
                       ) : (
                         knowledgeItems.map(item => (

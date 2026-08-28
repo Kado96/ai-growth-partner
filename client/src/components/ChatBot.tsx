@@ -17,7 +17,7 @@ const ChatBot = () => {
   const { openQuote } = useQuote();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ from: string; text: string }>>([
-    { from: "alexa", text: "Bonjour ! Je suis Alexa, votre assistante IA stratégique. 🚀 Comment puis-je vous aider à automatiser votre succès aujourd'hui ?" }
+    { from: "assistant", text: "Bonjour ! Je suis **Kukasoko**, votre assistant digital chez Kora Agency. Dites-moi ce que vous voulez développer — site web, réseaux sociaux, visibilité — et on en parle ensemble." }
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -48,15 +48,15 @@ const ChatBot = () => {
     setIsTyping(true);
 
     try {
-      console.log(`[ALEXA] Envoi à ${import.meta.env.DEV ? 'Proxy' : 'Prod'} : "${userMsg}"...`);
+      console.log(`[KUKASOKO] Envoi : "${userMsg}"...`);
       const data = await chatWithAlexa(userMsg, messages);
-      console.log("[ALEXA] Succès :", data.response);
-      setMessages(prev => [...prev, { from: "alexa", text: data.response }]);
+      console.log("[KUKASOKO] Réponse :", data.response);
+      setMessages(prev => [...prev, { from: "assistant", text: data.response }]);
     } catch (err) {
-      console.error("[ALEXA_ERROR] Échec de la connexion Kora-Brain :", err);
+      console.error("[KUKASOKO_ERROR]", err);
       setMessages(prev => [...prev, {
-        from: "alexa",
-        text: "Désolée, j'ai une petite perte de connexion. Veuillez rafraîchir la page (F5) ou réessayez dans un instant. Sinon, contactez mon responsable au +25779928864."
+        from: "assistant",
+        text: "Désolé, petite coupure de connexion. Réessayez dans un instant, ou écrivez-nous sur WhatsApp au **+257 79 92 88 64**."
       }]);
     } finally {
       setIsTyping(false);
@@ -128,8 +128,8 @@ const ChatBot = () => {
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-4 border-slate-950" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-white text-lg leading-tight">Alexa</h4>
-                    <p className="text-[10px] text-accent font-black uppercase tracking-widest">IA Strategic Partner</p>
+                    <h4 className="font-display font-bold text-white text-lg leading-tight">Kukasoko</h4>
+                    <p className="text-[10px] text-accent font-black uppercase tracking-widest">Assistant digital</p>
                   </div>
                 </div>
                 <button
@@ -150,9 +150,9 @@ const ChatBot = () => {
                     key={i}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${msg.from === "alexa" ? "justify-start" : "justify-end"}`}
+                    className={`flex ${msg.from === "assistant" || msg.from === "alexa" ? "justify-start" : "justify-end"}`}
                   >
-                    <div className={`max-w-[85%] p-4 rounded-3xl text-sm leading-relaxed shadow-sm ${msg.from === "alexa"
+                    <div className={`max-w-[85%] p-4 rounded-3xl text-sm leading-relaxed shadow-sm ${msg.from === "assistant" || msg.from === "alexa"
                         ? "bg-white/5 text-slate-200 rounded-bl-sm border border-white/5"
                         : "bg-accent text-white rounded-br-sm shadow-lg shadow-accent/10"
                       }`}>
@@ -185,13 +185,13 @@ const ChatBot = () => {
               {/* Input Footer */}
               <div className="p-6 mt-auto border-t border-white/5 bg-slate-900/30">
                 <form onSubmit={handleSend} className="relative">
-                  <label htmlFor="chatbot-input" className="sr-only">Message pour Alexa</label>
+                  <label htmlFor="chatbot-input" className="sr-only">Message pour Kukasoko</label>
                   <Input
                     id="chatbot-input"
                     name="chatbot-input"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Écrivez à Alexa ici..."
+                    placeholder="Écrivez à Kukasoko..."
                     className="h-14 bg-white/5 border-white/10 rounded-2xl pr-14 text-white placeholder:text-slate-600 focus:border-accent/40 transition-all"
                   />
                   <button
@@ -250,7 +250,7 @@ const MessageContent = ({ content, from }: { content: string; from: string }) =>
         >
           <img
             src={getMediaUrl(path)}
-            alt="Suggestion Alexa"
+            alt="Suggestion Kukasoko"
             className="w-full h-full object-cover"
           />
         </motion.div>
