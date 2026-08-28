@@ -22,10 +22,11 @@ const BlogDetail = () => {
     const [blog, setBlog] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
+    const serviceItems = Array.isArray(config?.services?.items) ? config.services.items : [];
     const targetServiceId = blog?.serviceId || serviceId;
-    const service = config?.services?.items.find((s: any) => s.id === targetServiceId);
+    const service = serviceItems.find((s: any) => s.id === targetServiceId);
 
-    const otherServices = config?.services?.items.filter((s: any) => s.id !== targetServiceId) || [];
+    const otherServices = serviceItems.filter((s: any) => s.id !== targetServiceId);
     const suggestedService = otherServices.length > 0
         ? otherServices[(targetServiceId?.length || 0) % otherServices.length]
         : service;

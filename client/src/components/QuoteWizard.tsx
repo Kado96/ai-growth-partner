@@ -41,7 +41,9 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
   useEffect(() => {
     if (isOpen) {
       if (initialServiceId) {
-        const found = config?.services?.items?.find((s: any) => s.id === initialServiceId);
+        const found = Array.isArray(config?.services?.items)
+          ? config.services.items.find((s: any) => s.id === initialServiceId)
+          : undefined;
         if (found) {
           setSelectedService(found);
           setStep(2); // Allez directement à l'étape 2 (formulaire de questions)
@@ -121,7 +123,7 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
     }
   };
 
-  const services = config?.services?.items || [];
+  const services = Array.isArray(config?.services?.items) ? config.services.items : [];
   const progress = (step / 3) * 100;
 
   const containerVariants = {
@@ -263,7 +265,7 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
                       </div>
 
                       <div className="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[350px]">
-                        {selectedService.questions.map((q: string, i: number) => (
+                        {(Array.isArray(selectedService.questions) ? selectedService.questions : []).map((q: string, i: number) => (
                           <div key={i} className="space-y-3">
                             <Label htmlFor={`q-${i}`} className="text-slate-300 font-medium text-sm">{q}</Label>
                             <Input

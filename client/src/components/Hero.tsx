@@ -19,6 +19,8 @@ const Hero = () => {
     stats: [] 
   }, branding } = config;
 
+  const stats = Array.isArray(hero.stats) ? hero.stats : [];
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
       {/* Animated background elements */}
@@ -79,7 +81,7 @@ const Hero = () => {
               transition={{ delay: 0.6 }}
               className="flex gap-12 mt-12 pt-8 border-t border-border/30"
             >
-              {(hero.stats || []).map((stat: any) => (
+              {stats.map((stat: any) => (
                 <div key={stat.label}>
                   <p className="font-display font-extrabold text-3xl gradient-text">{stat.value}</p>
                   <p className="font-body text-xs text-muted-foreground mt-1 uppercase tracking-wider">{stat.label}</p>

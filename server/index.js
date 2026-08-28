@@ -106,16 +106,34 @@ const DEFAULT_CONFIG = {
 
 const ensureArray = (value, fallback = []) => (Array.isArray(value) ? value : fallback);
 
+const normalizeServiceItems = (items) =>
+    ensureArray(items).map((item) => {
+        if (!item || typeof item !== 'object') return item;
+        return { ...item, questions: ensureArray(item.questions) };
+    });
+
 const normalizeConfig = (config) => {
     if (!config || typeof config !== 'object') return config;
-    const services = config.services && typeof config.services === 'object' ? config.services : {};
+
+    const rawServices = config.services;
+    const services = Array.isArray(rawServices)
+        ? { items: normalizeServiceItems(rawServices) }
+        : rawServices && typeof rawServices === 'object'
+            ? rawServices
+            : {};
+
     const about = config.about && typeof config.about === 'object' ? config.about : {};
     const hero = config.hero && typeof config.hero === 'object' ? config.hero : {};
     const footer = config.footer && typeof config.footer === 'object' ? config.footer : {};
+
+    const news = ensureArray(config.news).map((n) =>
+        typeof n === 'string' ? n : (n && typeof n === 'object' && 'text' in n ? String(n.text) : String(n ?? ''))
+    );
+
     return {
         ...config,
-        news: ensureArray(config.news),
-        services: { ...services, items: ensureArray(services.items) },
+        news,
+        services: { ...services, items: normalizeServiceItems(services.items) },
         about: { ...about, methodology: ensureArray(about.methodology) },
         hero: {
             ...hero,

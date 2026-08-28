@@ -1,21 +1,42 @@
 const ensureArray = (value: unknown, fallback: unknown[] = []) =>
   Array.isArray(value) ? value : fallback;
 
+const normalizeServiceItems = (items: unknown) =>
+  ensureArray(items).map((item: any) => {
+    if (!item || typeof item !== 'object') return item;
+    return {
+      ...item,
+      questions: ensureArray(item.questions),
+    };
+  });
+
 /** Normalise la config API pour éviter les .map() sur des valeurs non-tableaux. */
 export const normalizeConfig = (config: any) => {
   if (!config || typeof config !== 'object') return config;
 
-  const services = config.services && typeof config.services === 'object' ? config.services : {};
+  // Parfois la DB stocke services comme tableau directement
+  const rawServices = config.services;
+  const services =
+    Array.isArray(rawServices)
+      ? { items: normalizeServiceItems(rawServices) }
+      : rawServices && typeof rawServices === 'object'
+        ? rawServices
+        : {};
+
   const about = config.about && typeof config.about === 'object' ? config.about : {};
   const hero = config.hero && typeof config.hero === 'object' ? config.hero : {};
   const footer = config.footer && typeof config.footer === 'object' ? config.footer : {};
 
+  const news = ensureArray(config.news).map((n) =>
+    typeof n === 'string' ? n : (n && typeof n === 'object' && 'text' in n ? String((n as any).text) : String(n ?? ''))
+  );
+
   return {
     ...config,
-    news: ensureArray(config.news),
+    news,
     services: {
       ...services,
-      items: ensureArray(services.items),
+      items: normalizeServiceItems(services.items),
     },
     about: {
       ...about,

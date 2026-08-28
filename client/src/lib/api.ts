@@ -1,3 +1,5 @@
+import { normalizeConfig } from '@/lib/normalizeConfig';
+
 const getBaseUrl = () => {
   const envUrl = (import.meta.env.VITE_API_URL || '').trim();
   // Dev: proxy Vite. Prod Netlify: VITE_API_URL = Render (netlify.toml).
@@ -23,7 +25,8 @@ export const fetchConfig = async () => {
   try {
     const response = await fetch(`${API_URL}/api/config`);
     if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    return await response.json();
+    const data = await response.json();
+    return normalizeConfig(data);
   } catch (err) {
     console.error(`[API_ERROR] Échec de la récupération de la config sur ${API_URL}:`, err.message);
     throw err;

@@ -28,6 +28,8 @@ const Services = () => {
     items: [] 
   } } = config;
 
+  const serviceItems = Array.isArray(services.items) ? services.items : [];
+
   return (
     <section id="services" className="bg-section-alt relative overflow-hidden section-padding">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_hsl(260_80%_62%_/_0.05),_transparent_70%)]" />
@@ -48,7 +50,7 @@ const Services = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {(services.items || []).map((service: any, i: number) => {
+          {serviceItems.map((service: any, i: number) => {
             const Icon = IconMap[service.icon] || Brain;
             const isPremium = service.price >= 1000000;
             const sId = service.id || `service-${i}`;
