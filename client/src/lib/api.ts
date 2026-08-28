@@ -83,11 +83,14 @@ export const submitChatSummary = async (data: any) => {
   return response.json();
 };
 
-export const chatWithAlexa = async (message: string) => {
+export const chatWithAlexa = async (
+  message: string,
+  history?: Array<{ from: string; text: string }>
+) => {
   const response = await fetch(`${API_URL}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message })
+    body: JSON.stringify({ message, history: history?.slice(-8) })
   });
   if (!response.ok) throw new Error('Chat failed');
   return response.json();

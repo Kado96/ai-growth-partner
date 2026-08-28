@@ -553,43 +553,96 @@ app.get('/api/health', (req, res) => {
     res.json({ status: "OK", serverTime: new Date().toISOString() });
 });
 
-// --- MOTEUR RAG LOCAL POUR ALEXA ---
-const getLocalContext = async (query) => {
+// --- MOTEUR RAG + INTENTION POUR ALEXA ---
+const SERVICE_INTENTS = [
+    { ids: ['bundle'], keywords: ['site web', 'site internet', 'vitrine', 'créer un site', 'faire un site', 'website', 'création site'] },
+    { ids: ['publications'], keywords: ['réseaux sociaux', 'facebook', 'instagram', 'tiktok', 'publication', 'community manager', 'poster'] },
+    { ids: ['whatsapp'], keywords: ['whatsapp', 'bot', 'réponse automatique', 'automatiser whatsapp'] },
+    { ids: ['google'], keywords: ['google', 'maps', 'fiche google', 'référencement local', 'seo local'] },
+    { ids: ['airbnb'], keywords: ['airbnb', 'booking', 'location', 'hébergement'] },
+    { ids: ['tiktok'], keywords: ['vidéo', 'reels', 'script vidéo', 'contenu viral'] },
+    { ids: ['visuels'], keywords: ['visuel', 'affiche', 'design', 'graphisme', 'logo'] },
+    { ids: ['ia_assistant'], keywords: ['ia', 'intelligence artificielle', 'automatisation', 'auto-post'] },
+    { ids: ['calendrier'], keywords: ['calendrier', 'planning', 'plan de publication'] },
+    { ids: ['maintenance'], keywords: ['maintenance', 'mise à jour', 'support mensuel'] },
+];
+
+const CONTACT_FALLBACK = 'Pour une réponse personnalisée, contactez-nous sur WhatsApp au **+257 79 92 88 64** ou demandez un devis via le formulaire du site.';
+
+const scoreServices = (query, services = []) => {
+    const q = query.toLowerCase().trim();
+    const words = q.split(/\s+/).filter(w => w.length > 2);
+
+    return services.map(service => {
+        let score = 0;
+        const title = (service.title || '').toLowerCase();
+        const desc = (service.description || '').toLowerCase();
+        const id = (service.id || '').toLowerCase();
+        const cat = (service.category || '').toLowerCase();
+        const blob = `${title} ${desc} ${id} ${cat}`;
+
+        if (q && blob.includes(q)) score += 10;
+        words.forEach(w => { if (blob.includes(w)) score += 2; });
+
+        SERVICE_INTENTS.forEach(intent => {
+            if (!intent.ids.includes(id)) return;
+            intent.keywords.forEach(kw => {
+                if (q.includes(kw)) score += 8;
+                kw.split(' ').forEach(k => { if (words.includes(k)) score += 1; });
+            });
+        });
+
+        return { service, score };
+    })
+        .filter(x => x.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(x => x.service);
+};
+
+const getLocalContext = async (query, config) => {
     try {
         const queryLower = query.toLowerCase();
-        let context = "";
+        const services = config.services?.items || [];
+        let context = '';
+        const matchedServices = scoreServices(query, services);
 
-        // 1. Recherche dans les Blogs (Titre + Contenu)
+        if (matchedServices.length > 0) {
+            context += '\nServices pertinents pour cette demande :\n';
+            matchedServices.slice(0, 4).forEach(s => {
+                context += `- ${s.title} (id: ${s.id}) : ${s.description || ''}`;
+                if (s.price) context += ` | À partir de ${s.price} FBU`;
+                context += '\n';
+            });
+        }
+
         const blogs = await Blog.findAll();
         const matchingBlogs = blogs.filter(b =>
             b.title.toLowerCase().includes(queryLower) ||
             b.content.toLowerCase().includes(queryLower) ||
-            (b.tags && b.tags.some(t => t.toLowerCase().includes(queryLower)))
+            (b.tags && b.tags.some(t => t.toLowerCase().includes(queryLower))) ||
+            matchedServices.some(s => s.id === b.serviceId)
         ).slice(0, 3);
 
         if (matchingBlogs.length > 0) {
-            context += "\nInfos blog utiles :\n";
+            context += '\nArticles utiles :\n';
             matchingBlogs.forEach(b => {
-                context += `Service: ${b.serviceId} | Titre: ${b.title}\n`;
-                context += `Contenu (Extrait): ${b.content.substring(0, 1000)}...\n`;
-                context += `Lien: /blog/${b.serviceId}\n\n`;
+                context += `- ${b.title} (/blog/${b.serviceId || b.slug})\n`;
+                context += `  ${b.content.substring(0, 400)}...\n`;
             });
         }
 
-        // 2. Recherche dans les Médias
         const medias = await Media.findAll();
         const matchingMedias = medias.filter(m =>
             m.name.toLowerCase().includes(queryLower)
         ).slice(0, 3);
 
         if (matchingMedias.length > 0) {
-            context += "\nVisuels disponibles :\n";
+            context += '\nVisuels :\n';
             matchingMedias.forEach(m => {
-                context += `Nom: ${m.name} | Path: ${m.path}\n`;
+                context += `- ${m.name} [IMAGE:${m.path}]\n`;
             });
         }
 
-        // 3. Recherche dans la Base de Connaissance Manuelle
         const manualKnowledge = await Knowledge.findAll();
         const matchingManual = manualKnowledge.filter(k =>
             k.title.toLowerCase().includes(queryLower) ||
@@ -597,109 +650,130 @@ const getLocalContext = async (query) => {
         ).slice(0, 3);
 
         if (matchingManual.length > 0) {
-            context += "\nNotes internes utiles :\n";
+            context += '\nNotes internes :\n';
             matchingManual.forEach(k => {
-                context += `Sujet: ${k.title}\n`;
-                context += `Détails: ${k.content}\n\n`;
+                context += `- ${k.title}: ${k.content}\n`;
             });
         }
 
-        return context;
+        return { context: context.trim(), matchedServices };
     } catch (err) {
-        console.error("[RAG_ERROR]", err);
-        return "";
+        console.error('[RAG_ERROR]', err);
+        return { context: '', matchedServices: [] };
     }
 };
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const buildAlexaPrompt = (config, localContext, matchedServices, history = []) => {
+    const servicesCatalog = (config.services?.items || []).map(s => ({
+        id: s.id,
+        titre: s.title,
+        description: s.description,
+        categorie: s.category,
+        prix: s.price
+    }));
+
+    const historyText = history.length > 0
+        ? history.map(m => `${m.from === 'user' ? 'Client' : 'Alexa'}: ${m.text}`).join('\n')
+        : '';
+
+    return `Tu es Alexa, assistante commerciale de Kora Agency (marketing digital & IA, Burundi).
+Réponds comme ChatGPT : naturel, conversationnel, utile, en français. Tu connais l'agence par cœur.
+
+AGENCE :
+${JSON.stringify({ branding: config.branding, hero: config.hero, actualites: config.news }, null, 2)}
+
+CATALOGUE SERVICES (utilise ces infos pour conseiller — ne liste jamais tout sauf si le client le demande) :
+${JSON.stringify(servicesCatalog, null, 2)}
+
+${localContext ? `CONTEXTE PERTINENT POUR CETTE QUESTION :\n${localContext}` : 'Aucune info très spécifique trouvée pour cette question.'}
+
+${matchedServices.length > 0
+            ? `PRIORITÉ : oriente la réponse vers "${matchedServices[0].title}" si c'est le meilleur fit.`
+            : `Si tu ne trouves pas de service adapté dans le catalogue, dis-le honnêtement et propose : ${CONTACT_FALLBACK}`}
+
+${historyText ? `HISTORIQUE RÉCENT :\n${historyText}\n` : ''}
+
+RÈGLES STRICTES :
+- Parle comme une humaine, jamais "base de données", "RAG", "système", "extraction".
+- Réponds DIRECTEMENT à la question (ex: "créer un site" → Pack Agence Site Vitrine + Marketing).
+- 2 à 5 phrases max + une question de relance.
+- Cite prix/détails seulement si pertinents.
+- Lien article : /blog/{id}. Visuel : [IMAGE:chemin].
+- WhatsApp/devis seulement pour conclure ou si info manquante.`;
+};
+
+const generateWithGemini = async (systemPrompt, message) => {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+    let lastError = null;
+
+    for (const modelName of models) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const result = await model.generateContent([
+                systemPrompt,
+                `Message du client : ${message}`
+            ]);
+            const text = result.response.text();
+            if (text?.trim()) return text;
+        } catch (err) {
+            lastError = err;
+            console.warn(`[GEMINI] Modèle ${modelName} indisponible:`, err.message);
+        }
+    }
+    throw lastError || new Error('Aucun modèle Gemini disponible');
+};
+
+const buildOfflineReply = (message, config, matchedServices) => {
+    const msg = message.toLowerCase().trim();
+    const greetings = ['bonjour', 'salut', 'hello', 'coucou', 'qui es-tu', 'ca va', 'ça va'];
+    if (greetings.some(g => msg.includes(g))) {
+        return `Bonjour ! Je suis **Alexa**, votre assistante chez Kora Agency. Je peux vous conseiller sur nos services : site web, réseaux sociaux, WhatsApp, Google, et plus.\n\nQuel est votre objectif aujourd'hui ?`;
+    }
+
+    if (matchedServices.length === 1) {
+        const s = matchedServices[0];
+        const price = s.price ? ` (à partir de **${s.price.toLocaleString('fr-FR')} FBU**)` : '';
+        return `Parfait ! Pour votre demande, je vous recommande **${s.title}**${price}.\n\n${s.description || ''}\n\nSouhaitez-vous un devis ou plus de détails sur la mise en place ?`;
+    }
+
+    if (matchedServices.length > 1) {
+        const list = matchedServices.slice(0, 3).map(s => `• **${s.title}** — ${s.description || ''}`).join('\n');
+        return `Voici ce qui correspond le mieux à votre besoin :\n\n${list}\n\nLequel vous intéresse le plus ?`;
+    }
+
+    return `Merci pour votre message. Je n'ai pas assez d'éléments pour vous conseiller précisément sur ce point.\n\n${CONTACT_FALLBACK}`;
+};
+
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 app.post('/api/chat', async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, history = [] } = req.body;
+        if (!message?.trim()) return res.status(400).json({ error: 'Message requis.' });
+
         const config = await getConfig();
-        const msg = message.toLowerCase().trim();
+        const { context: localContext, matchedServices } = await getLocalContext(message, config);
+        const recentHistory = Array.isArray(history) ? history.slice(-8) : [];
+        const systemPrompt = buildAlexaPrompt(config, localContext, matchedServices, recentHistory);
 
-        // 🔍 ÉTAPE 1 : RÉCUPÉRATION DU CONTEXTE LOCAL (RAG)
-        const localContext = await getLocalContext(message);
+        const hasGemini = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'votre_cle_gemini_ici';
 
-        // --- MODE IA RÉELLE (GEMINI) ---
-        if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'votre_cle_gemini_ici') {
+        if (hasGemini) {
             try {
-                const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-                const systemPrompt = `
-Tu es Alexa, consultante digitale chez Kora Agency (Burundi et au-delà).
-Tu parles AU CLIENT comme une vraie experte : naturelle, claire, professionnelle et chaleureuse.
-
-CONNAISSANCES INTERNES (ne jamais citer leur origine, ni parler de "base de données", "RAG", "articles trouvés", "savoir spécifique", "système" ou "extraction") :
-${JSON.stringify({
-                    agence: config.branding,
-                    accroche: config.hero,
-                    services: config.services?.items?.map(s => ({
-                        titre: s.title,
-                        description: s.description,
-                        categorie: s.category,
-                        prix: s.price,
-                        id: s.id
-                    })),
-                    actualites: config.news
-                }, null, 2)}
-
-${localContext ? `Infos utiles pour cette question (à reformuler en langage client, jamais coller brut) :\n${localContext}` : ''}
-
-RÈGLES :
-1. Réponds en français, comme une conseillère face au client — jamais de jargon technique interne.
-2. Ne dis JAMAIS que tu "tires" ou "extrais" des infos d'une base, d'un site ou d'un fichier.
-3. Présente les services comme ton expertise d'agence ("Chez Kora Agency, nous proposons…").
-4. Si le client salue : sois accueillante, puis oriente vers son besoin.
-5. Si tu recommandes un service, tu peux suggérer /blog/{id} ou un visuel [IMAGE:chemin] sans expliquer le mécanisme.
-6. WhatsApp uniquement pour finaliser un rendez-vous ou un devis.
-7. Sois concise mais utile : 2–4 phrases + une question de relance.
-`;
-
-                const result = await model.generateContent([systemPrompt, `Message du client : ${message}`]);
-                const response = result.response.text();
-                return res.json({ response });
+                const response = await generateWithGemini(systemPrompt, message);
+                return res.json({ response, mode: 'gemini' });
             } catch (aiErr) {
-                console.error("[GEMINI_ERROR]", aiErr.message);
+                console.error('[GEMINI_ERROR]', aiErr.message);
             }
-        }
-
-        // --- MODE EXPERT DIRECT (ALEXA HORS-LIGNE) ---
-        const greetings = ["bonjour", "salut", "hello", "coucou", "qui es-tu", "tu es qui", "ca va", "ça va", "parle avec moi"];
-        const isGreeting = greetings.some(g => msg.includes(g));
-
-        let response = "";
-        if (isGreeting) {
-            response = `Bonjour ! Je suis **Alexa**, consultante en stratégie digitale chez Kora Agency. Je suis là pour vous aider à renforcer votre présence en ligne et à attirer plus de clients.\n\nQu’aimeriez-vous travailler en priorité : réseaux sociaux, visibilité Google, ou automatisation WhatsApp ?`;
         } else {
-            const services = config.services?.items || [];
-            // Réponse naturelle : ne jamais exposer le contexte RAG brut ni parler de "base de données"
-            const matched = services.filter(s =>
-                msg.includes((s.title || '').toLowerCase()) ||
-                msg.includes((s.id || '').toLowerCase()) ||
-                (s.category && msg.includes(s.category.toLowerCase())) ||
-                (s.description && s.description.toLowerCase().split(/\s+/).some(w => w.length > 5 && msg.includes(w)))
-            ).slice(0, 3);
-
-            if (matched.length === 1) {
-                const s = matched[0];
-                response = `Chez Kora Agency, **${s.title}** fait partie de nos expertises clés. ${s.description || ''}\n\nSouhaitez-vous que je vous détaille l’approche, le délai, ou un devis adapté à votre activité ?`;
-            } else if (matched.length > 1) {
-                const list = matched.map(s => `• **${s.title}** — ${s.description || 'accompagnement sur mesure'}`).join('\n');
-                response = `Voici ce que je vous recommande selon votre demande :\n\n${list}\n\nLequel souhaitez-vous explorer en premier ?`;
-            } else if (services.length > 0) {
-                const list = services.slice(0, 6).map(s => `• **${s.title}**`).join('\n');
-                response = `Avec plaisir. Chez Kora Agency, nous accompagnons les entreprises sur notamment :\n\n${list}\n\nDites-moi votre objectif (plus de clients, meilleure image, automatisation…) et je vous oriente vers la meilleure option.`;
-            } else {
-                response = `Je suis à votre écoute. Expliquez-moi brièvement votre activité et votre objectif (visibilité, ventes, automatisation…), et je vous proposerai la solution Kora Agency la plus adaptée.`;
-            }
+            console.warn('[ALEXA] GEMINI_API_KEY absente — mode hors-ligne');
         }
 
-        res.json({ response });
+        const response = buildOfflineReply(message, config, matchedServices);
+        res.json({ response, mode: 'offline' });
     } catch (err) {
-        console.error("[CHAT_ERROR]", err);
+        console.error('[CHAT_ERROR]', err);
         res.status(500).json({ error: "Erreur d'intelligence." });
     }
 });

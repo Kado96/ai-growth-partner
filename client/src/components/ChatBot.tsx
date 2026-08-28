@@ -49,7 +49,7 @@ const ChatBot = () => {
 
     try {
       console.log(`[ALEXA] Envoi à ${import.meta.env.DEV ? 'Proxy' : 'Prod'} : "${userMsg}"...`);
-      const data = await chatWithAlexa(userMsg);
+      const data = await chatWithAlexa(userMsg, messages);
       console.log("[ALEXA] Succès :", data.response);
       setMessages(prev => [...prev, { from: "alexa", text: data.response }]);
     } catch (err) {
