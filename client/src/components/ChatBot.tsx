@@ -17,7 +17,7 @@ const ChatBot = () => {
   const { openQuote } = useQuote();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ from: string; text: string }>>([
-    { from: "assistant", text: "Bonjour ! Je suis **Kukasoko**, votre assistant digital chez Kora Agency. Dites-moi ce que vous voulez développer — site web, réseaux sociaux, visibilité — et on en parle ensemble." }
+    { from: "assistant", text: "Bonjour ! Je suis **Alexa**, votre assistante chez Kora Agency. Dites-moi ce que vous voulez développer — site web, réseaux sociaux, visibilité — et on en parle ensemble." }
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -48,12 +48,12 @@ const ChatBot = () => {
     setIsTyping(true);
 
     try {
-      console.log(`[KUKASOKO] Envoi : "${userMsg}"...`);
+      console.log(`[ALEXA] Envoi : "${userMsg}"...`);
       const data = await chatWithAlexa(userMsg, messages);
-      console.log("[KUKASOKO] Réponse :", data.response);
+      console.log("[ALEXA] Réponse :", data.response);
       setMessages(prev => [...prev, { from: "assistant", text: data.response }]);
     } catch (err) {
-      console.error("[KUKASOKO_ERROR]", err);
+      console.error("[ALEXA_ERROR]", err);
       setMessages(prev => [...prev, {
         from: "assistant",
         text: "Désolé, petite coupure de connexion. Réessayez dans un instant, ou écrivez-nous sur WhatsApp au **+257 79 92 88 64**."
@@ -128,8 +128,8 @@ const ChatBot = () => {
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-4 border-slate-950" />
                   </div>
                   <div>
-                    <h4 className="font-display font-bold text-white text-lg leading-tight">Kukasoko</h4>
-                    <p className="text-[10px] text-accent font-black uppercase tracking-widest">Assistant digital</p>
+                    <h4 className="font-display font-bold text-white text-lg leading-tight">Alexa</h4>
+                    <p className="text-[10px] text-accent font-black uppercase tracking-widest">Kora Agency</p>
                   </div>
                 </div>
                 <button
@@ -185,13 +185,13 @@ const ChatBot = () => {
               {/* Input Footer */}
               <div className="p-6 mt-auto border-t border-white/5 bg-slate-900/30">
                 <form onSubmit={handleSend} className="relative">
-                  <label htmlFor="chatbot-input" className="sr-only">Message pour Kukasoko</label>
+                  <label htmlFor="chatbot-input" className="sr-only">Message pour Alexa</label>
                   <Input
                     id="chatbot-input"
                     name="chatbot-input"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Écrivez à Kukasoko..."
+                    placeholder="Écrivez à Alexa..."
                     className="h-14 bg-white/5 border-white/10 rounded-2xl pr-14 text-white placeholder:text-slate-600 focus:border-accent/40 transition-all"
                   />
                   <button
@@ -250,7 +250,7 @@ const MessageContent = ({ content, from }: { content: string; from: string }) =>
         >
           <img
             src={getMediaUrl(path)}
-            alt="Suggestion Kukasoko"
+            alt="Suggestion Alexa"
             className="w-full h-full object-cover"
           />
         </motion.div>

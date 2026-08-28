@@ -12,7 +12,7 @@ require('dotenv').config({ path: path.join(__dirname, envFile) });
 
 console.log(`[INIT] Environment: ${NODE_ENV} (Loaded ${envFile})`);
 
-const ASSISTANT_NAME = 'Kukasoko';
+const ASSISTANT_NAME = 'Alexa';
 
 const app = express();
 
@@ -673,7 +673,7 @@ const findServiceFromHistory = (history, services = []) => {
     return null;
 };
 
-const buildKukasokoPrompt = (config, localContext, matchedServices, history = []) => {
+const buildAlexaPrompt = (config, localContext, matchedServices, history = []) => {
     const servicesCatalog = (config.services?.items || []).map(s => ({
         id: s.id,
         titre: s.title,
@@ -686,14 +686,14 @@ const buildKukasokoPrompt = (config, localContext, matchedServices, history = []
         ? history.map(m => `${m.from === 'user' ? 'Client' : ASSISTANT_NAME}: ${m.text}`).join('\n')
         : '';
 
-    return `Tu es ${ASSISTANT_NAME}, l'assistant digital de Kora Agency (marketing digital & IA, Burundi).
+    return `Tu es ${ASSISTANT_NAME}, l'assistante digitale de Kora Agency (marketing digital & IA, Burundi).
 
 TON : comme un humain en conversation (WhatsApp / ChatGPT). Phrases naturelles, chaleureuses, professionnelles. Tu PARTICIPES au fil de la discussion — tu reformules, tu relances, tu conseilles.
 
 INTERDIT :
 - Listes à puces (•), catalogues, "Voici ce qui correspond le mieux", ton robotique
 - Dire "base de données", "RAG", "système", "extraction", "selon mes infos"
-- Te présenter comme "Alexa"
+- Te présenter comme "Kukasoko" ou un autre nom
 
 OBLIGATOIRE :
 - Répondre en français, en prose fluide (2 à 5 phrases)
@@ -780,7 +780,7 @@ app.post('/api/chat', async (req, res) => {
         const config = await getConfig();
         const { context: localContext, matchedServices } = await getLocalContext(message, config);
         const recentHistory = Array.isArray(history) ? history.slice(-8) : [];
-        const systemPrompt = buildKukasokoPrompt(config, localContext, matchedServices, recentHistory);
+        const systemPrompt = buildAlexaPrompt(config, localContext, matchedServices, recentHistory);
 
         const hasGemini = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'votre_cle_gemini_ici';
 
