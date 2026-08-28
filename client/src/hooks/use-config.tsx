@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { fetchConfig } from '@/lib/api';
+import { normalizeConfig } from '@/lib/normalizeConfig';
 
 interface ConfigContextType {
   config: any;
@@ -16,7 +17,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const loadConfig = async () => {
     try {
       const data = await fetchConfig();
-      setConfig(data);
+      setConfig(normalizeConfig(data));
     } catch (err) {
       console.error('Failed to load config from server:', err);
       // Fallback or handle error

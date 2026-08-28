@@ -50,7 +50,7 @@ const Hero = () => {
             </motion.div>
 
             <h1 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-7xl leading-tight text-foreground mb-6">
-              {hero.title.split('.').map((part: string, i: number) => (
+              {String(hero.title || '').split('.').map((part: string, i: number) => (
                 <span key={i} className={i === 1 ? "gradient-text" : ""}>
                   {part}{i === 0 && part.length > 0 ? "" : ""} 
                 </span>

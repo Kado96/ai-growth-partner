@@ -7,7 +7,7 @@ const NewsTicker: React.FC = () => {
 
   if (loading || !config) return null;
 
-  const messages = config.news || [];
+  const messages = Array.isArray(config.news) ? config.news : [];
 
   return (
     <div className="fixed bottom-0 left-0 w-full h-10 bg-slate-950 border-t border-slate-800 z-50 flex items-center overflow-hidden">

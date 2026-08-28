@@ -22,6 +22,8 @@ const About = () => {
     methodology: []
   } } = config;
 
+  const methodology = Array.isArray(about.methodology) ? about.methodology : [];
+
   return (
     <section id="about" className="section-padding relative overflow-hidden bg-background">
       <div className="container-narrow relative z-10">
@@ -44,7 +46,7 @@ const About = () => {
           </motion.div>
 
           <div className="grid sm:grid-cols-2 gap-6">
-            {about.methodology.map((item: any, i: number) => {
+            {methodology.map((item: any, i: number) => {
               const Icon = MethodIconMap[item.title] || Search;
               return (
                 <motion.div

@@ -104,6 +104,28 @@ const DEFAULT_CONFIG = {
     about: { methodology: [] }
 };
 
+const ensureArray = (value, fallback = []) => (Array.isArray(value) ? value : fallback);
+
+const normalizeConfig = (config) => {
+    if (!config || typeof config !== 'object') return config;
+    const services = config.services && typeof config.services === 'object' ? config.services : {};
+    const about = config.about && typeof config.about === 'object' ? config.about : {};
+    const hero = config.hero && typeof config.hero === 'object' ? config.hero : {};
+    const footer = config.footer && typeof config.footer === 'object' ? config.footer : {};
+    return {
+        ...config,
+        news: ensureArray(config.news),
+        services: { ...services, items: ensureArray(services.items) },
+        about: { ...about, methodology: ensureArray(about.methodology) },
+        hero: {
+            ...hero,
+            stats: ensureArray(hero.stats),
+            title: typeof hero.title === 'string' ? hero.title : String(hero.title ?? ''),
+        },
+        footer: { ...footer, links: ensureArray(footer.links) },
+    };
+};
+
 const Content = require('./models/Content');
 const Blog = require('./models/Blog');
 const Setting = require('./models/Setting');
@@ -124,7 +146,7 @@ const getConfig = async () => {
                     config.news.push(item.metadata);
                 }
             }
-            return config;
+            return normalizeConfig(config);
         }
     } catch (e) {
         console.error("[CONFIG] Erreur BDD:", e.message);
@@ -134,11 +156,11 @@ const getConfig = async () => {
     try {
         if (fs.existsSync(CONFIG_FILE)) {
             const localData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-            return { ...config, ...localData };
+            return normalizeConfig({ ...config, ...localData });
         }
     } catch (e) { console.error("[CONFIG] Erreur lecture config.json:", e.message); }
 
-    return config;
+    return normalizeConfig(config);
 };
 
 const saveConfig = async (updatedConfig) => {

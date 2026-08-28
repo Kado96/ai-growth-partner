@@ -9,6 +9,7 @@ import {
 import { useConfig } from "@/hooks/use-config";
 import { useQuote } from "@/hooks/use-quote";
 import { getMediaUrl } from "@/lib/api";
+import { normalizeTags } from "@/lib/normalizeConfig";
 import axios from "axios";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -244,7 +245,7 @@ const BlogDetail = () => {
                                     <Tag size={18} className="text-accent" /> Tags stratégiques
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {blog.tags?.map((tag: string) => (
+                                    {normalizeTags(blog.tags).map((tag: string) => (
                                         <span key={tag} className="px-3 py-1 rounded-lg bg-white/5 text-slate-400 text-xs hover:text-accent transition-colors">
                                             #{tag}
                                         </span>
