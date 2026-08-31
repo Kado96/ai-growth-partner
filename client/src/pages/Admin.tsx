@@ -31,7 +31,7 @@ const ImagePickerButton = ({ onSelect, medias }: { onSelect: (path: string) => v
         </DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 overflow-y-auto custom-scrollbar">
-        {medias.length === 0 ? (
+        {!Array.isArray(medias) || medias.length === 0 ? (
           <p className="col-span-full text-center text-slate-500 py-10">Aucune image disponible dans la médiathèque.</p>
         ) : (
           medias.map(media => (
@@ -834,7 +834,7 @@ const Admin = () => {
                       </div>
 
                       <div className="flex flex-wrap gap-4 pb-20 overflow-y-auto custom-scrollbar pr-2 min-h-[400px]">
-                        {medias.map(media => (
+                        {Array.isArray(medias) && medias.map(media => (
                           <div
                             key={media.id}
                             className="relative group w-[calc(50%-8px)] h-40 rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent transition-all flex-shrink-0"
@@ -873,7 +873,7 @@ const Admin = () => {
                     Articles Publiés
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {blogs.map((blog) => (
+                    {Array.isArray(blogs) && blogs.map((blog) => (
                       <div key={blog.id} className="p-8 rounded-[2.5rem] border border-white/5 bg-white/[0.02] relative group hover:border-accent/30 transition-all">
                         <div className="flex justify-between items-start mb-4">
                           <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
@@ -1069,7 +1069,7 @@ const Admin = () => {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {medias.length === 0 ? (
+                  {!Array.isArray(medias) || medias.length === 0 ? (
                     <div className="col-span-full border-2 border-dashed border-white/10 rounded-2xl p-10 flex flex-col items-center justify-center text-slate-500">
                       <ImageIcon size={48} className="mb-4 opacity-50" />
                       <p>Aucun média disponible.</p>
@@ -1272,7 +1272,7 @@ const Admin = () => {
                     </h3>
 
                     <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                      {knowledgeItems.length === 0 ? (
+                      {!Array.isArray(knowledgeItems) || knowledgeItems.length === 0 ? (
                         <div className="border border-dashed border-white/5 rounded-3xl p-10 text-center text-slate-500">
                           Alexa n'a pas encore de savoir spécifique. Ajoutez-en un !
                         </div>

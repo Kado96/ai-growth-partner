@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { normalizeConfig } from '@/lib/normalizeConfig';
 
 const getBaseUrl = () => {
@@ -8,6 +9,7 @@ const getBaseUrl = () => {
 };
 
 export const API_URL = getBaseUrl();
+axios.defaults.baseURL = API_URL;
 console.log(`[KORA-API] Mode: ${import.meta.env.DEV ? 'DEV' : 'PROD'} | BaseURL: ${API_URL}`);
 
 /**
