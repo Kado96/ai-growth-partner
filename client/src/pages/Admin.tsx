@@ -642,6 +642,8 @@ const Admin = () => {
                   </div>
                 </div>
               </div>
+            )}
+
             {activeTab === 'projects' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="flex justify-between items-end">
