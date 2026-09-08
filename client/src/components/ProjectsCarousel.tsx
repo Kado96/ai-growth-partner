@@ -29,11 +29,11 @@ const defaultProjects = [
 
 const ProjectsCarousel = () => {
   const { config } = useConfig();
-  const projects = config.projects?.items && config.projects.items.length > 0 
+  const projects = config?.projects?.items && config.projects.items.length > 0 
     ? config.projects.items 
     : defaultProjects;
-  const sectionTitle = config.projects?.title || "Nos Projets en Action";
-  const sectionSubtitle = config.projects?.subtitle || "Démonstrations Pro";
+  const sectionTitle = config?.projects?.title || "Nos Projets en Action";
+  const sectionSubtitle = config?.projects?.subtitle || "Démonstrations Pro";
 
   const [current, setCurrent] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

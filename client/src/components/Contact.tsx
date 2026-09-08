@@ -8,9 +8,9 @@ import { useConfig } from "@/hooks/use-config";
 
 const Contact = () => {
   const { config } = useConfig();
-  const email = config.branding?.email || "kandekedonald@gmail.com";
-  const phone = config.branding?.phone || "+257 79 92 88 64";
-  const address = config.branding?.address || "Bujumbura, Burundi";
+  const email = config?.branding?.email || "kandekedonald@gmail.com";
+  const phone = config?.branding?.phone || "+257 79 92 88 64";
+  const address = config?.branding?.address || "Bujumbura, Burundi";
 
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
