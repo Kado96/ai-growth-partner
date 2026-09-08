@@ -8,7 +8,7 @@ import {
   Settings, Layout, MessageSquare, Save, LogOut,
   Trash2, Plus, Globe, Sparkles, AlertCircle,
   ChevronRight, Layers, CreditCard, Image as ImageIcon, UploadCloud,
-  Share2, Activity, Zap, Brain, BookOpen, Lightbulb, Rocket, Play
+  Share2, Activity, Zap, Brain, BookOpen, Lightbulb, Rocket, Play, Inbox, Mail, Check, Reply
 } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription
@@ -119,6 +119,38 @@ const Admin = () => {
     }
   };
 
+  const [contactMessages, setContactMessages] = useState<any[]>([]);
+
+  const fetchContactMessages = async () => {
+    try {
+      const { data } = await axios.get('/api/contact-messages', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setContactMessages(data);
+    } catch (e) {
+      console.error("Erreur chargement messages", e);
+    }
+  };
+
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      await axios.patch(`/api/contact-messages/${id}/read`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchContactMessages();
+    } catch (e) { console.error(e); }
+  };
+
+  const handleDeleteContactMessage = async (id: string) => {
+    try {
+      await axios.delete(`/api/contact-messages/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Message supprimé.");
+      fetchContactMessages();
+    } catch (e) { toast.error("Échec de la suppression."); }
+  };
+
   const fetchMedias = async () => {
     try {
       const { data } = await axios.get('/api/media');
@@ -134,6 +166,7 @@ const Admin = () => {
       fetchN8nSettings();
       fetchKnowledge();
       fetchBlogs();
+      fetchContactMessages();
     }
   }, [isLoggedIn]);
 
@@ -447,6 +480,7 @@ const Admin = () => {
         {/* Navigation Sidebar */}
         <aside className="w-72 flex-shrink-0 space-y-2">
           {[
+            { id: 'messages', label: 'Messages & Devis', icon: Inbox },
             { id: 'branding', label: 'Branding & Identité', icon: Globe },
             { id: 'hero', label: 'Section Accueil (Hero)', icon: Layout },
             { id: 'projects', label: 'Projets en Action', icon: Play },
@@ -478,6 +512,115 @@ const Admin = () => {
         {/* Content Panel */}
         <main className="flex-grow p-1 rounded-3xl bg-gradient-to-br from-white/10 to-transparent">
           <div className="bg-[#0b0f17] rounded-[22px] p-8 min-h-[600px] border border-white/5">
+            {activeTab === 'messages' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <h2 className="text-2xl font-display font-bold text-white mb-2">Boîte de Réception (Messages & Devis)</h2>
+                    <p className="text-slate-400 text-sm">Consultez les demandes des clients et répondez-leur directement par Gmail.</p>
+                  </div>
+                  <Button onClick={fetchContactMessages} variant="outline" size="sm" className="border-white/10 hover:bg-white/5 rounded-full text-xs">
+                    Rafraîchir
+                  </Button>
+                </div>
+
+                {!Array.isArray(contactMessages) || contactMessages.length === 0 ? (
+                  <div className="text-center py-20 border border-dashed border-white/10 rounded-3xl">
+                    <Inbox size={48} className="mx-auto text-slate-600 mb-4" />
+                    <p className="text-slate-400 font-bold">Aucun message reçu pour le moment.</p>
+                    <p className="text-xs text-slate-500 mt-1">Les messages du formulaire de contact et les demandes de devis apparaîtront ici.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-h-[650px] overflow-y-auto custom-scrollbar pr-2">
+                    {contactMessages.map((msg: any) => (
+                      <div
+                        key={msg.id}
+                        className={`p-6 rounded-2xl border transition-all ${
+                          msg.read 
+                            ? 'bg-slate-900/40 border-white/5 opacity-80' 
+                            : 'bg-accent/5 border-accent/30 shadow-lg shadow-accent/5'
+                        }`}
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                          <div className="flex items-center gap-3">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
+                              msg.type === 'quote' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' : 'bg-accent/20 text-accent border border-accent/30'
+                            }`}>
+                              {msg.type === 'quote' ? `Devis : ${msg.service || 'Général'}` : 'Contact Web'}
+                            </span>
+                            {!msg.read && (
+                              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" title="Non lu" />
+                            )}
+                            <span className="text-xs text-slate-500">
+                              {new Date(msg.createdAt).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {msg.email && (
+                              <a
+                                href={`mailto:${msg.email}?subject=Re:%20Votre%20demande%20chez%20Kora%20Agency&body=Bonjour%20${encodeURIComponent(msg.name)},%0A%0AMerci%20pour%20votre%20message.%0A%0ACordialement,%0AL'équipe%20Kora%20Agency`}
+                                onClick={() => handleMarkAsRead(msg.id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent hover:bg-accent/80 text-white font-bold text-xs shadow-lg shadow-accent/20 transition-all"
+                              >
+                                <Reply size={14} /> Répondre par Gmail
+                              </a>
+                            )}
+                            {msg.whatsapp && (
+                              <a
+                                href={`https://wa.me/${msg.whatsapp.replace(/\D/g, '')}?text=Bonjour%20${encodeURIComponent(msg.name)},%20je%20vous%20contacte%20suite%20à%20votre%20message%20sur%20Kora%20Agency.`}
+                                onClick={() => handleMarkAsRead(msg.id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 font-bold text-xs transition-all"
+                              >
+                                WhatsApp
+                              </a>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteContactMessage(msg.id)}
+                              className="text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl"
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-baseline gap-2">
+                            <h4 className="font-bold text-white text-base">{msg.name}</h4>
+                            {msg.email && <span className="text-xs text-slate-400">({msg.email})</span>}
+                            {msg.whatsapp && <span className="text-xs text-emerald-400 font-mono">WA: {msg.whatsapp}</span>}
+                          </div>
+
+                          {msg.message && (
+                            <p className="text-sm text-slate-300 bg-slate-950/60 p-4 rounded-xl border border-white/5 whitespace-pre-wrap leading-relaxed">
+                              {msg.message}
+                            </p>
+                          )}
+
+                          {msg.answers && typeof msg.answers === 'object' && (
+                            <div className="bg-slate-950/60 p-4 rounded-xl border border-white/5 space-y-1.5 mt-2">
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Réponses au Devis :</p>
+                              {Object.entries(msg.answers).map(([q, a]: any) => (
+                                <div key={q} className="text-xs flex gap-2">
+                                  <span className="text-slate-400 font-medium">{q} :</span>
+                                  <span className="text-white font-semibold">{String(a)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {activeTab === 'branding' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">

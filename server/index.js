@@ -471,10 +471,28 @@ app.post('/api/notify-payment', async (req, res) => {
     }
 });
 
+const ContactMessage = require('./models/ContactMessage');
+
 // --- Email Notifier (For Quotes & Contacts) ---
 const sendAdminNotification = async (type, data) => {
     let subject = "";
     let html = "";
+
+    // 0) Sauvegarder en base de données pour l'interface Admin
+    try {
+        await ContactMessage.create({
+            type: type,
+            name: data.name || 'Visiteur',
+            email: data.email || null,
+            whatsapp: data.whatsapp || null,
+            service: data.service || null,
+            message: data.message || null,
+            answers: data.answers || null,
+        });
+        console.log(`[DB] Message client sauvegardé (${type})`);
+    } catch (dbErr) {
+        console.error('[DB_ERROR] Échec sauvegarde message:', dbErr.message);
+    }
 
     if (type === 'quote') {
         subject = `[NOUVEAU DEVIS] ${data.service} - ${data.name}`;
@@ -483,7 +501,7 @@ const sendAdminNotification = async (type, data) => {
                 <h2 style="color: #2F2F2F;">Demande de Devis - ${data.service}</h2>
                 <hr/>
                 <p><strong>Client :</strong> ${data.name}</p>
-                <p><strong>WhatsApp :</strong> <a href="https://wa.me/${data.whatsapp.replace(/\D/g, '')}">${data.whatsapp}</a></p>
+                <p><strong>WhatsApp :</strong> <a href="https://wa.me/${data.whatsapp ? data.whatsapp.replace(/\D/g, '') : ''}">${data.whatsapp || 'Non fourni'}</a></p>
                 <hr/>
                 <h3>Réponses au Questionnaire :</h3>
                 <ul>
@@ -515,6 +533,7 @@ const sendAdminNotification = async (type, data) => {
         await transporter.sendMail({
             from: `"Kora Notifications" <${process.env.EMAIL_USER}>`,
             to: "kandekedonald@gmail.com",
+            replyTo: data.email || undefined,
             subject: subject,
             html: html,
         });
@@ -561,6 +580,34 @@ app.post('/api/contact-message', async (req, res) => {
         }
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// --- ROUTES GESTION MESSAGES CLIENTS (ADMIN) ---
+app.get('/api/contact-messages', requireAdmin, async (req, res) => {
+    try {
+        const messages = await ContactMessage.findAll({ order: [['createdAt', 'DESC']] });
+        res.json(messages);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.patch('/api/contact-messages/:id/read', requireAdmin, async (req, res) => {
+    try {
+        await ContactMessage.update({ read: true }, { where: { id: req.params.id } });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/contact-messages/:id', requireAdmin, async (req, res) => {
+    try {
+        await ContactMessage.destroy({ where: { id: req.params.id } });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
