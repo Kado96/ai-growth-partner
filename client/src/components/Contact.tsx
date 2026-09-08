@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { submitContact } from "@/lib/api";
 import { toast } from "sonner";
-import { useConfig } from "@/context/ConfigContext";
+import { useConfig } from "@/hooks/use-config";
 
 const Contact = () => {
   const { config } = useConfig();

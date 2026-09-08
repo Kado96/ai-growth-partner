@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, TrendingUp, Play } from "lucide-react";
-import { useConfig } from "@/context/ConfigContext";
+import { useConfig } from "@/hooks/use-config";
 
 const defaultProjects = [
   {
