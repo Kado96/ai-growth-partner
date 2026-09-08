@@ -387,7 +387,19 @@ class AlexaBrain {
           suggestions.push(a.title, b.title, 'Demander un devis');
         } else if (knowledge.length > 0) {
           const top = knowledge[0];
-          answer = `${String(top.meta.content || '').replace(/^Réponse type\s*:\s*/i, '')}\n\nPuis-je préciser un point, ou vous orienter vers un service Kora Agency ?`;
+          // Nettoyer et reformuler le contenu brut du Knowledge de façon conversationnelle
+          let rawContent = String(top.meta.content || '').trim();
+          rawContent = rawContent
+            .replace(/^Réponse type\s*:\s*/i, '')
+            .replace(/^Lorsque l'utilisateur\s+[^.]+\.\s*/i, '')
+            .replace(/^répondez par exemple\s*:\s*/i, '')
+            .trim();
+          // Construire une réponse naturelle
+          if (rawContent.length > 0) {
+            answer = `${rawContent}\n\nPuis-je préciser un point, ou vous orienter vers un service Kora Agency ?`;
+          } else {
+            answer = `Permettez-moi de vous orienter : **${top.title}**. Souhaitez-vous plus de détails ou un accompagnement personnalisé ?`;
+          }
           suggestions.push('Nos services', 'Contact WhatsApp');
         } else if (blogs.length > 0) {
           const b = blogs[0];

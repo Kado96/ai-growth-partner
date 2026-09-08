@@ -769,8 +769,8 @@ ${historyText ? `HISTORIQUE :\n${historyText}` : ''}`;
 };
 
 const generateWithGemini = async (systemPrompt, message) => {
-                const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const models = ['gemini-3.6-flash', 'gemini-2.0-flash-exp', 'gemini-flash-latest'];
     let lastError = null;
 
     for (const modelName of models) {
@@ -843,24 +843,34 @@ app.post('/api/chat', async (req, res) => {
 
         const hasGemini = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'votre_cle_gemini_ici';
 
-        // 2) Gemini optionnel : reformule avec le contexte BM25 (n'invente pas)
+        // 2) Gemini : génère une vraie réponse conversationnelle naturelle
         if (hasGemini) {
             try {
-                const matchedServiceObjs = brain.hits
-                    .filter((h) => h.type === 'service')
-                    .map((h) => (config.services?.items || []).find((s) => s.id === h.id))
-                    .filter(Boolean);
+                // Construire l'historique lisible pour Gemini
+                const historyText = recentHistory.length > 0
+                    ? recentHistory.map(m => `${m.from === 'user' ? 'Client' : 'Alexa'}: ${m.text}`).join('\n')
+                    : '';
 
-                const systemPrompt = buildAlexaPrompt(
-                    config,
-                    brain.contextForLlm,
-                    matchedServiceObjs,
-                    recentHistory
-                );
-                const geminiText = await generateWithGemini(
-                    `${systemPrompt}\n\nCONTEXTE RETRIEVAL BM25 (base-toi UNIQUEMENT là-dessus, n'invente rien) :\n${brain.contextForLlm}\n\nRéponse hors-ligne de référence (améliore le style, garde les faits) :\n${brain.answer}`,
-                    message
-                );
+                // Prompt système concis et ciblé
+                const systemPrompt = `Tu es Alexa, la concierge digitale de Kora Agency (Bujumbura, Burundi).
+Kora Agency : communication digitale, développement web & Android, marketplace, IA kirundi, enquêtes, suivi-évaluation, QuickSales.
+Contact WhatsApp : +257 79 92 88 64
+
+PERSONA :
+- Ton chaleureux, professionnel, élégant (style hôtel 5 étoiles)
+- TOUJOURS vouvoyer le client
+- Réponse fluide en français, 2 à 4 phrases maximum
+- Terminer par une question de relance naturelle
+- Jamais de liste à puces, jamais de ton robotique
+- Jamais mentionner "base de données", "RAG", "fragments", "savoir", "extraction"
+- Emojis : 0 ou 1 maximum, seulement si naturel
+
+INFORMATIONS DISPONIBLES (utilise-les pour répondre, reformule naturellement) :
+${brain.contextForLlm}
+
+${historyText ? `HISTORIQUE RÉCENT :\n${historyText}` : ''}`;
+
+                const geminiText = await generateWithGemini(systemPrompt, message);
                 return res.json({
                     response: geminiText,
                     mode: 'gemini+bm25',
@@ -870,11 +880,13 @@ app.post('/api/chat', async (req, res) => {
                 });
             } catch (aiErr) {
                 console.error('[GEMINI_ERROR]', aiErr.message);
+                // Fallback vers BM25 si Gemini échoue
             }
         } else {
             console.warn(`[${ASSISTANT_NAME}] Mode BM25 hors-ligne (pas de Gemini)`);
         }
 
+        // Fallback BM25 offline (réponse pré-composée)
         res.json({
             response: brain.answer,
             mode: 'bm25',
