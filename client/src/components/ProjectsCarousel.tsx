@@ -1,14 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, TrendingUp, Play } from "lucide-react";
+import { useConfig } from "@/context/ConfigContext";
 
-const projects = [
+const defaultProjects = [
   {
     title: "Assistant IA — Gestion des Réservations",
     client: "Chaîne de restaurants semi-gastronomiques",
     description: "Agent IA multicanal (WhatsApp + site web) pour réservations, commandes à emporter, FAQ.",
     impact: "+40% de réservations automatisées, -60% d'appels entrants",
-    youtubeId: "dQw4w9WgXcQ", // Remplacez par vos IDs réels
+    youtubeId: "dQw4w9WgXcQ",
   },
   {
     title: "Scoring de Leads IA",
@@ -27,6 +28,13 @@ const projects = [
 ];
 
 const ProjectsCarousel = () => {
+  const { config } = useConfig();
+  const projects = config.projects?.items && config.projects.items.length > 0 
+    ? config.projects.items 
+    : defaultProjects;
+  const sectionTitle = config.projects?.title || "Nos Projets en Action";
+  const sectionSubtitle = config.projects?.subtitle || "Démonstrations Pro";
+
   const [current, setCurrent] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -35,7 +43,7 @@ const ProjectsCarousel = () => {
     setCurrent((c) => (c + 1) % projects.length);
     setIsPlaying(false);
     setProgress(0);
-  }, []);
+  }, [projects.length]);
 
   const prev = () => {
     setCurrent((c) => (c - 1 + projects.length) % projects.length);
@@ -44,7 +52,7 @@ const ProjectsCarousel = () => {
   };
 
   useEffect(() => {
-    if (isPlaying) return;
+    if (isPlaying || projects.length === 0) return;
     const interval = setInterval(() => {
       setProgress((p) => {
         if (p >= 100) {
@@ -55,9 +63,10 @@ const ProjectsCarousel = () => {
       });
     }, 100);
     return () => clearInterval(interval);
-  }, [next, isPlaying]);
+  }, [next, isPlaying, projects.length]);
 
-  const project = projects[current];
+  if (!projects || projects.length === 0) return null;
+  const project = projects[current] || projects[0];
 
   return (
     <section id="projects" className="bg-background relative overflow-hidden">
@@ -70,9 +79,9 @@ const ProjectsCarousel = () => {
           className="text-center mb-12"
         >
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 font-display font-semibold text-accent text-xs tracking-widest uppercase mb-4">
-            Démonstrations Pro
+            {sectionSubtitle}
           </span>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white mt-3">Nos Projets en Action</h2>
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white mt-3">{sectionTitle}</h2>
         </motion.div>
 
         <div className="relative">

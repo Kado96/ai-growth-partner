@@ -5,7 +5,38 @@
     "description": "Agence de communication, technologie et solutions digitales : web, mobile, IA, collecte de données et suivi-évaluation pour entreprises, ONG, institutions et particuliers.",
     "logoPath": "/logo.PNG",
     "email": "kandekedonald@gmail.com",
-    "phone": "+257 79 92 88 64"
+    "phone": "+257 79 92 88 64",
+    "address": "Bujumbura, Burundi"
+  },
+  "projects": {
+    "title": "Nos Projets en Action",
+    "subtitle": "Démonstrations Pro",
+    "items": [
+      {
+        "id": "1",
+        "title": "Assistant IA — Gestion des Réservations",
+        "client": "Chaîne de restaurants semi-gastronomiques",
+        "description": "Agent IA multicanal (WhatsApp + site web) pour réservations, commandes à emporter, FAQ.",
+        "impact": "+40% de réservations automatisées, -60% d'appels entrants",
+        "youtubeId": "dQw4w9WgXcQ"
+      },
+      {
+        "id": "2",
+        "title": "Scoring de Leads IA",
+        "client": "Agence de génération de leads B2B",
+        "description": "Modèle IA de qualification automatique des prospects.",
+        "impact": "+70% de taux de conversion, meilleure priorisation",
+        "youtubeId": "dQw4w9WgXcQ"
+      },
+      {
+        "id": "3",
+        "title": "Agent Conversationnel WhatsApp",
+        "client": "Sites web & e-commerce",
+        "description": "Agent conversationnel autonome pour gérer 80% des requêtes utilisateurs ou prospects.",
+        "impact": "Temps de réponse 3x plus rapide, -50% charge support",
+        "youtubeId": "dQw4w9WgXcQ"
+      }
+    ]
   },
   "services": {
     "title": "Nos Services",
@@ -132,7 +163,7 @@
     "KORA AGENCY : Agence complète — communication, web, Android, data et IA.",
     "NOUVEAU : Enquêtes, collecte de données et suivi-évaluation pour ONG et projets.",
     "VISION : IA et API en kirundi pour rapprocher la tech de la population burundaise.",
-    "PRODUITS : Marketplace vendeurs/acheteurs et QuickSales pour boutiques."
+    "PRODUITS : Marketplace vendeurs/acheteurs pour boutiques."
   ],
   "hero": {
     "badge": "Communication · Tech · Data · IA",

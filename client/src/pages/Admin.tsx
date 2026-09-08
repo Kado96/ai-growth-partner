@@ -283,6 +283,37 @@ const Admin = () => {
   };
 
   // --- CRUD Helpers ---
+  const addProject = () => {
+    const newProject = {
+      id: `${Date.now()}`,
+      title: "Nouveau Projet IA",
+      client: "Nom du Client",
+      description: "Description du projet et des technologies utilisées.",
+      impact: "+50% d'efficacité",
+      youtubeId: "dQw4w9WgXcQ"
+    };
+    const currentProjects = editedConfig.projects?.items || [];
+    setEditedConfig({
+      ...editedConfig,
+      projects: {
+        ...(editedConfig.projects || { title: "Nos Projets en Action", subtitle: "Démonstrations Pro" }),
+        items: [...currentProjects, newProject]
+      }
+    });
+  };
+
+  const removeProject = (index: number) => {
+    const currentProjects = [...(editedConfig.projects?.items || [])];
+    currentProjects.splice(index, 1);
+    setEditedConfig({
+      ...editedConfig,
+      projects: {
+        ...editedConfig.projects,
+        items: currentProjects
+      }
+    });
+  };
+
   const addService = () => {
     const newService = {
       id: `service_${Date.now()}`,
@@ -418,6 +449,7 @@ const Admin = () => {
           {[
             { id: 'branding', label: 'Branding & Identité', icon: Globe },
             { id: 'hero', label: 'Section Accueil (Hero)', icon: Layout },
+            { id: 'projects', label: 'Projets en Action', icon: Play },
             { id: 'services', label: 'Gestion des Services', icon: Settings },
             { id: 'methodology', label: 'Méthodologie Audit', icon: Layers },
             { id: 'news', label: 'Notifications Ticker', icon: MessageSquare },
@@ -450,8 +482,8 @@ const Admin = () => {
             {activeTab === 'branding' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div>
-                  <h2 className="text-2xl font-display font-bold text-white mb-2">Identité de l'Agence</h2>
-                  <p className="text-slate-400 text-sm">Configurez le nom et les messages globaux de votre marque.</p>
+                  <h2 className="text-2xl font-display font-bold text-white mb-2">Identité & Coordonnées</h2>
+                  <p className="text-slate-400 text-sm">Configurez le nom, la description et les coordonnées de l'agence.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
@@ -472,6 +504,40 @@ const Admin = () => {
                       value={editedConfig.branding?.motto || ''}
                       onChange={e => setEditedConfig({ ...editedConfig, branding: { ...editedConfig.branding, motto: e.target.value } })}
                       className="bg-slate-900 border-white/10 h-12"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="brand-email" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Adresse Email</label>
+                    <Input
+                      id="brand-email"
+                      name="brand-email"
+                      type="email"
+                      value={editedConfig.branding?.email || ''}
+                      onChange={e => setEditedConfig({ ...editedConfig, branding: { ...editedConfig.branding, email: e.target.value } })}
+                      className="bg-slate-900 border-white/10 h-12"
+                      placeholder="contact@kora-agency.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="brand-phone" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Numéro de Téléphone / WhatsApp</label>
+                    <Input
+                      id="brand-phone"
+                      name="brand-phone"
+                      value={editedConfig.branding?.phone || ''}
+                      onChange={e => setEditedConfig({ ...editedConfig, branding: { ...editedConfig.branding, phone: e.target.value } })}
+                      className="bg-slate-900 border-white/10 h-12"
+                      placeholder="+257 79 92 88 64"
+                    />
+                  </div>
+                  <div className="md:col-span-2 space-y-2">
+                    <label htmlFor="brand-address" className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Adresse Physique</label>
+                    <Input
+                      id="brand-address"
+                      name="brand-address"
+                      value={editedConfig.branding?.address || ''}
+                      onChange={e => setEditedConfig({ ...editedConfig, branding: { ...editedConfig.branding, address: e.target.value } })}
+                      className="bg-slate-900 border-white/10 h-12"
+                      placeholder="Bujumbura, Burundi"
                     />
                   </div>
                   <div className="md:col-span-2 space-y-2">
@@ -574,6 +640,108 @@ const Admin = () => {
                       placeholder="Ex: /media/xyz.jpg ou https://..."
                     />
                   </div>
+                </div>
+              </div>
+            {activeTab === 'projects' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <h2 className="text-2xl font-display font-bold text-white mb-2">Projets en Action</h2>
+                    <p className="text-slate-400 text-sm">Gérez les démonstrations de projets de votre vitrine.</p>
+                  </div>
+                  <Button onClick={addProject} size="sm" className="bg-accent hover:bg-accent/80 gap-2 rounded-full">
+                    <Plus size={16} /> Nouveau Projet
+                  </Button>
+                </div>
+
+                <div className="space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar pr-4">
+                  {(editedConfig.projects?.items || []).map((item: any, idx: number) => (
+                    <div key={idx} className="p-6 rounded-2xl border border-white/5 bg-white/[0.02] space-y-5 relative group">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeProject(idx)}
+                        className="absolute top-4 right-4 text-slate-600 hover:text-red-500 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all rounded-full"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label htmlFor={`project-title-${idx}`} className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Titre du Projet</label>
+                          <Input
+                            id={`project-title-${idx}`}
+                            name={`project-title-${idx}`}
+                            value={item.title || ''}
+                            onChange={e => {
+                              const newItems = [...(editedConfig.projects?.items || [])];
+                              newItems[idx].title = e.target.value;
+                              setEditedConfig({ ...editedConfig, projects: { ...editedConfig.projects, items: newItems } });
+                            }}
+                            className="bg-slate-900 border-white/5"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label htmlFor={`project-client-${idx}`} className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Client / Secteur</label>
+                          <Input
+                            id={`project-client-${idx}`}
+                            name={`project-client-${idx}`}
+                            value={item.client || ''}
+                            onChange={e => {
+                              const newItems = [...(editedConfig.projects?.items || [])];
+                              newItems[idx].client = e.target.value;
+                              setEditedConfig({ ...editedConfig, projects: { ...editedConfig.projects, items: newItems } });
+                            }}
+                            className="bg-slate-900 border-white/5"
+                          />
+                        </div>
+                        <div className="md:col-span-2 space-y-1">
+                          <label htmlFor={`project-desc-${idx}`} className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Description</label>
+                          <Textarea
+                            id={`project-desc-${idx}`}
+                            name={`project-desc-${idx}`}
+                            rows={2}
+                            value={item.description || ''}
+                            onChange={e => {
+                              const newItems = [...(editedConfig.projects?.items || [])];
+                              newItems[idx].description = e.target.value;
+                              setEditedConfig({ ...editedConfig, projects: { ...editedConfig.projects, items: newItems } });
+                            }}
+                            className="bg-slate-900 border-white/5"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label htmlFor={`project-impact-${idx}`} className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Résultats / Impact (ex: +70% conversion)</label>
+                          <Input
+                            id={`project-impact-${idx}`}
+                            name={`project-impact-${idx}`}
+                            value={item.impact || ''}
+                            onChange={e => {
+                              const newItems = [...(editedConfig.projects?.items || [])];
+                              newItems[idx].impact = e.target.value;
+                              setEditedConfig({ ...editedConfig, projects: { ...editedConfig.projects, items: newItems } });
+                            }}
+                            className="bg-slate-900 border-white/5"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label htmlFor={`project-yt-${idx}`} className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">ID Vidéo YouTube (ex: dQw4w9WgXcQ)</label>
+                          <Input
+                            id={`project-yt-${idx}`}
+                            name={`project-yt-${idx}`}
+                            value={item.youtubeId || ''}
+                            onChange={e => {
+                              const newItems = [...(editedConfig.projects?.items || [])];
+                              newItems[idx].youtubeId = e.target.value;
+                              setEditedConfig({ ...editedConfig, projects: { ...editedConfig.projects, items: newItems } });
+                            }}
+                            className="bg-slate-900 border-white/5"
+                            placeholder="dQw4w9WgXcQ"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

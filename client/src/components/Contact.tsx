@@ -4,8 +4,14 @@ import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { submitContact } from "@/lib/api";
 import { toast } from "sonner";
+import { useConfig } from "@/context/ConfigContext";
 
 const Contact = () => {
+  const { config } = useConfig();
+  const email = config.branding?.email || "kandekedonald@gmail.com";
+  const phone = config.branding?.phone || "+257 79 92 88 64";
+  const address = config.branding?.address || "Bujumbura, Burundi";
+
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -104,9 +110,9 @@ const Contact = () => {
             className="space-y-6"
           >
             {[
-              { icon: Mail, title: "Email", content: "koraagency05@gmail.com", href: "mailto:koraagency05@gmail.com" },
-              { icon: Phone, title: "Téléphone", content: "+257 69 725 535", href: "tel:+25769725535" },
-              { icon: MapPin, title: "Adresse", content: "Bujumbura, Burundi", href: undefined },
+              { icon: Mail, title: "Email", content: email, href: `mailto:${email}` },
+              { icon: Phone, title: "Téléphone", content: phone, href: `tel:${phone.replace(/\s+/g, '')}` },
+              { icon: MapPin, title: "Adresse", content: address, href: undefined },
             ].map((item) => (
               <div key={item.title} className="glass-card p-5 flex items-start gap-4 hover:border-accent/30 transition-all duration-300 group">
                 <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
