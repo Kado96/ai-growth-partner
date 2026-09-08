@@ -3,15 +3,11 @@ import Hero from "@/components/Hero";
 import Services from "@/components/Services";
 import ProjectsCarousel from "@/components/ProjectsCarousel";
 import About from "@/components/About";
-import VideoGallery from "@/components/VideoGallery";
+import PresentationPlayer from "@/components/PresentationPlayer";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import QuoteWizard from "@/components/QuoteWizard";
-import { useQuote } from "@/hooks/use-quote";
 
 const Index = () => {
-  const { isOpen, closeQuote } = useQuote();
-  
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -19,7 +15,7 @@ const Index = () => {
       <Services />
       <ProjectsCarousel />
       <About />
-      <VideoGallery />
+      <PresentationPlayer />
       <Contact />
       <Footer />
     </div>

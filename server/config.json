@@ -7,25 +7,6 @@
     "email": "kandekedonald@gmail.com",
     "phone": "+257 79 92 88 64"
   },
-  "hero": {
-    "badge": "Communication · Tech · Data · IA",
-    "title": "Kora Agency. Solutions digitales adaptées au Burundi et au-delà.",
-    "description": "Nous créons des solutions technologiques utiles et accessibles pour entreprises, ONG, institutions, banques, commerces et particuliers : de l'idée au déploiement, jusqu'au suivi et à l'évaluation.",
-    "stats": [
-      {
-        "value": "7",
-        "label": "Pôles d'expertise"
-      },
-      {
-        "value": "End-to-end",
-        "label": "De l'idée au S&E"
-      },
-      {
-        "value": "Local",
-        "label": "Focus Burundi & kirundi"
-      }
-    ]
-  },
   "services": {
     "title": "Nos Services",
     "subtitle": "Kora Agency",
@@ -124,12 +105,6 @@
       }
     ]
   },
-  "news": [
-    "KORA AGENCY : Agence complète — communication, web, Android, data et IA.",
-    "NOUVEAU : Enquêtes, collecte de données et suivi-évaluation pour ONG et projets.",
-    "VISION : IA et API en kirundi pour rapprocher la tech de la population burundaise.",
-    "PRODUITS : Marketplace vendeurs/acheteurs et QuickSales pour boutiques."
-  ],
   "about": {
     "title": "Notre Vision",
     "motto": "Utiliser la technologie pour faciliter la vie et rendre le numérique accessible.",
@@ -150,6 +125,31 @@
       {
         "title": "Com, Data & S&E",
         "desc": "Communiquer, collecter, analyser et améliorer en continu."
+      }
+    ]
+  },
+  "news": [
+    "KORA AGENCY : Agence complète — communication, web, Android, data et IA.",
+    "NOUVEAU : Enquêtes, collecte de données et suivi-évaluation pour ONG et projets.",
+    "VISION : IA et API en kirundi pour rapprocher la tech de la population burundaise.",
+    "PRODUITS : Marketplace vendeurs/acheteurs et QuickSales pour boutiques."
+  ],
+  "hero": {
+    "badge": "Communication · Tech · Data · IA",
+    "title": "Kora Agency. Solutions digitales adaptées au Burundi et au-delà.",
+    "description": "Nous créons des solutions technologiques utiles et accessibles pour entreprises, ONG, institutions, banques, commerces et particuliers : de l'idée au déploiement, jusqu'au suivi et à l'évaluation.",
+    "stats": [
+      {
+        "value": "7",
+        "label": "Pôles d'expertise"
+      },
+      {
+        "value": "End-to-end",
+        "label": "De l'idée au S&E"
+      },
+      {
+        "value": "Local",
+        "label": "Focus Burundi & kirundi"
       }
     ]
   },

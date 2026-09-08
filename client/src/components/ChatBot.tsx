@@ -24,13 +24,14 @@ type ChatMessage = {
   from: "assistant" | "user";
   text: string;
   isLoading?: boolean;
+  suggestions?: string[];
 };
 
 const ChatBot = () => {
   const { openQuote } = useQuote();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: 1, from: "assistant", text: WELCOME_TEXT },
+    { id: 1, from: "assistant", text: WELCOME_TEXT, suggestions: SUGGESTIONS },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -73,7 +74,12 @@ const ChatBot = () => {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === loadingId
-              ? { id: loadingId, from: "assistant", text: data.response }
+              ? {
+                  id: loadingId,
+                  from: "assistant",
+                  text: data.response,
+                  suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
+                }
               : m
           )
         );
@@ -167,25 +173,31 @@ const ChatBot = () => {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.map((msg) => (
-                <MessageBubble key={msg.id} msg={msg} />
-              ))}
-
-              {messages.length === 1 && !isTyping && (
-                <div className="flex flex-wrap gap-1.5 pt-1 pl-9">
-                  {SUGGESTIONS.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() =>
-                        s.toLowerCase().includes("devis") ? handleDevis() : sendMessage(s)
-                      }
-                      className="text-[11px] px-2.5 py-1 rounded-full border border-accent/40 text-accent hover:bg-accent hover:text-white transition-colors"
-                    >
-                      {s}
-                    </button>
-                  ))}
+                <div key={msg.id} className="space-y-2">
+                  <MessageBubble msg={msg} />
+                  {msg.from === "assistant" &&
+                    !msg.isLoading &&
+                    msg.suggestions &&
+                    msg.suggestions.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pl-9">
+                        {msg.suggestions.map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() =>
+                              s.toLowerCase().includes("devis")
+                                ? handleDevis()
+                                : sendMessage(s)
+                            }
+                            className="text-[11px] px-2.5 py-1 rounded-full border border-accent/40 text-accent hover:bg-accent hover:text-white transition-colors"
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                 </div>
-              )}
+              ))}
               <div ref={messagesEndRef} />
             </div>
 

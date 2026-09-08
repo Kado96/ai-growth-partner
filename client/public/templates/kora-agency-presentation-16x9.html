@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080" />
+  <title>Kora Agency — Présentation Officielle (16:9 30s)</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #030712; color: #fff; font-family: "Plus Jakarta Sans", system-ui, sans-serif; overflow: hidden; }
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: #030712;
+    }
+    .clip { position: absolute; inset: 0; opacity: 0; visibility: hidden; }
+    .clip.active { opacity: 1; visibility: visible; }
+
+    /* Background Grid & FX */
+    .grid-overlay {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 100px 100px;
+      z-index: 1;
+    }
+    .scene-vignette {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(3,7,18,0.2) 0%, rgba(3,7,18,0.92) 100%);
+      z-index: 2;
+    }
+
+    /* Layout Elements */
+    .header {
+      position: absolute; top: 60px; left: 100px; right: 100px; z-index: 10;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .brand-logo {
+      font-size: 36px; font-weight: 900; letter-spacing: 2px; color: #fff;
+      display: flex; align-items: center; gap: 15px;
+    }
+    .brand-dot { width: 16px; height: 16px; background: #38bdf8; border-radius: 50%; box-shadow: 0 0 20px #38bdf8; }
+    .category-badge {
+      background: rgba(56, 189, 248, 0.15); border: 2px solid #38bdf8; color: #38bdf8;
+      padding: 10px 24px; border-radius: 999px; font-size: 20px; font-weight: 800; text-transform: uppercase;
+    }
+
+    .main-stage {
+      position: relative; z-index: 10; height: 100%;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 0 160px; text-align: center;
+    }
+
+    .pill-tag {
+      display: inline-block; background: rgba(99, 102, 241, 0.2); border: 1px solid #6366f1;
+      color: #a5b4fc; font-size: 22px; font-weight: 800; padding: 10px 28px; border-radius: 999px;
+      margin-bottom: 24px; text-transform: uppercase; letter-spacing: 2px;
+    }
+    .headline {
+      font-size: 80px; font-weight: 900; line-height: 1.1; margin: 0; text-transform: uppercase;
+      letter-spacing: -2px;
+    }
+    .headline span.blue {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .headline span.yellow { color: #facc15; }
+    .headline span.green { color: #10b981; }
+
+    .subline {
+      font-size: 30px; font-weight: 700; color: #94a3b8; max-width: 1200px; margin-top: 24px; line-height: 1.4;
+    }
+
+    /* Cards Layout for Services */
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 50px; width: 100%;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px); border-radius: 30px; padding: 40px; text-align: left;
+    }
+    .card-icon { font-size: 50px; margin-bottom: 20px; }
+    .card-title { font-size: 32px; font-weight: 900; color: #fff; margin-bottom: 12px; }
+    .card-desc { font-size: 20px; color: #94a3b8; font-weight: 600; line-height: 1.4; }
+
+    /* Footer & CTA */
+    .cta-btn {
+      margin-top: 40px; background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+      color: #fff; font-size: 32px; font-weight: 900; padding: 24px 50px; border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(37,99,235,0.5); border: 2px solid rgba(255,255,255,0.2);
+      text-transform: uppercase; display: inline-flex; align-items: center; gap: 15px;
+    }
+    .footer-url {
+      position: absolute; bottom: 50px; left: 0; right: 0; z-index: 10; text-align: center;
+      font-size: 24px; font-weight: 800; color: #64748b; letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div class="grid-overlay"></div>
+    <div class="scene-vignette"></div>
+
+    <div class="header">
+      <div class="brand-logo"><div class="brand-dot"></div> KORA AGENCY</div>
+      <div class="category-badge">Présentation 2026</div>
+    </div>
+
+    <!-- SCENE 1: HOOK (0s - 6s) -->
+    <section id="scene-0" class="clip active">
+      <div class="main-stage">
+        <div class="pill-tag" id="pill-0">🚀 TECHNOLOGIE ACCESSIBLE & LOCALE</div>
+        <h1 class="headline" id="headline-0">VOTRE PARTENAIRE DIGITAL <br><span class="blue">ET DE CROISSANCE IA</span></h1>
+        <p class="subline" id="subline-0">Solutions web, mobile, collecte de données et intelligence artificielle pour entreprises et ONG.</p>
+        <div class="cta-btn" id="cta-0">DÉCOUVRIR L'AGENCE ➔</div>
+      </div>
+    </section>
+
+    <!-- SCENE 2: SERVICES CLÉS (6s - 12s) -->
+    <section id="scene-1" class="clip">
+      <div class="main-stage">
+        <h1 class="headline" id="headline-1">NOS DOMAINES <span class="yellow">D'EXPERTISE</span></h1>
+        <div class="cards-grid">
+          <div class="card" id="card-1-1">
+            <div class="card-icon">🌐</div>
+            <div class="card-title">Développement Web</div>
+            <div class="card-desc">Sites vitrines, plateformes professionnelles et applications web sur-mesure.</div>
+          </div>
+          <div class="card" id="card-1-2">
+            <div class="card-icon">📱</div>
+            <div class="card-title">Applications Android</div>
+            <div class="card-desc">Conception, intégration et digitalisation complète de vos services mobiles.</div>
+          </div>
+          <div class="card" id="card-1-3">
+            <div class="card-icon">🤖</div>
+            <div class="card-title">IA & Kirundi</div>
+            <div class="card-desc">Intégration d'APIs et technologies IA adaptées à la langue locale.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 3: DATA & S&E (12s - 18s) -->
+    <section id="scene-2" class="clip">
+      <div class="main-stage">
+        <div class="pill-tag" id="pill-2" style="border-color:#10b981; color:#34d399;">📊 PÔLE DATA & IMPACT</div>
+        <h1 class="headline" id="headline-2">COLLECTE DE DONNÉES <br><span class="green">& SUIVI-ÉVALUATION</span></h1>
+        <p class="subline" id="subline-2">Conception de formulaires, enquêtes terrain, analyse de données et tableaux de bord temps réel pour ONG et projets de développement.</p>
+      </div>
+    </section>
+
+    <!-- SCENE 4: SOLUTIONS BUSINESS (18s - 24s) -->
+    <section id="scene-3" class="clip">
+      <div class="main-stage">
+        <h1 class="headline" id="headline-3">PRODUITS & <span class="yellow">SOLUTIONS SUR-MESURE</span></h1>
+        <div class="cards-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 1200px;">
+          <div class="card" id="card-3-1">
+            <div class="card-icon">🏪</div>
+            <div class="card-title">Marketplace Intelligente</div>
+            <div class="card-desc">Mise en relation acheteurs/vendeurs avec chatbot IA guidé.</div>
+          </div>
+          <div class="card" id="card-3-2">
+            <div class="card-icon">📦</div>
+            <div class="card-title">QuickSales</div>
+            <div class="card-desc">Gestion et contrôle des stocks et ventes pour boutiques et magasins.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 5: FINAL CTA (24s - 30s) -->
+    <section id="scene-4" class="clip">
+      <div class="main-stage">
+        <div class="pill-tag" id="pill-4" style="border-color:#38bdf8; color:#38bdf8;">🌐 VISITEZ NOTRE SITE WEB</div>
+        <h1 class="headline" id="headline-4">DONNEZ VIE À VOS PROJETS <br><span class="blue">AVEC KORA AGENCY</span></h1>
+        <div class="cta-btn" id="cta-4" style="margin-top: 50px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">DEMANDER UN DEVIS GRATUIT ➔</div>
+      </div>
+    </section>
+
+    <div class="footer-url">koragency.netlify.app • Bujumbura, Burundi • kandekedonald@gmail.com</div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: false, repeat: -1 });
+
+    const scenes = [0, 6, 12, 18, 24];
+    scenes.forEach((startTime, idx) => {
+      tl.call(() => {
+        document.querySelectorAll('.clip').forEach(c => c.classList.remove('active'));
+        document.getElementById(`scene-${idx}`).classList.add('active');
+      }, null, startTime);
+    });
+
+    // SCENE 1 (0s-6s)
+    tl.from("#pill-0", { scale: 0.8, opacity: 0, duration: 0.4, ease: "back.out(1.7)" }, 0.2);
+    tl.from("#headline-0", { y: 60, opacity: 0, duration: 0.6, ease: "power4.out" }, 0.4);
+    tl.from("#subline-0", { y: 30, opacity: 0, duration: 0.4 }, 0.6);
+    tl.from("#cta-0", { scale: 0.9, opacity: 0, duration: 0.5, ease: "back.out(1.5)" }, 0.8);
+
+    // SCENE 2 (6s-12s)
+    tl.from("#headline-1", { y: 50, opacity: 0, duration: 0.5 }, 6.2);
+    tl.from("#card-1-1", { y: 60, opacity: 0, duration: 0.4 }, 6.4);
+    tl.from("#card-1-2", { y: 60, opacity: 0, duration: 0.4 }, 6.6);
+    tl.from("#card-1-3", { y: 60, opacity: 0, duration: 0.4 }, 6.8);
+
+    // SCENE 3 (12s-18s)
+    tl.from("#pill-2", { scale: 0.8, opacity: 0, duration: 0.4 }, 12.2);
+    tl.from("#headline-2", { y: 60, opacity: 0, duration: 0.6 }, 12.4);
+    tl.from("#subline-2", { y: 30, opacity: 0, duration: 0.4 }, 12.6);
+
+    // SCENE 4 (18s-24s)
+    tl.from("#headline-3", { y: 50, opacity: 0, duration: 0.5 }, 18.2);
+    tl.from("#card-3-1", { x: -60, opacity: 0, duration: 0.5 }, 18.4);
+    tl.from("#card-3-2", { x: 60, opacity: 0, duration: 0.5 }, 18.6);
+
+    // SCENE 5 (24s-30s)
+    tl.from("#pill-4", { scale: 0.8, opacity: 0, duration: 0.4 }, 24.2);
+    tl.from("#headline-4", { y: 60, opacity: 0, duration: 0.6 }, 24.4);
+    tl.from("#cta-4", { scale: 0.9, opacity: 0, duration: 0.5, ease: "back.out(1.5)" }, 24.7);
+
+    window.__timelines = { main: tl };
+  </script>
+</body>
+</html>

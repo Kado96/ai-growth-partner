@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "populate:knowledge": "node scripts/populateKnowledgeAlexa.js",
+    "test:brain": "node scripts/test-alexa-brain.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

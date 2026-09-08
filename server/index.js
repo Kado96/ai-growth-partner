@@ -828,6 +828,7 @@ const buildOfflineReply = (message, config, matchedServices, history = []) => {
 };
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { alexaBrain } = require('./services/alexaBrain');
 
 app.post('/api/chat', async (req, res) => {
     try {
@@ -835,25 +836,52 @@ app.post('/api/chat', async (req, res) => {
         if (!message?.trim()) return res.status(400).json({ error: 'Message requis.' });
 
         const config = await getConfig();
-        const { context: localContext, matchedServices } = await getLocalContext(message, config);
         const recentHistory = Array.isArray(history) ? history.slice(-8) : [];
-        const systemPrompt = buildAlexaPrompt(config, localContext, matchedServices, recentHistory);
+
+        // 1) Moteur local BM25 + intentions (marche SANS clé IA)
+        const brain = await alexaBrain.answer(message, config, recentHistory);
 
         const hasGemini = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'votre_cle_gemini_ici';
 
+        // 2) Gemini optionnel : reformule avec le contexte BM25 (n'invente pas)
         if (hasGemini) {
             try {
-                const response = await generateWithGemini(systemPrompt, message);
-                return res.json({ response, mode: 'gemini' });
+                const matchedServiceObjs = brain.hits
+                    .filter((h) => h.type === 'service')
+                    .map((h) => (config.services?.items || []).find((s) => s.id === h.id))
+                    .filter(Boolean);
+
+                const systemPrompt = buildAlexaPrompt(
+                    config,
+                    brain.contextForLlm,
+                    matchedServiceObjs,
+                    recentHistory
+                );
+                const geminiText = await generateWithGemini(
+                    `${systemPrompt}\n\nCONTEXTE RETRIEVAL BM25 (base-toi UNIQUEMENT là-dessus, n'invente rien) :\n${brain.contextForLlm}\n\nRéponse hors-ligne de référence (améliore le style, garde les faits) :\n${brain.answer}`,
+                    message
+                );
+                return res.json({
+                    response: geminiText,
+                    mode: 'gemini+bm25',
+                    intent: brain.intent,
+                    suggestions: brain.suggestions,
+                    hits: brain.hits,
+                });
             } catch (aiErr) {
                 console.error('[GEMINI_ERROR]', aiErr.message);
             }
         } else {
-            console.warn(`[${ASSISTANT_NAME}] GEMINI_API_KEY absente — mode hors-ligne`);
+            console.warn(`[${ASSISTANT_NAME}] Mode BM25 hors-ligne (pas de Gemini)`);
         }
 
-        const response = buildOfflineReply(message, config, matchedServices, recentHistory);
-        res.json({ response, mode: 'offline' });
+        res.json({
+            response: brain.answer,
+            mode: 'bm25',
+            intent: brain.intent,
+            suggestions: brain.suggestions,
+            hits: brain.hits,
+        });
     } catch (err) {
         console.error('[CHAT_ERROR]', err);
         res.status(500).json({ error: "Erreur d'intelligence." });
@@ -870,9 +898,10 @@ app.get('/api/knowledge', requireAdmin, async (req, res) => {
 
 app.post('/api/knowledge', requireAdmin, async (req, res) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, category } = req.body;
         if (!title || !content) return res.status(400).json({ error: "Champs manquants." });
-        const item = await Knowledge.create({ title, content });
+        const item = await Knowledge.create({ title, content, category: category || 'général' });
+        alexaBrain.invalidate();
         res.json(item);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -880,8 +909,24 @@ app.post('/api/knowledge', requireAdmin, async (req, res) => {
 app.delete('/api/knowledge/:id', requireAdmin, async (req, res) => {
     try {
         await Knowledge.destroy({ where: { id: req.params.id } });
+        alexaBrain.invalidate();
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/chat/brain-status', async (_req, res) => {
+    try {
+        const config = await getConfig();
+        await alexaBrain.ensureIndex(config);
+        res.json({
+            ready: true,
+            docs: alexaBrain.docs.length,
+            cacheAgeMs: Date.now() - alexaBrain.lastLoad,
+            engine: 'BM25 + intent (AlexaBrain)',
+        });
+    } catch (e) {
+        res.status(500).json({ ready: false, error: e.message });
+    }
 });
 
 // --- BLOG & MEDIA AUTOMATION ---
