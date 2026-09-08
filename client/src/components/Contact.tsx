@@ -12,7 +12,7 @@ const Contact = () => {
   const phone = config?.branding?.phone || "+257 79 92 88 64";
   const address = config?.branding?.address || "Bujumbura, Burundi";
 
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", whatsapp: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +21,7 @@ const Contact = () => {
     try {
       await submitContact(form);
       toast.success("Message envoyé avec succès !");
-      setForm({ name: "", email: "", message: "" });
+      setForm({ name: "", email: "", whatsapp: "", message: "" });
     } catch (err) {
       toast.error("Erreur lors de l'envoi du message.");
     } finally {
@@ -82,6 +82,18 @@ const Contact = () => {
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm font-body text-foreground focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition placeholder:text-muted-foreground/50"
                 placeholder="votre@email.com"
+              />
+            </div>
+            <div>
+              <label htmlFor="form-whatsapp" className="font-body text-sm font-medium text-foreground block mb-2">Téléphone / WhatsApp (Optionnel)</label>
+              <input
+                id="form-whatsapp"
+                name="whatsapp"
+                type="tel"
+                value={form.whatsapp || ""}
+                onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm font-body text-foreground focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition placeholder:text-muted-foreground/50"
+                placeholder="+257 79 00 00 00"
               />
             </div>
             <div>
