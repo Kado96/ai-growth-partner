@@ -22,16 +22,18 @@ async function sync() {
     // For each section in config.json
     for (const [sectionKey, sectionData] of Object.entries(configData)) {
       if (sectionKey === 'news') {
-        // Special case for news array
+        // Special case for news array (strings or objects)
         console.log(`[SYNC] Updating section: ${sectionKey} (Array)`);
         const items = Array.isArray(sectionData) ? sectionData : [];
         for (let i = 0; i < items.length; i++) {
+          const entry = items[i];
+          const isObj = entry && typeof entry === 'object';
           await Content.create({
             section: 'news',
             name: `news_${i}`,
-            title: items[i].title || '',
-            description: items[i].text || '',
-            metadata: items[i]
+            title: isObj ? (entry.title || '') : '',
+            description: isObj ? (entry.text || entry.description || '') : String(entry || ''),
+            metadata: entry
           });
         }
       } else {

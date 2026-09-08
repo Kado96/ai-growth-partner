@@ -22,7 +22,13 @@ if (process.env.DATABASE_URL) {
   sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: path.join(__dirname, '../database.sqlite3'),
-    logging: false
+    logging: false,
+    retry: { max: 3 },
+    pool: { max: 1, idle: 10000 },
+    dialectOptions: {
+      // évite les hangs infinis si un autre process (sync) lock le fichier
+      timeout: 5000
+    }
   });
   console.log('[DB] Connexion SQLite locale configurée.');
 }

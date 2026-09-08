@@ -1,76 +1,111 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  X, FileText, Mail, Bot, Send,
-  Sparkles, MessageSquare, Briefcase, Zap,
-  Terminal, ShieldCheck, HeartPulse
+  X, FileText, Bot, Send, User, Loader2, MessageCircle, Phone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useQuote } from "@/hooks/use-quote";
 import { submitChatSummary, chatWithAlexa, getMediaUrl } from "@/lib/api";
-import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
+
+const WELCOME_TEXT =
+  "Bienvenue chez **Kora Agency**.\n\nJe suis **Alexa**, votre concierge digital. C'est un honneur de vous accueillir. Dites-moi simplement ce dont vous avez besoin, je m'occupe du reste avec attention et discrétion.";
+
+const SUGGESTIONS = [
+  "Présentez-moi vos services",
+  "Je souhaite un site web",
+  "Enquêtes & suivi-évaluation",
+  "Demander un devis",
+];
+
+type ChatMessage = {
+  id: number;
+  from: "assistant" | "user";
+  text: string;
+  isLoading?: boolean;
+};
 
 const ChatBot = () => {
   const { openQuote } = useQuote();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Array<{ from: string; text: string }>>([
-    { from: "assistant", text: "Bonjour ! Je suis **Alexa**, votre assistante chez Kora Agency. Dites-moi ce que vous voulez développer — site web, réseaux sociaux, visibilité — et on en parle ensemble." }
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { id: 1, from: "assistant", text: WELCOME_TEXT },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  // Initial greeting
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-    }, 4000);
+    const timer = setTimeout(() => setIsOpen(true), 3500);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSend = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!inputValue.trim()) return;
+  const sendMessage = useCallback(
+    async (raw?: string) => {
+      const userMsg = (raw ?? inputValue).trim();
+      if (!userMsg || isTyping) return;
 
-    const userMsg = inputValue.trim();
-    setMessages(prev => [...prev, { from: "user", text: userMsg }]);
-    setInputValue("");
-    setIsTyping(true);
+      setInputValue("");
+      setIsTyping(true);
 
-    try {
-      console.log(`[ALEXA] Envoi : "${userMsg}"...`);
-      const data = await chatWithAlexa(userMsg, messages);
-      console.log("[ALEXA] Réponse :", data.response);
-      setMessages(prev => [...prev, { from: "assistant", text: data.response }]);
-    } catch (err) {
-      console.error("[ALEXA_ERROR]", err);
-      setMessages(prev => [...prev, {
+      const historyForApi = messages.map((m) => ({ from: m.from, text: m.text }));
+      const userEntry: ChatMessage = { id: Date.now(), from: "user", text: userMsg };
+      const loadingId = Date.now() + 1;
+      const loadingEntry: ChatMessage = {
+        id: loadingId,
         from: "assistant",
-        text: "Désolé, petite coupure de connexion. Réessayez dans un instant, ou écrivez-nous sur WhatsApp au **+257 79 92 88 64**."
-      }]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
+        text: "",
+        isLoading: true,
+      };
+
+      setMessages((prev) => [...prev, userEntry, loadingEntry]);
+
+      try {
+        const data = await chatWithAlexa(userMsg, [
+          ...historyForApi,
+          { from: "user", text: userMsg },
+        ]);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === loadingId
+              ? { id: loadingId, from: "assistant", text: data.response }
+              : m
+          )
+        );
+      } catch {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === loadingId
+              ? {
+                  id: loadingId,
+                  from: "assistant",
+                  text: "Je vous prie de m'excuser : une brève interruption est survenue. Puis-je vous proposer de réessayer, ou de nous joindre directement sur WhatsApp au **+257 79 92 88 64** ?",
+                }
+              : m
+          )
+        );
+      } finally {
+        setIsTyping(false);
+      }
+    },
+    [inputValue, isTyping, messages]
+  );
 
   const handleClose = async () => {
-    // If we have more than the welcome message, send summary
     if (messages.length > 1) {
       try {
-        await submitChatSummary({ transcript: messages });
-        console.log("[CHAT] Résumé envoyé par email.");
-      } catch (err) {
-        console.error("Failed to send chat summary", err);
+        await submitChatSummary({
+          transcript: messages
+            .filter((m) => !m.isLoading)
+            .map((m) => ({ from: m.from, text: m.text })),
+        });
+      } catch {
+        /* silencieux */
       }
     }
     setIsOpen(false);
@@ -83,177 +118,221 @@ const ChatBot = () => {
 
   return (
     <>
-      {/* Floating Entry Button */}
       {!isOpen && (
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.08 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-16 right-6 z-50 w-16 h-16 rounded-3xl bg-accent text-white flex items-center justify-center shadow-2xl shadow-accent/40 group overflow-hidden"
+          aria-label="Ouvrir le concierge Kora Agency"
+          className="fixed bottom-16 right-6 z-[9999] w-14 h-14 rounded-full bg-accent text-white shadow-xl shadow-accent/30 flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          <MessageSquare size={26} className="relative z-10" />
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-slate-950 animate-pulse" />
+          <MessageCircle className="w-6 h-6" />
+          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-slate-950" />
         </motion.button>
       )}
 
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-[60] flex justify-end">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={handleClose}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
-            />
-
-            {/* Sidebar Bot */}
-            <motion.div
-              initial={{ x: "100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "100%", opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full sm:w-[450px] bg-slate-950 h-full shadow-[-20px_0_50px_rgba(0,0,0,0.5)] border-l border-white/5 flex flex-col overflow-hidden"
-            >
-              {/* Header */}
-              <div className="p-6 bg-gradient-to-r from-accent/20 to-cta/10 border-b border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center shadow-lg shadow-accent/20">
-                      <Bot size={24} className="text-white" />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-4 border-slate-950" />
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-white text-lg leading-tight">Alexa</h4>
-                    <p className="text-[10px] text-accent font-black uppercase tracking-widest">Kora Agency</p>
-                  </div>
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ type: "spring", damping: 22, stiffness: 260 }}
+            className="fixed bottom-16 right-6 z-[9999] w-[380px] max-w-[calc(100vw-1.5rem)] h-[580px] max-h-[calc(100vh-5rem)] bg-slate-950 rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden"
+          >
+            {/* Header style Kukasoko */}
+            <div className="bg-gradient-to-r from-accent to-cta/90 text-white px-4 py-3 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                  <Bot className="w-5 h-5" />
                 </div>
-                <button
-                  onClick={handleClose}
-                  className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"
-                >
-                  <X size={20} />
-                </button>
+                <div>
+                  <p className="font-bold text-sm leading-tight">Alexa · Concierge</p>
+                  <p className="text-[11px] opacity-90 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 inline-block animate-pulse" />
+                    À votre disposition · Kora Agency
+                  </p>
+                </div>
               </div>
-
-              {/* Chat Area */}
-              <div
-                ref={scrollRef}
-                className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"
+              <button
+                onClick={handleClose}
+                className="hover:bg-white/20 rounded-full p-1.5 transition-colors"
+                aria-label="Fermer"
               >
-                {messages.map((msg, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${msg.from === "assistant" || msg.from === "alexa" ? "justify-start" : "justify-end"}`}
-                  >
-                    <div className={`max-w-[85%] p-4 rounded-3xl text-sm leading-relaxed shadow-sm ${msg.from === "assistant" || msg.from === "alexa"
-                        ? "bg-white/5 text-slate-200 rounded-bl-sm border border-white/5"
-                        : "bg-accent text-white rounded-br-sm shadow-lg shadow-accent/10"
-                      }`}>
-                      <MessageContent content={msg.text} from={msg.from} />
-                    </div>
-                  </motion.div>
-                ))}
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-                {isTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-white/5 border border-white/5 rounded-3xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
-                      <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "200ms" }} />
-                      <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: "400ms" }} />
-                    </div>
-                  </div>
-                )}
-              </div>
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {messages.map((msg) => (
+                <MessageBubble key={msg.id} msg={msg} />
+              ))}
 
-              {/* Action Quick Chips */}
-              <div className="px-6 py-2 flex gap-2 overflow-x-auto no-scrollbar">
-                <button onClick={handleDevis} className="whitespace-nowrap px-4 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-slate-300 hover:bg-accent hover:text-white transition-all flex items-center gap-2">
-                  <FileText size={12} /> Devis Gratuit
-                </button>
-                <button onClick={() => window.open("https://wa.me/25779928864")} className="whitespace-nowrap px-4 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-slate-300 hover:bg-white/10 transition-all flex items-center gap-2">
-                  <Zap size={12} /> Appel Urgent
-                </button>
-              </div>
-
-              {/* Input Footer */}
-              <div className="p-6 mt-auto border-t border-white/5 bg-slate-900/30">
-                <form onSubmit={handleSend} className="relative">
-                  <label htmlFor="chatbot-input" className="sr-only">Message pour Alexa</label>
-                  <Input
-                    id="chatbot-input"
-                    name="chatbot-input"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Écrivez à Alexa..."
-                    className="h-14 bg-white/5 border-white/10 rounded-2xl pr-14 text-white placeholder:text-slate-600 focus:border-accent/40 transition-all"
-                  />
-                  <button
-                    type="submit"
-                    aria-label="Envoyer"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-accent text-white flex items-center justify-center disabled:opacity-50 disabled:grayscale transition-all hover:scale-105 active:scale-95"
-                  >
-                    <Send size={18} />
-                  </button>
-                </form>
-                <div className="mt-4 flex items-center justify-center gap-6 opacity-40">
-                  <Terminal size={12} />
-                  <ShieldCheck size={12} />
-                  <HeartPulse size={12} />
+              {messages.length === 1 && !isTyping && (
+                <div className="flex flex-wrap gap-1.5 pt-1 pl-9">
+                  {SUGGESTIONS.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() =>
+                        s.toLowerCase().includes("devis") ? handleDevis() : sendMessage(s)
+                      }
+                      className="text-[11px] px-2.5 py-1 rounded-full border border-accent/40 text-accent hover:bg-accent hover:text-white transition-colors"
+                    >
+                      {s}
+                    </button>
+                  ))}
                 </div>
-              </div>
-            </motion.div>
-          </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Actions rapides */}
+            <div className="px-3 pb-1 flex gap-2 overflow-x-auto no-scrollbar shrink-0">
+              <button
+                type="button"
+                onClick={handleDevis}
+                className="whitespace-nowrap px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-slate-300 hover:bg-accent hover:text-white transition-all flex items-center gap-1.5"
+              >
+                <FileText size={11} /> Devis
+              </button>
+              <button
+                type="button"
+                onClick={() => window.open("https://wa.me/25779928864", "_blank")}
+                className="whitespace-nowrap px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-slate-300 hover:bg-white/10 transition-all flex items-center gap-1.5"
+              >
+                <Phone size={11} /> WhatsApp
+              </button>
+            </div>
+
+            {/* Input */}
+            <div className="border-t border-white/10 p-3 shrink-0 bg-slate-900/50">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  sendMessage();
+                }}
+                className="flex gap-2"
+              >
+                <label htmlFor="chatbot-input" className="sr-only">
+                  Message pour Alexa
+                </label>
+                <input
+                  id="chatbot-input"
+                  name="chatbot-input"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Comment puis-je vous aider ?"
+                  disabled={isTyping}
+                  maxLength={500}
+                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-accent/50 disabled:opacity-50"
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  disabled={isTyping || !inputValue.trim()}
+                  className="bg-accent hover:bg-accent/90 text-white shrink-0 rounded-xl h-10 w-10"
+                  aria-label="Envoyer"
+                >
+                  {isTyping ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </Button>
+              </form>
+              <p className="text-[10px] text-slate-500 text-center mt-1.5">
+                Accueil personnalisé · Kora Agency
+              </p>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
   );
 };
 
-const MessageContent = ({ content, from }: { content: string; from: string }) => {
-  // Détection des images [IMAGE:path]
-  const imageRegex = /\[IMAGE:(.*?)\]/g;
-  const parts = content.split(imageRegex);
-  const images = [...content.matchAll(imageRegex)].map(match => match[1]);
-
-  if (from === "user") return <span>{content}</span>;
+const MessageBubble = ({ msg }: { msg: ChatMessage }) => {
+  if (msg.from === "user") {
+    return (
+      <div className="flex gap-2 justify-end">
+        <div className="max-w-[82%] rounded-2xl rounded-br-sm px-3 py-2 text-sm bg-accent text-white leading-relaxed">
+          {msg.text}
+        </div>
+        <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-1">
+          <User className="w-4 h-4 text-slate-300" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4 prose prose-invert prose-sm max-w-none">
+    <div className="flex gap-2 justify-start">
+      <div className="w-7 h-7 rounded-full bg-accent/20 flex items-center justify-center shrink-0 mt-1">
+        {msg.isLoading ? (
+          <Loader2 className="w-4 h-4 text-accent animate-spin" />
+        ) : (
+          <Bot className="w-4 h-4 text-accent" />
+        )}
+      </div>
+      <div className="max-w-[92%] rounded-2xl rounded-bl-sm px-3 py-2 text-sm bg-white/5 text-slate-200 border border-white/5 whitespace-pre-line leading-relaxed">
+        {msg.isLoading ? (
+          <span className="text-slate-400 italic">Un instant, je m'en occupe…</span>
+        ) : (
+          <MessageContent content={msg.text} />
+        )}
+      </div>
+    </div>
+  );
+};
+
+const MessageContent = ({ content }: { content: string }) => {
+  const imageRegex = /\[IMAGE:(.*?)\]/g;
+  const images = [...content.matchAll(imageRegex)].map((match) => match[1]);
+
+  return (
+    <div className="space-y-3 prose prose-invert prose-sm max-w-none">
       <ReactMarkdown
         components={{
-          a: ({ node, ...props }) => {
+          a: ({ ...props }) => {
             const isInternal = props.href?.startsWith("/");
             if (isInternal) {
-              return <Link to={props.href!} className="text-accent font-bold hover:underline" {...props} />;
+              return (
+                <Link
+                  to={props.href!}
+                  className="text-accent font-semibold hover:underline"
+                  {...props}
+                />
+              );
             }
-            return <a target="_blank" rel="noopener noreferrer" className="text-accent font-bold hover:underline" {...props} />;
+            return (
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent font-semibold hover:underline"
+                {...props}
+              />
+            );
           },
-          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>
+          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
         }}
       >
         {content.replace(imageRegex, "")}
       </ReactMarkdown>
 
       {images.map((path, idx) => (
-        <motion.div
+        <div
           key={idx}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900 aspect-video"
+          className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 aspect-video"
         >
           <img
             src={getMediaUrl(path)}
-            alt="Suggestion Alexa"
+            alt="Illustration Kora Agency"
             className="w-full h-full object-cover"
           />
-        </motion.div>
+        </div>
       ))}
     </div>
   );

@@ -1,217 +1,207 @@
 {
   "branding": {
     "name": "Kora Agency",
-    "motto": "Kora Agency au service de votre succès",
-    "description": "Expertise en Marketing Digital et Automatisation IA pour propulser votre croissance au Burundi et au-delà.",
+    "motto": "Technologie utile, accessible et locale",
+    "description": "Agence de communication, technologie et solutions digitales : web, mobile, IA, collecte de données et suivi-évaluation pour entreprises, ONG, institutions et particuliers.",
     "logoPath": "/logo.PNG",
     "email": "kandekedonald@gmail.com",
     "phone": "+257 79 92 88 64"
   },
   "hero": {
-    "badge": "Marketing Digital & Kora Agency",
-    "title": "Kora Agency au service de votre succès.",
-    "description": "Propulsez votre entreprise avec nos solutions d'automatisation IA et de marketing digital. Spécialistes de la visibilité en ligne et de l'acquisition client pour booster vos revenus.",
+    "badge": "Communication · Tech · Data · IA",
+    "title": "Kora Agency. Solutions digitales adaptées au Burundi et au-delà.",
+    "description": "Nous créons des solutions technologiques utiles et accessibles pour entreprises, ONG, institutions, banques, commerces et particuliers : de l'idée au déploiement, jusqu'au suivi et à l'évaluation.",
     "stats": [
       {
-        "value": "500K+",
-        "label": "Audience atteinte"
+        "value": "7",
+        "label": "Pôles d'expertise"
       },
       {
-        "value": "98%",
-        "label": "Satisfaction client"
+        "value": "End-to-end",
+        "label": "De l'idée au S&E"
       },
       {
-        "value": "24/7",
-        "label": "Support Expert"
+        "value": "Local",
+        "label": "Focus Burundi & kirundi"
       }
     ]
   },
   "services": {
-    "title": "Nos Solutions Marketing",
-    "subtitle": "Tarifs & Expertise",
-    "description": "Des services professionnels adaptés à votre budget pour une visibilité maximale sur tous vos canaux.",
+    "title": "Nos Services",
+    "subtitle": "Kora Agency",
+    "description": "Communication digitale, développement web et Android, marketplace, IA en kirundi, collecte de données et suivi-évaluation, solutions de gestion.",
     "items": [
       {
-        "id": "visuels",
-        "title": "Création de visuels professionnels",
-        "description": "Conception de posts et affiches publicitaires uniques pour capter l'attention de votre audience.",
-        "icon": "Palette",
-        "category": "Marketing",
-        "imagePath": "/media/visuels.jpg",
-        "price": 300000,
-        "questions": [
-          "Quel est le thème de votre campagne ?",
-          "Voulez-vous des formats spécifiques (Story, Feed) ?"
-        ]
-      },
-      {
-        "id": "publications",
-        "title": "Gestion des publications (Facebook, IG, TikTok)",
-        "description": "Rédaction et publication de contenus attrayants sur vos réseaux sociaux principaux.",
-        "icon": "MessageSquare",
-        "category": "Social",
+        "id": "communication-digitale",
+        "title": "Communication digitale & réseaux sociaux",
+        "description": "Gestion des réseaux, création de contenus, community management, stratégie digitale et promotion de produits ou services. Au-delà du CM classique : intégration de la communication dans des solutions technologiques complètes.",
+        "icon": "Share2",
+        "category": "Communication",
         "imagePath": "/media/social-posts.jpg",
-        "price": 500000,
+        "price": 0,
         "questions": [
-          "Quels réseaux sociaux ciblez-vous ?",
-          "Quelle est la fréquence souhaitée ?"
+          "Quels réseaux sociaux voulez-vous renforcer ?",
+          "Quel est votre objectif principal (notoriété, leads, ventes) ?"
         ]
       },
       {
-        "id": "calendrier",
-        "title": "Plan de publication (Calendrier 7j)",
-        "description": "Stratégie complète de contenu sur une semaine pour une présence régulière.",
-        "icon": "Calendar",
-        "category": "Social",
-        "imagePath": "/media/content-plan.jpg",
-        "price": 200000,
-        "questions": [
-          "Quelle est votre ligne éditoriale ?"
-        ]
-      },
-      {
-        "id": "hashtags",
-        "title": "Séléction de Hashtags Pertinents",
-        "description": "Optimisation de votre portée organique grâce à des tags ciblés.",
-        "icon": "Hash",
-        "category": "Social",
-        "imagePath": "/media/hashtags.jpg",
-        "price": 50000,
-        "questions": [
-          "Qui est votre audience cible ?"
-        ]
-      },
-      {
-        "id": "whatsapp",
-        "title": "Réponses Automatiques WhatsApp",
-        "description": "Script et configuration de votre assistant WhatsApp pour ne rater aucun client.",
-        "icon": "Smartphone",
-        "category": "IA & Automation",
-        "imagePath": "/media/whatsapp-bot.jpg",
-        "price": 200000,
-        "questions": [
-          "Quelles sont les questions les plus fréquentes de vos clients ?"
-        ]
-      },
-      {
-        "id": "google",
-        "title": "Optimisation Google Business",
-        "description": "Amélioration de votre fiche pour apparaître en haut des recherches locales.",
-        "icon": "MapPin",
-        "category": "Référencement & Local",
-        "imagePath": "/media/google-maps.jpg",
-        "price": 100000,
-        "questions": [
-          "Votre établissement est-il déjà référencé sur Maps ?"
-        ]
-      },
-      {
-        "id": "airbnb",
-        "title": "Descriptions Airbnb & Booking",
-        "description": "Rédaction persuasive pour transformer les curieux en voyageurs réservés.",
-        "icon": "Home",
-        "category": "Référencement & Local",
-        "imagePath": "/media/airbnb-expert.jpg",
-        "price": 150000,
-        "questions": [
-          "Combien de chambres proposez-vous ?",
-          "Quels sont les atouts majeurs (Wifi, Piscine, Vue) ?"
-        ]
-      },
-      {
-        "id": "tiktok",
-        "title": "Scripts Vidéos TikTok / Reels",
-        "description": "Idées créatives et scripts complets pour vos contenus vidéos viraux.",
-        "icon": "Video",
-        "category": "Marketing",
-        "imagePath": "/media/tiktok-viral.jpg",
-        "price": 200000,
-        "questions": [
-          "Quel type d'humour ou de ton préférez-vous ?"
-        ]
-      },
-      {
-        "id": "bundle",
-        "title": "Pack Agence : Site Vitrine + Marketing",
-        "description": "Création d'un site vitrine inclus avec TOUS nos services marketing + 6 mois de suivi gratuit.",
-        "icon": "Rocket",
-        "category": "Bundle",
+        "id": "developpement-web",
+        "title": "Développement web",
+        "description": "Sites vitrines, sites professionnels, plateformes web, systèmes de gestion, applications web, API et solutions digitales sur mesure.",
+        "icon": "Globe",
+        "category": "Développement",
         "imagePath": "/media/agency-pack.jpg",
-        "price": 2000000,
+        "price": 0,
         "questions": [
-          "Décrivez votre activité en 3 phrases.",
-          "Avez-vous déjà un nom de domaine ?"
+          "Quel type de site ou plateforme souhaitez-vous ?",
+          "Avez-vous déjà un nom de domaine ou une identité visuelle ?"
         ]
       },
       {
-        "id": "ia_assistant",
-        "title": "Assistant IA (Auto-Post 30j)",
-        "description": "Publication automatisée pendant 1 mois grâce à notre technologie Kora AI.",
-        "icon": "Zap",
-        "category": "IA & Automation",
+        "id": "apps-android",
+        "title": "Développement d'applications Android",
+        "description": "Conception, design, développement, intégration, tests, amélioration et audit d'applications Android pour digitaliser vos services.",
+        "icon": "Smartphone",
+        "category": "Développement",
+        "imagePath": "/media/whatsapp-bot.jpg",
+        "price": 0,
+        "questions": [
+          "Quel problème métier l'application doit-elle résoudre ?",
+          "Disposez-vous déjà de maquettes ou d'un cahier des charges ?"
+        ]
+      },
+      {
+        "id": "marketplace",
+        "title": "Marketplace",
+        "description": "Plateforme vendeurs / acheteurs : annonces, recherche, chat, questions produits, récupération, livraison et suivi des commandes. Chatbot intégré pour guider les utilisateurs (ex. publier une annonce).",
+        "icon": "Store",
+        "category": "Produits",
         "imagePath": "/media/ai-assistant.jpg",
-        "price": 300000,
+        "price": 0,
         "questions": [
-          "Préférez-vous l'IA créative ou informative ?"
+          "Ciblez-vous un secteur ou une zone géographique précise ?",
+          "Souhaitez-vous une marketplace clé en main ou une adaptation sur mesure ?"
         ]
       },
       {
-        "id": "maintenance",
-        "title": "Maintenance Mensuelle",
-        "description": "Mise à jour régulière de vos contenus (Site, WhatsApp, Réseaux).",
-        "icon": "Settings",
-        "category": "Service",
+        "id": "ia-kirundi",
+        "title": "Intelligence artificielle & IA en kirundi",
+        "description": "Technologie pour comprendre et générer du kirundi, faciliter les interactions locales, et API IA (clés / tokens) pour banques, administrations, apps et organisations.",
+        "icon": "Brain",
+        "category": "IA",
+        "imagePath": "/media/tiktok-viral.jpg",
+        "price": 0,
+        "questions": [
+          "Souhaitez-vous une intégration API ou un prototype métier ?",
+          "Quels cas d'usage (chatbot, traduction, assistance client) ?"
+        ]
+      },
+      {
+        "id": "collecte-enquetes-se",
+        "title": "Collecte de données, enquêtes & suivi-évaluation",
+        "description": "Conception de formulaires et questionnaires, collecte terrain ou en ligne, nettoyage et analyse, rapports détaillés, suivi d'indicateurs et évaluation de projets pour ONG, programmes et organisations.",
+        "icon": "BarChart3",
+        "category": "Data",
+        "imagePath": "/media/content-plan.jpg",
+        "price": 0,
+        "questions": [
+          "S'agit-il d'une enquête, d'un suivi-évaluation, ou des deux ?",
+          "Quels indicateurs et quelle zone géographique ?"
+        ]
+      },
+      {
+        "id": "quicksales",
+        "title": "Solutions de gestion — QuickSales",
+        "description": "Application de gestion et de contrôle des boutiques et magasins (adaptables à d'autres secteurs, dont les pharmacies), développée avec un partenaire pour digitaliser le commerce.",
+        "icon": "Package",
+        "category": "Produits",
         "imagePath": "/media/tech-support.jpg",
-        "price": 150000,
+        "price": 0,
         "questions": [
-          "Avez-vous déjà un site en ligne ?"
-        ]
-      },
-      {
-        "id": "affiche",
-        "title": "Affiche Publicitaire",
-        "description": "Design d'affiches grand format pour vos événements ou promotions.",
-        "icon": "FileText",
-        "category": "Marketing",
-        "imagePath": "/media/ads-poster.jpg",
-        "price": 150000,
-        "questions": [
-          "Quel est l'objectif principal de l'affiche (Vente, Notoriété) ?"
+          "Combien de points de vente à piloter ?",
+          "Quelles fonctions prioritaires (stock, ventes, contrôle) ?"
         ]
       }
     ]
   },
   "news": [
-    "KORA AGENCY : Nouveau Pack Agence (Site + Marketing) à 2.000.000 FBU disponible.",
-    "EN DIRECT : Automatisez votre WhatsApp pour seulement 200.000 FBU.",
-    "INFOS : Rédaction Airbnb & Booking à 150.000 FBU pour booster vos réservations.",
-    "CONSEIL : Optimisation Google Business - Votre visibilité locale commence ici."
+    "KORA AGENCY : Agence complète — communication, web, Android, data et IA.",
+    "NOUVEAU : Enquêtes, collecte de données et suivi-évaluation pour ONG et projets.",
+    "VISION : IA et API en kirundi pour rapprocher la tech de la population burundaise.",
+    "PRODUITS : Marketplace vendeurs/acheteurs et QuickSales pour boutiques."
   ],
   "about": {
     "title": "Notre Vision",
-    "motto": "Convertir les clics en croissance.",
-    "text": "Kora Agency est une agence de marketing digital nouvelle génération qui utilise l'intelligence artificielle pour automatiser la réussite de nos clients. Nous croyons que chaque interaction digitale est une opportunité de croissance infinie.",
+    "motto": "Utiliser la technologie pour faciliter la vie et rendre le numérique accessible.",
+    "text": "Kora Agency est une agence digitale spécialisée dans la communication numérique, le développement web et mobile, les solutions digitales, l'intelligence artificielle, la collecte et l'analyse de données, ainsi que le suivi et l'évaluation des projets. Nous créons des solutions utiles, accessibles et adaptées aux entreprises, ONG, institutions, banques, organisations, commerces et particuliers. Notre ambition : des technologies adaptées au contexte local, utilisables aussi au-delà du Burundi.",
     "methodology": [
       {
-        "title": "Audit & Analyse",
-        "desc": "Nous étudions votre marché et vos concurrents."
+        "title": "Idée & Analyse",
+        "desc": "Comprendre le besoin, le contexte et les objectifs."
       },
       {
-        "title": "Stratégie IA",
-        "desc": "Mise en place de solutions automatisées."
+        "title": "Conception & Design",
+        "desc": "Architecturer et designer la solution adaptée."
       },
       {
-        "title": "Exécution Créative",
-        "desc": "Production de contenus impactants."
+        "title": "Développement & Déploiement",
+        "desc": "Construire, tester et mettre en production."
       },
       {
-        "title": "Suivi & Rapports",
-        "desc": "Analyse rigoureuse de vos performances."
+        "title": "Com, Data & S&E",
+        "desc": "Communiquer, collecter, analyser et améliorer en continu."
       }
     ]
   },
+  "clients": [
+    "Entreprises",
+    "Banques et institutions financières",
+    "Boutiques et magasins",
+    "ONG",
+    "Institutions gouvernementales",
+    "Organisations non gouvernementales",
+    "Projets et programmes de développement",
+    "Particuliers",
+    "Vendeurs et prestataires de services",
+    "Startups et entrepreneurs"
+  ],
+  "solutions": [
+    {
+      "name": "Marketplace",
+      "objectif": "Mettre en relation vendeurs et acheteurs"
+    },
+    {
+      "name": "IA Kirundi",
+      "objectif": "Permettre aux technologies de comprendre et utiliser le kirundi"
+    },
+    {
+      "name": "API IA Kirundi",
+      "objectif": "Intégrer le kirundi dans vos applications via API"
+    },
+    {
+      "name": "QuickSales",
+      "objectif": "Gestion et contrôle des boutiques et magasins"
+    },
+    {
+      "name": "Solutions d'enquêtes",
+      "objectif": "Collecte et gestion de données"
+    },
+    {
+      "name": "Suivi & Évaluation",
+      "objectif": "Mesurer les résultats des projets et programmes"
+    },
+    {
+      "name": "Solutions Web & Android",
+      "objectif": "Digitaliser les services et activités"
+    },
+    {
+      "name": "Communication digitale",
+      "objectif": "Développer la présence et la visibilité en ligne"
+    }
+  ],
+  "tagline": "Kora Agency combine communication digitale, développement technologique, intelligence artificielle, collecte et analyse de données et suivi-évaluation pour créer des solutions numériques adaptées aux entreprises, organisations et à la population.",
   "footer": {
-    "text": "© 2026 Kora Agency. Votre succès est notre mission.",
+    "text": "© 2026 Kora Agency. Technologie utile, accessible et locale.",
     "links": [
       {
         "label": "Accueil",
@@ -220,6 +210,10 @@
       {
         "label": "Services",
         "href": "#services"
+      },
+      {
+        "label": "À propos",
+        "href": "#about"
       },
       {
         "label": "Devis",

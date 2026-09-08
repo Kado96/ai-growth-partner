@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { 
   Brain, Cog, Lightbulb, Palette, MessageSquare, 
   Calendar, Hash, Smartphone, MapPin, Home, 
-  Video, Rocket, Zap, FileText, Settings, ChevronRight 
+  Video, Rocket, Zap, FileText, Settings, ChevronRight,
+  Share2, Globe, Store, BarChart3, Package
 } from "lucide-react";
 import { useConfig } from "@/hooks/use-config";
 import { useQuote } from "@/hooks/use-quote";
@@ -12,7 +13,8 @@ import { API_URL } from "@/lib/api";
 const IconMap: Record<string, any> = {
   Brain, Cog, Lightbulb, Palette, MessageSquare, 
   Calendar, Hash, Smartphone, MapPin, Home, 
-  Video, Rocket, Zap, FileText, Settings
+  Video, Rocket, Zap, FileText, Settings,
+  Share2, Globe, Store, BarChart3, Package
 };
 
 const Services = () => {
@@ -96,7 +98,7 @@ const Services = () => {
                     onClick={() => openQuote(sId)}
                     className={`w-full py-4 rounded-xl font-display font-bold text-sm transition-all ${isPremium ? 'bg-accent text-white hover:bg-accent/90 shadow-[0_10px_20px_-5px_rgba(0,255,255,0.3)]' : 'bg-secondary text-foreground hover:bg-secondary/80'}`}
                   >
-                    Demander l'expertise
+                    {Number(service.price) > 0 ? "Demander l'expertise" : "Demander un devis"}
                   </button>
                 </div>
               </motion.div>

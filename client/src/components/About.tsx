@@ -7,7 +7,11 @@ const MethodIconMap: Record<string, any> = {
   "Audit & Analyse": Search,
   "Stratégie IA": Cpu,
   "Exécution Créative": PenTool,
-  "Suivi & Rapports": BarChart3
+  "Suivi & Rapports": BarChart3,
+  "Idée & Analyse": Search,
+  "Conception & Design": PenTool,
+  "Développement & Déploiement": Cpu,
+  "Com, Data & S&E": BarChart3
 };
 
 const About = () => {
@@ -77,9 +81,9 @@ const About = () => {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent via-cta to-accent rounded-t-2xl" />
           <Quote className="text-accent/20 absolute top-6 left-6" size={48} />
           <blockquote className="font-body text-xl text-foreground italic text-center relative z-10 leading-relaxed max-w-3xl mx-auto">
-            "Kora Agency n'est pas qu'une agence de marketing. C'est votre partenaire de croissance, utilisant les technologies de demain pour résoudre les problèmes d'aujourd'hui."
+            "{config.tagline || "Kora Agency combine communication digitale, développement technologique, intelligence artificielle, collecte et analyse de données et suivi-évaluation pour créer des solutions numériques adaptées aux entreprises, organisations et à la population."}"
           </blockquote>
-          <p className="font-display font-semibold gradient-text text-center mt-6 uppercase tracking-wider">— Kora Team</p>
+          <p className="font-display font-semibold gradient-text text-center mt-6 uppercase tracking-wider">— Kora Agency</p>
         </motion.div>
       </div>
     </section>

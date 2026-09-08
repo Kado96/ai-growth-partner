@@ -25,7 +25,7 @@ const Footer = () => {
               )}
             </div>
             <p className="font-body text-sm text-muted-foreground">
-              Marketing Automation & IA
+              {config?.branding?.description || "Communication, tech et solutions digitales"}
             </p>
           </div>
           <div>

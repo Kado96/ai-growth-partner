@@ -101,7 +101,7 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
         `🚀 *NOUVEAU DEVIS KORA AGENCY*\n\n` +
         `👤 *Client :* ${contact.name}\n` +
         `💼 *Service :* ${selectedService.title}\n` +
-        `💰 *Estimation :* ${selectedService.price.toLocaleString()} FBU\n\n` +
+        `💰 *Estimation :* ${selectedService.price > 0 ? `${selectedService.price.toLocaleString()} FBU` : "Sur devis"}\n\n` +
         `*DÉTAILS DU PROJET :*\n${quoteDetails}\n\n` +
         `✅ Merci de confirmer la réception de ma demande.`
       );
@@ -244,7 +244,11 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
                               </div>
                               <span className="font-display font-bold text-white text-sm group-hover:text-accent transition-colors line-clamp-1">{s.title}</span>
                               <span className="text-accent font-display font-black text-xs mt-auto">
-                                {s.price.toLocaleString()} <span className="text-[10px] opacity-70">FBU</span>
+                                {s.price > 0 ? (
+                                  <>{s.price.toLocaleString()} <span className="text-[10px] opacity-70">FBU</span></>
+                                ) : (
+                                  <span className="opacity-90">Sur devis</span>
+                                )}
                               </span>
                             </button>
                           );
@@ -337,7 +341,11 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-[10px] uppercase font-bold text-slate-500">Total estimé</span>
-                            <span className="text-xl font-black text-white">{selectedService?.price.toLocaleString()} FBU</span>
+                            <span className="text-xl font-black text-white">
+                              {selectedService?.price > 0
+                                ? `${selectedService.price.toLocaleString()} FBU`
+                                : "Sur devis"}
+                            </span>
                           </div>
                         </div>
                       </div>

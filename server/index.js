@@ -153,7 +153,18 @@ const Media = require('./models/Media');
 const getConfig = async () => {
     let config = { ...DEFAULT_CONFIG, news: [] };
 
-    // Priority 1: SQLite (or Postgres) DB via Sequelize
+    // Source de vérité locale : config.json (évite les locks SQLite / config admin obsolète)
+    try {
+        if (fs.existsSync(CONFIG_FILE)) {
+            const localData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+            console.log('[CONFIG] Chargée depuis config.json');
+            return normalizeConfig({ ...config, ...localData });
+        }
+    } catch (e) {
+        console.error("[CONFIG] Erreur lecture config.json:", e.message);
+    }
+
+    // Fallback BDD uniquement si le fichier est absent
     try {
         const contents = await Content.findAll();
         if (contents.length > 0) {
@@ -164,19 +175,12 @@ const getConfig = async () => {
                     config.news.push(item.metadata);
                 }
             }
+            console.log('[CONFIG] Chargée depuis la BDD');
             return normalizeConfig(config);
         }
     } catch (e) {
         console.error("[CONFIG] Erreur BDD:", e.message);
     }
-
-    // Priority 2: Local JSON Fallback
-    try {
-        if (fs.existsSync(CONFIG_FILE)) {
-            const localData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-            return normalizeConfig({ ...config, ...localData });
-        }
-    } catch (e) { console.error("[CONFIG] Erreur lecture config.json:", e.message); }
 
     return normalizeConfig(config);
 };
@@ -288,9 +292,14 @@ const requireAdmin = (req, res, next) => {
 
 // --- Config Routes ---
 app.get('/api/config', async (req, res) => {
-    const config = await getConfig();
-    if (!config) return res.status(404).json({ message: 'No config found' });
-    res.json(config);
+    try {
+        const config = await getConfig();
+        if (!config) return res.status(404).json({ message: 'No config found' });
+        return res.json(config);
+    } catch (e) {
+        console.error('[CONFIG] GET /api/config failed:', e);
+        return res.status(500).json({ message: 'Config unavailable', error: e.message });
+    }
 });
 
 app.post('/api/config', requireAdmin, async (req, res) => {
@@ -596,19 +605,16 @@ app.get('/api/health', (req, res) => {
 });
 
 const SERVICE_INTENTS = [
-    { ids: ['bundle'], keywords: ['site web', 'site internet', 'vitrine', 'créer un site', 'faire un site', 'website', 'création site'] },
-    { ids: ['publications'], keywords: ['réseaux sociaux', 'facebook', 'instagram', 'tiktok', 'publication', 'community manager', 'poster'] },
-    { ids: ['whatsapp'], keywords: ['whatsapp', 'bot', 'réponse automatique', 'automatiser whatsapp'] },
-    { ids: ['google'], keywords: ['google', 'maps', 'fiche google', 'référencement local', 'seo local'] },
-    { ids: ['airbnb'], keywords: ['airbnb', 'booking', 'location', 'hébergement'] },
-    { ids: ['tiktok'], keywords: ['vidéo', 'reels', 'script vidéo', 'contenu viral'] },
-    { ids: ['visuels'], keywords: ['visuel', 'affiche', 'design', 'graphisme', 'logo'] },
-    { ids: ['ia_assistant'], keywords: ['ia', 'intelligence artificielle', 'automatisation', 'auto-post'] },
-    { ids: ['calendrier'], keywords: ['calendrier', 'planning', 'plan de publication'] },
-    { ids: ['maintenance'], keywords: ['maintenance', 'mise à jour', 'support mensuel'] },
+    { ids: ['communication-digitale'], keywords: ['réseaux sociaux', 'facebook', 'instagram', 'tiktok', 'community', 'communication', 'contenu', 'publication', 'visibilité'] },
+    { ids: ['developpement-web'], keywords: ['site web', 'site internet', 'vitrine', 'plateforme', 'créer un site', 'website', 'application web', 'api'] },
+    { ids: ['apps-android'], keywords: ['android', 'application mobile', 'app mobile', 'apk', 'play store'] },
+    { ids: ['marketplace'], keywords: ['marketplace', 'vendeur', 'acheteur', 'annonce', 'boutique en ligne', 'chatbot marketplace'] },
+    { ids: ['ia-kirundi'], keywords: ['kirundi', 'ia', 'intelligence artificielle', 'api ia', 'chatbot kirundi'] },
+    { ids: ['collecte-enquetes-se'], keywords: ['enquête', 'collecte', 'données', 'kobo', 'suivi', 'évaluation', 's&e', 'indicateur', 'rapport'] },
+    { ids: ['quicksales'], keywords: ['quicksales', 'boutique', 'magasin', 'stock', 'pharmacie', 'gestion magasin'] },
 ];
 
-const CONTACT_FALLBACK = 'Pour une réponse personnalisée, contactez-nous sur WhatsApp au **+257 79 92 88 64** ou demandez un devis via le formulaire du site.';
+const CONTACT_FALLBACK = 'Je reste à votre disposition sur WhatsApp au **+257 79 92 88 64**, ou via le formulaire de devis sur le site.';
 
 const scoreServices = (query, services = []) => {
     const q = query.toLowerCase().trim();
@@ -651,7 +657,7 @@ const getLocalContext = async (query, config) => {
             context += '\nServices pertinents pour cette demande :\n';
             matchedServices.slice(0, 4).forEach(s => {
                 context += `- ${s.title} (id: ${s.id}) : ${s.description || ''}`;
-                if (s.price) context += ` | À partir de ${s.price} FBU`;
+                if (s.price) context += ` | Sur devis / à partir de ${s.price} FBU`;
                 context += '\n';
             });
         }
@@ -726,31 +732,38 @@ const buildAlexaPrompt = (config, localContext, matchedServices, history = []) =
         ? history.map(m => `${m.from === 'user' ? 'Client' : ASSISTANT_NAME}: ${m.text}`).join('\n')
         : '';
 
-    return `Tu es ${ASSISTANT_NAME}, l'assistante digitale de Kora Agency (marketing digital & IA, Burundi).
+    return `Tu es ${ASSISTANT_NAME}, concierge digital de Kora Agency (Bujumbura).
+Kora Agency : communication digitale, développement web & Android, marketplace, IA kirundi, enquêtes / collecte / suivi-évaluation, QuickSales.
 
-TON : comme un humain en conversation (WhatsApp / ChatGPT). Phrases naturelles, chaleureuses, professionnelles. Tu PARTICIPES au fil de la discussion — tu reformules, tu relances, tu conseilles.
+PERSONA (hôtel 5 étoiles) :
+- Accueil impeccable, chaleureux, discret, jamais pressé
+- Tutoiement ou vouvoiement : toujours le VOUVOIEMENT
+- Vocabulaire soigné : "Bienvenue", "Avec plaisir", "Je vous en prie", "Permettez-moi", "Je reste à votre disposition"
+- Empathie et écoute d'abord ; jamais de pression commerciale
+- Tu guides comme un concierge : clarifier le besoin, proposer 1 option pertinente, offrir la suite
 
 INTERDIT :
-- Listes à puces (•), catalogues, "Voici ce qui correspond le mieux", ton robotique
-- Dire "base de données", "RAG", "système", "extraction", "selon mes infos"
-- Te présenter comme "Kukasoko" ou un autre nom
+- Listes à puces longues, catalogues, ton robotique ou "commercial agressif"
+- Dire "base de données", "RAG", "système", "extraction"
+- Te présenter comme Kukasoko ou un autre nom
+- Emojis excessifs (0 à 1 maximum, et seulement si naturel)
 
 OBLIGATOIRE :
-- Répondre en français, en prose fluide (2 à 5 phrases)
-- Une question de relance naturelle à la fin
-- Si le client demande "comment faire", explique les étapes simplement en t'appuyant sur le sujet déjà évoqué dans l'historique
-- Citer un prix seulement si utile ; lien /blog/{id} ou visuel [IMAGE:chemin] si pertinent
-- Si tu ne sais pas : propose ${CONTACT_FALLBACK}
+- Français, prose fluide (2 à 5 phrases)
+- Une question de relance élégante à la fin
+- Prix uniquement si utile ; sinon "sur devis" avec douceur
+- Lien /blog/{id} ou [IMAGE:chemin] seulement si pertinent
+- Si tu ne sais pas : ${CONTACT_FALLBACK}
 
 AGENCE :
-${JSON.stringify({ branding: config.branding, hero: config.hero, actualites: config.news }, null, 2)}
+${JSON.stringify({ branding: config.branding, hero: config.hero, tagline: config.tagline, actualites: config.news }, null, 2)}
 
 SERVICES (conseille le plus adapté, sans tout lister) :
 ${JSON.stringify(servicesCatalog, null, 2)}
 
 ${localContext ? `INFOS UTILES (reformule, ne copie pas) :\n${localContext}` : ''}
 
-${matchedServices.length > 0 ? `PRIORITÉ : "${matchedServices[0].title}" si c'est le meilleur choix.` : ''}
+${matchedServices.length > 0 ? `PRIORITÉ discrète : "${matchedServices[0].title}" si c'est le meilleur choix.` : ''}
 
 ${historyText ? `HISTORIQUE :\n${historyText}` : ''}`;
 };
@@ -780,34 +793,38 @@ const generateWithGemini = async (systemPrompt, message) => {
 const buildOfflineReply = (message, config, matchedServices, history = []) => {
     const msg = message.toLowerCase().trim();
     const services = config.services?.items || [];
-    const greetings = ['bonjour', 'salut', 'hello', 'coucou', 'qui es-tu', 'ca va', 'ça va'];
+    const greetings = ['bonjour', 'salut', 'hello', 'bonsoir', 'qui es-tu', 'ca va', 'ça va', 'merci'];
     const isFollowUp = /comment|explique|dis[- ]moi|dites[- ]moi|comment faire|ça marche|la marche|et ensuite|la suite|comment procéder/.test(msg);
 
     if (greetings.some(g => msg.includes(g))) {
-        return `Bonjour ! Moi c'est **${ASSISTANT_NAME}**, votre assistant chez Kora Agency. Racontez-moi un peu ce que vous voulez accomplir en ligne — site web, réseaux sociaux, visibilité Google — et on voit ensemble la meilleure option pour vous.`;
+        return `Bienvenue. Je suis **${ASSISTANT_NAME}**, votre concierge chez Kora Agency. C'est un plaisir de vous accueillir. Souhaitez-vous découvrir un service précis — site web, application, communication, enquêtes, ou autre — ou préférez-vous que je vous oriente selon votre besoin du jour ?`;
     }
 
     if (isFollowUp && history.length > 0) {
         const topic = findServiceFromHistory(history, services) || matchedServices[0];
         if (topic) {
-            const price = topic.price ? ` On démarre à partir de **${topic.price.toLocaleString('fr-FR')} FBU**.` : '';
-            return `Avec plaisir ! Pour **${topic.title}**, on commence par comprendre votre activité et vos objectifs. Ensuite, ${topic.description?.toLowerCase() || 'on met en place une solution sur mesure'}.${price} Si ça vous va, je peux vous orienter vers un devis ou un échange rapide sur WhatsApp — qu'est-ce qui vous arrange ?`;
+            const priceNote = topic.price > 0
+                ? ` Nos interventions démarrent autour de **${topic.price.toLocaleString('fr-FR')} FBU**.`
+                : ` Nous établissons une proposition **sur devis**, selon votre contexte.`;
+            return `Avec plaisir. Pour **${topic.title}**, nous commençons par écouter vos objectifs, puis nous concevons une solution adaptée : ${topic.description || 'un accompagnement sur mesure'}.${priceNote} Souhaitez-vous un devis ou un échange rapide sur WhatsApp ?`;
         }
     }
 
     if (matchedServices.length === 1) {
         const s = matchedServices[0];
-        const price = s.price ? ` Le tarif commence à **${s.price.toLocaleString('fr-FR')} FBU**.` : '';
-        return `Pour ce que vous décrivez, je pense que **${s.title}** serait le plus adapté : ${s.description || 'un accompagnement pensé pour votre croissance.'}${price} Vous voulez qu'on en parle plus en détail ?`;
+        const priceNote = s.price > 0
+            ? ` Tarif indicatif à partir de **${s.price.toLocaleString('fr-FR')} FBU**.`
+            : ` Proposition établie **sur devis**.`;
+        return `Permettez-moi de vous orienter vers **${s.title}** : ${s.description || 'un accompagnement pensé pour vous.'}${priceNote} Puis-je vous en dire un peu plus, ou préparer un devis ?`;
     }
 
     if (matchedServices.length >= 2) {
         const a = matchedServices[0];
         const b = matchedServices[1];
-        return `Je vois deux directions possibles : **${a.title}** (${a.description}) ou plutôt **${b.title}**. Dites-moi ce qui compte le plus pour vous en ce moment — visibilité, ventes, automatisation ?`;
+        return `Deux pistes me semblent pertinentes : **${a.title}**, ou **${b.title}**. Qu'est-ce qui compte le plus pour vous en ce moment — digitaliser un service, gagner en visibilité, ou mesurer des résultats ?`;
     }
 
-    return `Merci pour votre message. Pour vous répondre précisément, j'aurais besoin d'un peu plus de contexte sur votre activité. Sinon, ${CONTACT_FALLBACK}`;
+    return `Je vous remercie pour votre message. Afin de vous servir au mieux, pourriez-vous me préciser votre activité ou votre besoin principal ? Sinon, ${CONTACT_FALLBACK}`;
 };
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -1033,8 +1050,9 @@ if (fs.existsSync(clientDistPath)) {
     app.use(express.static(clientDistPath));
 
     // MOTEUR D'INJECTION SEO DYNAMIQUE
-    app.get('*', async (req, res) => {
-        if (req.url.startsWith('/api')) return;
+    app.get('*', async (req, res, next) => {
+        // Ne jamais avaler les routes API (sinon la requête reste pendante → 500 proxy Vite)
+        if (req.path.startsWith('/api')) return next();
 
         try {
             let html = fs.readFileSync(path.join(clientDistPath, 'index.html'), 'utf8');

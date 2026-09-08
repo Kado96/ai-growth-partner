@@ -64,7 +64,7 @@ const Hero = () => {
             <div className="flex flex-wrap gap-4">
               <Button variant="hero" asChild size="lg">
                 <a href="#services" className="group">
-                  Nos Tarifs
+                  Nos Services
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </a>
               </Button>
