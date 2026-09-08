@@ -8,7 +8,7 @@ import {
   Settings, Layout, MessageSquare, Save, LogOut,
   Trash2, Plus, Globe, Sparkles, AlertCircle,
   ChevronRight, Layers, CreditCard, Image as ImageIcon, UploadCloud,
-  Share2, Activity, Zap, Brain, BookOpen, Lightbulb, Rocket
+  Share2, Activity, Zap, Brain, BookOpen, Lightbulb, Rocket, Play
 } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription
