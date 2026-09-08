@@ -98,7 +98,7 @@ const ProjectsCarousel = () => {
               <div className="rounded-3xl overflow-hidden glow-border relative group aspect-video bg-slate-900 shadow-2xl">
                 {isPlaying ? (
                   <iframe
-                    src={`https://www.youtube.com/embed/${project.youtubeId}?autoplay=1`}
+                    src={`https://www.youtube.com/embed/${project.youtubeId || 'dQw4w9WgXcQ'}?autoplay=1`}
                     className="absolute inset-0 w-full h-full"
                     allow="autoplay; encrypted-media"
                     allowFullScreen
@@ -106,9 +106,12 @@ const ProjectsCarousel = () => {
                 ) : (
                   <div className="relative w-full h-full cursor-pointer" onClick={() => setIsPlaying(true)}>
                     <img 
-                      src={`https://img.youtube.com/vi/${project.youtubeId}/maxresdefault.jpg`} 
+                      src={`https://img.youtube.com/vi/${project.youtubeId || 'dQw4w9WgXcQ'}/hqdefault.jpg`} 
                       alt={project.title} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-60" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80';
+                      }}
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-20 h-20 rounded-full bg-accent/90 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
