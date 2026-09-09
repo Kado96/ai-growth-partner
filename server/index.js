@@ -51,8 +51,8 @@ const mediaRoutes = require('./routes/mediaRoutes');
 const { scanMediaFolder } = require('./scripts/mediaCollector');
 const { sendToN8N } = require('./services/n8nService');
 
-// Synchroniser la DB au démarrage (Ne pas utiliser force:true en prod)
-sequelize.sync({ alter: false }).then(() => {
+// Synchroniser la DB au démarrage (Création automatique des nouvelles tables)
+sequelize.sync({ alter: true }).then(() => {
     console.log("[INIT] Base de données Sequelize synchronisée.");
 }).catch(err => {
     console.error("[CRITICAL] Erreur de synchronisation DB:", err);
