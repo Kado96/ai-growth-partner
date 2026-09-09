@@ -10,10 +10,10 @@ const NewsTicker: React.FC = () => {
   const messages = Array.isArray(config.news) ? config.news : [];
 
   return (
-    <div className="fixed bottom-0 left-0 w-full h-10 bg-slate-950 border-t border-slate-800 z-50 flex items-center overflow-hidden">
-      {/* Label "EN DIRECT" */}
-      <div className="flex-shrink-0 bg-red-600 h-full px-4 flex items-center justify-center z-10 shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
-        <span className="text-white font-bold text-xs uppercase tracking-wider animate-pulse whitespace-nowrap">
+    <div className="fixed bottom-0 left-0 w-full h-8 sm:h-10 bg-slate-950 border-t border-slate-800 z-50 flex items-center overflow-hidden">
+      {/* Label "EN DIRECT" compact sur mobile */}
+      <div className="flex-shrink-0 bg-red-600 h-full px-2 sm:px-4 flex items-center justify-center z-10 shadow-[2px_0_6px_rgba(0,0,0,0.5)]">
+        <span className="text-white font-bold text-[10px] sm:text-xs uppercase tracking-tight sm:tracking-wider animate-pulse whitespace-nowrap">
           EN DIRECT
         </span>
       </div>
@@ -33,16 +33,16 @@ const NewsTicker: React.FC = () => {
           {/* Double content for seamless looping */}
           <div className="flex gap-16 items-center">
             {messages.map((msg: string, index: number) => (
-              <span key={`msg-1-${index}`} className="text-slate-200 text-sm font-medium flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+              <span key={`msg-1-${index}`} className="text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-2">
+                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-slate-600" />
                 {msg}
               </span>
             ))}
           </div>
           <div className="flex gap-16 items-center">
             {messages.map((msg: string, index: number) => (
-              <span key={`msg-2-${index}`} className="text-slate-200 text-sm font-medium flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+              <span key={`msg-2-${index}`} className="text-slate-200 text-xs sm:text-sm font-medium flex items-center gap-2">
+                <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-slate-600" />
                 {msg}
               </span>
             ))}
