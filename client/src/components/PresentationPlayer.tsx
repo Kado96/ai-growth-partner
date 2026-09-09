@@ -5,7 +5,12 @@ import { useState, useEffect, useRef } from "react";
 const PresentationPlayer = () => {
   const [currentScene, setCurrentScene] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [aspectRatio, setAspectRatio] = useState<"16:9" | "9:16">("16:9");
+  const [aspectRatio, setAspectRatio] = useState<"16:9" | "9:16">(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 640) {
+      return "9:16";
+    }
+    return "16:9";
+  });
   const [sceneProgress, setSceneProgress] = useState(0);
 
   const scenes = [
