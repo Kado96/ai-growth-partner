@@ -61,9 +61,10 @@ sequelize.sync({ alter: true }).then(() => {
 
 const PORT = process.env.PORT || 5001;
 
-// Configuration CORS (Render + Netlify + Dev local)
+// Configuration CORS (Render + Netlify + InfinityFree/Wuaze + Dev local)
 const allowedOrigins = [
     'https://ai-growth-partner.onrender.com',
+    'https://koraagency.wuaze.com',
     'https://koragency.netlify.app',
     'http://localhost:8080',
     'http://localhost:8081',
