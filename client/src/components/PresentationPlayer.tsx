@@ -104,34 +104,36 @@ const PresentationPlayer = () => {
         </div>
 
         {/* Player Controls Bar */}
-        <div className="flex flex-wrap items-center justify-between max-w-4xl mx-auto mb-6 bg-slate-900/80 p-3 rounded-2xl border border-slate-800 backdrop-blur-md">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 max-w-4xl mx-auto mb-6 bg-slate-900/80 p-3 sm:p-4 rounded-2xl border border-slate-800 backdrop-blur-md">
           {/* Controls Bar & Play/Pause */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="p-2.5 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-colors shadow-lg shadow-sky-500/20"
-              title={isPlaying ? "Pause" : "Lecture"}
-            >
-              {isPlaying ? <Pause size={18} /> : <Play size={18} />}
-            </button>
-            <button
-              onClick={() => { setCurrentScene(0); setSceneProgress(0); }}
-              className="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
-              title="Redémarrer la vidéo"
-            >
-              <RotateCcw size={18} />
-            </button>
-            <span className="text-xs font-mono font-bold text-slate-400 ml-2 hidden sm:inline">
-              Scène {currentScene + 1} / {scenes.length} (30s Total)
+          <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="p-2.5 rounded-xl bg-sky-500 text-white hover:bg-sky-400 transition-colors shadow-lg shadow-sky-500/20"
+                title={isPlaying ? "Pause" : "Lecture"}
+              >
+                {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+              </button>
+              <button
+                onClick={() => { setCurrentScene(0); setSceneProgress(0); }}
+                className="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+                title="Redémarrer la vidéo"
+              >
+                <RotateCcw size={18} />
+              </button>
+            </div>
+            <span className="text-xs font-mono font-bold text-slate-400">
+              Scène {currentScene + 1} / {scenes.length}
             </span>
           </div>
 
           {/* Aspect Ratio & Download Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center sm:justify-end w-full sm:w-auto gap-2">
             <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
               <button
                 onClick={() => setAspectRatio("16:9")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   aspectRatio === "16:9" ? "bg-sky-500 text-white" : "text-slate-400 hover:text-white"
                 }`}
               >
@@ -139,7 +141,7 @@ const PresentationPlayer = () => {
               </button>
               <button
                 onClick={() => setAspectRatio("9:16")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   aspectRatio === "9:16" ? "bg-sky-500 text-white" : "text-slate-400 hover:text-white"
                 }`}
               >
@@ -155,7 +157,7 @@ const PresentationPlayer = () => {
                   : "/templates/kora-shorts-presentation/index.html"
                 }
                 download={aspectRatio === "16:9" ? "Kora_Agency_Presentation_16x9.html" : "Kora_Agency_Shorts_9x16.html"}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all border border-slate-700"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all border border-slate-700"
                 title="Télécharger la composition web"
               >
                 <Download size={14} /> HTML
@@ -169,10 +171,10 @@ const PresentationPlayer = () => {
                   link.download = aspectRatio === "16:9" ? "Kora_Agency_Presentation_16x9.mp4" : "Kora_Agency_Shorts_9x16.mp4";
                   link.click();
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/30 transition-all cursor-pointer border border-emerald-400/30"
+                className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-lg shadow-emerald-600/30 transition-all cursor-pointer border border-emerald-400/30"
                 title="Télécharger directement la vidéo MP4 HD"
               >
-                <Download size={15} /> MP4 HD
+                <Download size={14} /> MP4 HD
               </button>
             </div>
           </div>
