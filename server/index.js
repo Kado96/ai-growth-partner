@@ -47,6 +47,9 @@ app.use((req, res, next) => {
 
 // -- Database & Media config --
 const sequelize = require('./config/database');
+require('./models/User');
+require('./models/ContactMessage');
+require('./models/Media');
 const mediaRoutes = require('./routes/mediaRoutes');
 const { scanMediaFolder } = require('./scripts/mediaCollector');
 const { sendToN8N } = require('./services/n8nService');
@@ -474,7 +477,6 @@ app.post('/api/notify-payment', async (req, res) => {
 
 const { User } = require('./models/User');
 const ContactMessage = require('./models/ContactMessage');
-const Media = require('./models/Media');
 
 // --- Email Notifier (For Quotes & Contacts) ---
 const sendAdminNotification = async (type, data) => {
