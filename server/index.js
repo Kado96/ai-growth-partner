@@ -472,7 +472,9 @@ app.post('/api/notify-payment', async (req, res) => {
     }
 });
 
+const { sequelize, User } = require('./models/User');
 const ContactMessage = require('./models/ContactMessage');
+const Media = require('./models/Media');
 
 // --- Email Notifier (For Quotes & Contacts) ---
 const sendAdminNotification = async (type, data) => {
