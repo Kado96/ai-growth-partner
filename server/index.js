@@ -472,7 +472,7 @@ app.post('/api/notify-payment', async (req, res) => {
     }
 });
 
-const { sequelize, User } = require('./models/User');
+const { User } = require('./models/User');
 const ContactMessage = require('./models/ContactMessage');
 const Media = require('./models/Media');
 
