@@ -19,7 +19,7 @@ const Footer = () => {
                   className="h-9 w-auto object-contain"
                 />
               )}
-              <h3 className="font-display font-extrabold text-xl text-foreground">
+              <h3 className="font-display font-extrabold text-xl text-white">
                 {config?.branding?.name || "Kora Agency"}
               </h3>
             </div>

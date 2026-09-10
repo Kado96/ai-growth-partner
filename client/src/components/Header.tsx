@@ -22,7 +22,7 @@ const Header = () => {
                 className="h-8 sm:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
             )}
-            <span className="font-display font-extrabold text-lg sm:text-2xl text-foreground tracking-tight">
+            <span className="font-display font-extrabold text-lg sm:text-2xl text-white tracking-tight">
               {config?.branding?.name || "Kora Agency"}
             </span>
           </a>
