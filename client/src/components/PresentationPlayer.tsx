@@ -74,6 +74,18 @@ const PresentationPlayer = () => {
     }
   ];
 
+  // Force 9:16 par défaut sur mobile (<768px) et réagit au redimensionnement
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setAspectRatio("9:16");
+      }
+    };
+    handleResize(); // Exécuter immédiatement au montage
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Timer logic - 6 sec per scene (Total 30 sec)
   useEffect(() => {
     if (!isPlaying) return;

@@ -41,10 +41,7 @@ const ChatBot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsOpen(true), 3500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Le chatbot reste fermé au démarrage jusqu'à ce que l'utilisateur clique dessus
 
   const sendMessage = useCallback(
     async (raw?: string) => {
@@ -141,10 +138,10 @@ const ChatBot = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.96 }}
-            transition={{ type: "spring", damping: 22, stiffness: 260 }}
+            exit={{ opacity: 0, y: 10, scale: 0.96 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
             className="fixed bottom-16 right-6 z-[9999] w-[380px] max-w-[calc(100vw-1.5rem)] h-[580px] max-h-[calc(100vh-5rem)] bg-slate-950 rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden"
           >
             {/* Header style Kukasoko */}

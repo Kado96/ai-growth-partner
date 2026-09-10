@@ -11,18 +11,17 @@ const Footer = () => {
       <div className="container-narrow section-padding !py-12">
         <div className="grid sm:grid-cols-3 gap-8">
           <div>
-            <div className="mb-3">
-              {config?.branding?.logoPath ? (
+            <div className="flex items-center gap-2.5 mb-3">
+              {config?.branding?.logoPath && (
                 <img
                   src={config.branding.logoPath.startsWith('http') ? config.branding.logoPath : `${API_URL}${config.branding.logoPath}`}
                   alt={config?.branding?.name || "Logo"}
-                  className="h-10 w-auto object-contain"
+                  className="h-9 w-auto object-contain"
                 />
-              ) : (
-                <h3 className="font-display font-extrabold text-xl text-foreground">
-                  Kora<span className="gradient-text">Agency</span>
-                </h3>
               )}
+              <h3 className="font-display font-extrabold text-xl text-foreground">
+                {config?.branding?.name || "Kora Agency"}
+              </h3>
             </div>
             <p className="font-body text-sm text-muted-foreground">
               {config?.branding?.description || "Communication, tech et solutions digitales"}
@@ -31,9 +30,23 @@ const Footer = () => {
           <div>
             <h4 className="font-display font-semibold text-sm uppercase tracking-wider mb-3 text-muted-foreground">Contact</h4>
             <ul className="space-y-2 font-body text-sm text-muted-foreground">
-              <li><a href="mailto:contact@kora-agency.com" className="hover:text-accent transition-colors">contact@kora-agency.com</a></li>
-              <li><a href="tel:+25769725535" className="hover:text-accent transition-colors">+257 69 725 535</a></li>
-              <li>Bujumbura, Burundi</li>
+              {config?.branding?.email && (
+                <li>
+                  <a href={`mailto:${config.branding.email}`} className="hover:text-accent transition-colors">
+                    {config.branding.email}
+                  </a>
+                </li>
+              )}
+              {config?.branding?.phone && (
+                <li>
+                  <a href={`tel:${config.branding.phone.replace(/\s+/g, '')}`} className="hover:text-accent transition-colors">
+                    {config.branding.phone}
+                  </a>
+                </li>
+              )}
+              {config?.branding?.address && (
+                <li>{config.branding.address}</li>
+              )}
             </ul>
           </div>
           <div>
@@ -49,7 +62,7 @@ const Footer = () => {
         </div>
         <div className="border-t border-border/30 mt-8 pt-8 text-center">
           <p className="font-body text-xs text-muted-foreground/60">
-            © 2026 Kora Agency Marketing Automation. Tous droits réservés.
+            © 2026 {config?.branding?.name || "Kora Agency"}. Tous droits réservés.
           </p>
         </div>
       </div>

@@ -14,18 +14,17 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-2xl border-b border-border/50">
       <div className="container-narrow section-padding !py-0">
         <div className="flex items-center justify-between h-16 sm:h-20">
-          <a href="/" className="flex items-center gap-2 group">
-            {config?.branding?.logoPath ? (
+          <a href="/" className="flex items-center gap-2.5 group">
+            {config?.branding?.logoPath && (
               <img
                 src={config.branding.logoPath.startsWith('http') ? config.branding.logoPath : `${API_URL}${config.branding.logoPath}`}
                 alt={config?.branding?.name || "Logo"}
                 className="h-8 sm:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
-            ) : (
-              <span className="font-display font-extrabold text-xl sm:text-2xl text-foreground">
-                Kora<span className="gradient-text">Agency</span>
-              </span>
             )}
+            <span className="font-display font-extrabold text-lg sm:text-2xl text-foreground tracking-tight">
+              {config?.branding?.name || "Kora Agency"}
+            </span>
           </a>
 
           <nav className="hidden md:flex items-center gap-8">
