@@ -47,7 +47,6 @@ app.use((req, res, next) => {
 
 // -- Database & Media config --
 const sequelize = require('./config/database');
-require('./models/User');
 require('./models/ContactMessage');
 require('./models/Media');
 const mediaRoutes = require('./routes/mediaRoutes');
