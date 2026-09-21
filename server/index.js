@@ -474,7 +474,6 @@ app.post('/api/notify-payment', async (req, res) => {
     }
 });
 
-const { User } = require('./models/User');
 const ContactMessage = require('./models/ContactMessage');
 
 // --- Email Notifier (For Quotes & Contacts) ---
