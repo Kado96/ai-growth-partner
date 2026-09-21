@@ -297,11 +297,12 @@ const requireAdmin = (req, res, next) => {
 app.get('/api/config', async (req, res) => {
     try {
         const config = await getConfig();
-        if (!config) return res.status(404).json({ message: 'No config found' });
+        if (!config) return res.json(normalizeConfig(DEFAULT_CONFIG));
         return res.json(config);
     } catch (e) {
         console.error('[CONFIG] GET /api/config failed:', e);
-        return res.status(500).json({ message: 'Config unavailable', error: e.message });
+        // Fallback d'urgence : ne jamais envoyer une 500 pour bloquer le frontend
+        return res.json(normalizeConfig(DEFAULT_CONFIG));
     }
 });
 
