@@ -7,10 +7,16 @@ const path = require('path');
 
 // -- Environment Logic --
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const envFile = NODE_ENV === 'production' ? '.env.production' : '.env';
-require('dotenv').config({ path: path.join(__dirname, envFile) });
 
-console.log(`[INIT] Environment: ${NODE_ENV} (Loaded ${envFile})`);
+// Cherche d'abord server/.env (local dev), puis .env.production à la racine (production)
+const envLocalPath = path.join(__dirname, '.env');
+const envProdPath = path.join(__dirname, '..', '.env.production');
+const envFilePath = NODE_ENV === 'production' ? envProdPath : envLocalPath;
+
+require('dotenv').config({ path: envFilePath });
+
+console.log(`[INIT] Environment: ${NODE_ENV} (Loaded env from: ${envFilePath})`);
+
 
 const ASSISTANT_NAME = 'Alexa';
 
