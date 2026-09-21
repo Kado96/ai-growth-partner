@@ -26,7 +26,7 @@ app.use((req, res, next) => {
             'Content-Security-Policy',
             [
                 "default-src 'self'",
-                "script-src 'self' https://tracker.metricool.com",
+                "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://tracker.metricool.com",
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                 "font-src 'self' https://fonts.gstatic.com data:",
                 "img-src 'self' data: blob: https:",
