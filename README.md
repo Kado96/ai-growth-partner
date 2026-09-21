@@ -20,15 +20,24 @@ Pour résoudre les erreurs de connexion et lancer le projet :
 - **Backend (Render)** : [https://ai-growth-partner.onrender.com](https://ai-growth-partner.onrender.com)
 
 > En local, laissez `VITE_API_URL` vide dans `client/.env` (proxy Vite `/api` → `:5001`).
-> Sur Netlify, `VITE_API_URL` pointe vers Render (voir `netlify.toml`).
+---
 
-### Redeploy Netlify (corriger le 404)
+## ⚡ Procédure Rapide de Commit & Migration Automatique
+
+Chaque `git commit` et `git push` déclenche automatiquement la migration de **toutes vos données et photos** vers **Supabase** et la base de données PostgreSQL en production :
+
+### 1️⃣ Commander un Commit & Déploiement Complet :
 ```powershell
-npx netlify login
-npx netlify link
-npx netlify deploy --prod --build
+git add .
+git commit -m "update: vos modifications de code et médias"
+git push
 ```
-Ou dans le dashboard Netlify : Site → Deploys → Trigger deploy (repo GitHub `Kado96/ai-growth-partner`, base `client`, publish `dist`).
+
+### 2️⃣ Déclenchement Automatique :
+* 📦 **GitHub** : Reçoit votre code à jour.
+* 🚀 **Render** : Déploie la nouvelle version et exécute automatiquement `migrateAll.js`.
+* ☁️ **Supabase Storage** : Reçoit et synchronise automatiquement toutes les nouvelles photos du dossier `media/`.
+* 🗄️ **Base de Données** : Synchronise tous les contenus et configurations.
 
 ---
 
