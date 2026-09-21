@@ -821,21 +821,29 @@ ${historyText ? `HISTORIQUE :\n${historyText}` : ''}`;
 
 const generateWithGemini = async (systemPrompt, message) => {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const models = ['gemini-3.6-flash', 'gemini-2.0-flash-exp', 'gemini-flash-latest'];
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
     let lastError = null;
 
     for (const modelName of models) {
         try {
             const model = genAI.getGenerativeModel({ model: modelName });
-            const result = await model.generateContent([
+            
+            // Timeout de 3.5s max par appel Gemini pour garantir une réponse instantanée
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Gemini timeout 3.5s exceeded')), 3500)
+            );
+
+            const generatePromise = model.generateContent([
                 systemPrompt,
                 `Message du client : ${message}`
             ]);
+
+            const result = await Promise.race([generatePromise, timeoutPromise]);
             const text = result.response.text();
             if (text?.trim()) return text;
         } catch (err) {
             lastError = err;
-            console.warn(`[GEMINI] Modèle ${modelName} indisponible:`, err.message);
+            console.warn(`[GEMINI] Modèle ${modelName} indisponible ou trop lent:`, err.message);
         }
     }
     throw lastError || new Error('Aucun modèle Gemini disponible');
