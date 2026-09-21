@@ -54,8 +54,14 @@ const { scanMediaFolder } = require('./scripts/mediaCollector');
 const { sendToN8N } = require('./services/n8nService');
 
 // Synchroniser la DB au démarrage (Création automatique des nouvelles tables)
-sequelize.sync({ alter: true }).then(() => {
+const { runFullMigration } = require('./scripts/migrateAll');
+
+sequelize.sync({ alter: true }).then(async () => {
     console.log("[INIT] Base de données Sequelize synchronisée.");
+    if (NODE_ENV === 'production' || process.env.DATABASE_URL) {
+        console.log("[AUTO-MIGRATE] Démarrage de la synchronisation Supabase & BDD...");
+        await runFullMigration();
+    }
 }).catch(err => {
     console.error("[CRITICAL] Erreur de synchronisation DB:", err);
 });

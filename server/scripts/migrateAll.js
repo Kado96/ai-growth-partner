@@ -167,12 +167,15 @@ async function runFullMigration() {
     console.log(`✅ ${totalUploaded} médias et photos traités et enregistrés.\n`);
 
     console.log('🎉 === MIGRATION GLOBALE KORA AGENCY TERMINÉE AVEC SUCCÈS === 🎉');
-    process.exit(0);
-
+    return { success: true };
   } catch (error) {
     console.error('❌ ÉCHEC DE LA MIGRATION :', error);
-    process.exit(1);
+    return { success: false, error };
   }
 }
 
-runFullMigration();
+if (require.main === module) {
+  runFullMigration().then(() => process.exit(0)).catch(() => process.exit(1));
+}
+
+module.exports = { runFullMigration };
