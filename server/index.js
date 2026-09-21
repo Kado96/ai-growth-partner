@@ -560,10 +560,72 @@ const sendAdminNotification = async (type, data) => {
             : `📧 NOUVEAU CONTACT : ${data.name} (${data.email})`;
         await sendWhatsApp(waMsg);
 
+        // AUTO-RÉPONSE IA AU CLIENT (si email présent)
+        if (data.email) {
+            sendClientAutoReply(type, data).catch(err => console.error('[AUTO_REPLY_ERR]', err));
+        }
+
         return true;
     } catch (error) {
         console.error("[MAIL] Erreur envoi notifications :", error);
         return false;
+    }
+};
+
+const sendClientAutoReply = async (type, data) => {
+    try {
+        const config = await getConfig();
+        const userPrompt = type === 'quote'
+            ? `Demande de devis pour le service "${data.service}". Précisions du client : ${JSON.stringify(data.answers || {})}`
+            : `Message de contact : "${data.message}"`;
+
+        const { context, matchedServices } = await getLocalContext(userPrompt, config);
+        const alexaPrompt = buildAlexaPrompt(config, context, matchedServices, []);
+
+        let aiReply = null;
+        if (process.env.GEMINI_API_KEY) {
+            try {
+                aiReply = await generateWithGemini(alexaPrompt, `Le client ${data.name} vous a envoyé une demande (${type}). Rédigez une réponse professionnelle et personnalisée de confirmation en son nom.`);
+            } catch (gemErr) {
+                console.warn('[AUTO_REPLY_GEMINI_FAIL]', gemErr.message);
+            }
+        }
+
+        if (!aiReply) {
+            aiReply = alexaBrain.query(userPrompt).reply;
+        }
+
+        const emailHtml = `
+            <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 10px; padding: 25px; color: #333;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: #6366f1; margin: 0;">${config.branding?.name || 'Kora Agency'}</h2>
+                    <p style="font-size: 13px; color: #666; margin-top: 5px;">${config.branding?.description || 'Votre partenaire de croissance digitale'}</p>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                <p>Bonjour <strong>${data.name}</strong>,</p>
+                <p>Nous avons bien reçu votre ${type === 'quote' ? 'demande de devis' : 'message'} et nous vous en remercions chaleureusement.</p>
+                
+                <div style="background-color: #f8fafc; border-left: 4px solid #6366f1; padding: 15px; border-radius: 4px; margin: 20px 0; font-size: 14px; line-height: 1.6;">
+                    ${aiReply.replace(/\n/g, '<br/>')}
+                </div>
+
+                <p>Un membre de notre équipe prendra directement contact avec vous rapidement si des précisions sont nécessaires.</p>
+                <p>Vous pouvez également nous joindre directement via WhatsApp au <strong>+257 79 92 88 64</strong>.</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0 15px 0;" />
+                <p style="font-size: 11px; color: #999; text-align: center;">${config.branding?.name || 'Kora Agency'} — ${config.branding?.motto || 'L\'excellence par l\'automatisation'}</p>
+            </div>
+        `;
+
+        await transporter.sendMail({
+            from: `"${config.branding?.name || 'Kora Agency'}" <${process.env.EMAIL_USER}>`,
+            to: data.email,
+            subject: `[Kora Agency] Confirmation de votre ${type === 'quote' ? 'demande de devis' : 'message'}`,
+            html: emailHtml,
+        });
+
+        console.log(`[AUTO_REPLY] Email d'auto-réponse IA envoyé avec succès à ${data.email}`);
+    } catch (err) {
+        console.error('[AUTO_REPLY_ERROR] Échec envoi auto-réponse client :', err);
     }
 };
 
