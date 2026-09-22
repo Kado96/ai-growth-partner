@@ -28,7 +28,15 @@ const Header = () => {
           </a>
 
           <nav className="hidden md:flex items-center gap-8">
-            {["Nos Services", "Nos Projets", "À Propos", "Vidéos", "Contact"].map((item) => {
+            {["Nos Services", "Nos Projets", "À Propos", "Blog", "Vidéos", "Contact"].map((item) => {
+              if (item === "Blog") {
+                return (
+                  <a key="blog" href="/blog/ia-kirundi" className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors relative group">
+                    Blog
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300 rounded-full" />
+                  </a>
+                );
+              }
               const id = item === "Nos Services" ? "services" : item === "Nos Projets" ? "projects" : item === "À Propos" ? "about" : item === "Vidéos" ? "videos" : "contact";
               return (
                 <a key={id} href={`/#${id}`} className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors relative group">
@@ -51,13 +59,14 @@ const Header = () => {
         {isOpen && (
           <div className="md:hidden pb-4 flex flex-col gap-3 border-t border-border/50 pt-4">
             {[
-              { label: "Nos Services", id: "services" },
-              { label: "Nos Projets", id: "projects" },
-              { label: "À Propos", id: "about" },
-              { label: "Vidéos", id: "videos" },
-              { label: "Contact", id: "contact" },
+              { label: "Nos Services", href: "/#services" },
+              { label: "Nos Projets", href: "/#projects" },
+              { label: "À Propos", href: "/#about" },
+              { label: "Blog", href: "/blog/ia-kirundi" },
+              { label: "Vidéos", href: "/#videos" },
+              { label: "Contact", href: "/#contact" },
             ].map((item) => (
-              <a key={item.id} href={`/#${item.id}`} className="font-body text-sm text-muted-foreground py-2 hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
+              <a key={item.label} href={item.href} className="font-body text-sm text-muted-foreground py-2 hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
                 {item.label}
               </a>
             ))}

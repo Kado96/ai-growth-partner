@@ -160,6 +160,18 @@ const Admin = () => {
     }
   };
 
+  const [stats, setStats] = useState<{ totalVisits: number; uniqueVisitors: number; todayVisits: number } | null>(null);
+  const [previewBlog, setPreviewBlog] = useState<any | null>(null);
+
+  const fetchStats = async () => {
+    try {
+      const { data } = await axios.get('/api/admin/stats', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStats(data);
+    } catch (e) { console.error('Erreur chargement stats', e); }
+  };
+
   useEffect(() => {
     if (isLoggedIn) {
       fetchMedias();
@@ -167,6 +179,7 @@ const Admin = () => {
       fetchKnowledge();
       fetchBlogs();
       fetchContactMessages();
+      fetchStats();
     }
   }, [isLoggedIn]);
 
@@ -491,6 +504,7 @@ const Admin = () => {
             { id: 'social', label: 'Automatisations n8n', icon: Zap },
             { id: 'alexa-brain', label: 'Cerveau Alexa', icon: Brain },
             { id: 'expertise', label: 'Expertise (Blogs)', icon: BookOpen },
+            { id: 'stats', label: 'Statistiques Visiteurs', icon: Activity },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1611,6 +1625,43 @@ const Admin = () => {
                         ))
                       )}
                     </div>
+                  </div>
+                </div>
+              </div>
+            {activeTab === 'stats' && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-20">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
+                      <Activity size={24} />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-display font-bold text-white leading-tight">Statistiques de Fréquentation</h2>
+                      <p className="text-slate-400 text-sm">Nombre de personnes ayant consulté votre site web en temps réel.</p>
+                    </div>
+                  </div>
+                  <Button onClick={fetchStats} variant="outline" size="sm" className="border-white/10 hover:bg-white/5 rounded-full text-xs">
+                    <Activity size={14} className="mr-2 text-accent" /> Rafraîchir
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-8 rounded-[2rem] bg-gradient-to-br from-accent/10 to-purple-500/5 border border-accent/20 space-y-2">
+                    <p className="text-[10px] uppercase font-black text-accent tracking-[0.2em]">Total Visites Enregistrées</p>
+                    <p className="text-4xl font-extrabold text-white">{stats ? stats.totalVisits : "..."}</p>
+                    <p className="text-xs text-slate-400 mt-2">Visites enregistrées depuis la création</p>
+                  </div>
+
+                  <div className="p-8 rounded-[2rem] bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 space-y-2">
+                    <p className="text-[10px] uppercase font-black text-emerald-400 tracking-[0.2em]">Visiteurs Uniques (IP)</p>
+                    <p className="text-4xl font-extrabold text-white">{stats ? stats.uniqueVisitors : "..."}</p>
+                    <p className="text-xs text-slate-400 mt-2">Utilisateurs distincts ayant visité le site</p>
+                  </div>
+
+                  <div className="p-8 rounded-[2rem] bg-gradient-to-br from-blue-500/10 to-cyan-500/5 border border-blue-500/20 space-y-2">
+                    <p className="text-[10px] uppercase font-black text-blue-400 tracking-[0.2em]">Visites Aujourd'hui</p>
+                    <p className="text-4xl font-extrabold text-white">{stats ? stats.todayVisits : "..."}</p>
+                    <p className="text-xs text-slate-400 mt-2">Nombre de consultations effectuées ce jour</p>
                   </div>
                 </div>
               </div>

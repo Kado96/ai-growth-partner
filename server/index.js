@@ -55,6 +55,8 @@ app.use((req, res, next) => {
 const sequelize = require('./config/database');
 require('./models/ContactMessage');
 require('./models/Media');
+const Visitor = require('./models/Visitor');
+const { seedBlogs } = require('./scripts/seedBlogs');
 const mediaRoutes = require('./routes/mediaRoutes');
 const { scanMediaFolder } = require('./scripts/mediaCollector');
 const { sendToN8N } = require('./services/n8nService');
@@ -95,6 +97,19 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+
+// Middleware de comptage des visiteurs (Filtrage des assets statiques & bot)
+app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.url.startsWith('/api') && !req.url.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2)$/)) {
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+        Visitor.create({
+            ip: Array.isArray(ip) ? ip[0] : ip.split(',')[0].trim(),
+            userAgent: req.headers['user-agent'] || '',
+            path: req.url
+        }).catch(err => console.error('[VISITOR_LOG_ERR]', err.message));
+    }
+    next();
+});
 
 // Logger de diagnostic
 app.use((req, res, next) => {
@@ -658,7 +673,36 @@ app.post('/api/contact-message', async (req, res) => {
     }
 });
 
-// --- ROUTES GESTION MESSAGES CLIENTS (ADMIN) ---
+// --- ROUTES GESTION MESSAGES CLIENTS & STATISTIQUES (ADMIN) ---
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
+    try {
+        const totalVisits = await Visitor.count();
+        const uniqueVisitors = await Visitor.count({
+            distinct: true,
+            col: 'ip'
+        });
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        
+        const { Op } = require('sequelize');
+        const todayVisits = await Visitor.count({
+            where: {
+                createdAt: {
+                    [Op.gte]: todayStart
+                }
+            }
+        });
+
+        res.json({
+            totalVisits,
+            uniqueVisitors,
+            todayVisits
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/contact-messages', requireAdmin, async (req, res) => {
     try {
         const messages = await ContactMessage.findAll({ order: [['createdAt', 'DESC']] });
