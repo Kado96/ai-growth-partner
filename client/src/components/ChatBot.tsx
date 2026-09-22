@@ -99,19 +99,17 @@ const ChatBot = () => {
     [inputValue, isTyping, messages]
   );
 
-  const handleClose = async () => {
-    if (messages.length > 1) {
-      try {
-        await submitChatSummary({
-          transcript: messages
-            .filter((m) => !m.isLoading)
-            .map((m) => ({ from: m.from, text: m.text })),
-        });
-      } catch {
-        /* silencieux */
-      }
-    }
+  const handleClose = () => {
     setIsOpen(false);
+    if (messages.length > 1) {
+      submitChatSummary({
+        transcript: messages
+          .filter((m) => !m.isLoading)
+          .map((m) => ({ from: m.from, text: m.text })),
+      }).catch(() => {
+        /* silencieux */
+      });
+    }
   };
 
   const handleDevis = () => {

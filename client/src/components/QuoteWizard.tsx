@@ -88,6 +88,7 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
       const quoteData = {
         service: selectedService.title,
         name: contact.name,
+        email: contact.email,
         whatsapp: contact.whatsapp,
         answers: answers,
         total: selectedService.price
@@ -303,7 +304,7 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
                       </div>
 
                       <div className="space-y-4 mb-8">
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="contact-name" className="text-slate-300 text-xs uppercase tracking-wider font-bold">Nom complet / Entreprise</Label>
                             <Input
@@ -317,19 +318,33 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="contact-whatsapp" className="text-slate-300 text-xs uppercase tracking-wider font-bold">Numéro WhatsApp</Label>
-                            <div className="relative">
-                              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">+257</span>
-                              <Input
-                                id="contact-whatsapp"
-                                name="whatsapp"
-                                autoComplete="tel"
-                                className="h-12 bg-white/5 border-white/10 text-white pl-14 rounded-xl"
-                                placeholder="69 ...."
-                                value={contact.whatsapp}
-                                onChange={(e) => handleContactChange("whatsapp", e.target.value)}
-                              />
-                            </div>
+                            <Label htmlFor="contact-email" className="text-slate-300 text-xs uppercase tracking-wider font-bold">Adresse E-mail</Label>
+                            <Input
+                              id="contact-email"
+                              name="email"
+                              type="email"
+                              autoComplete="email"
+                              className="h-12 bg-white/5 border-white/10 text-white rounded-xl"
+                              placeholder="votre@email.com"
+                              value={contact.email}
+                              onChange={(e) => handleContactChange("email", e.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 mt-4">
+                          <Label htmlFor="contact-whatsapp" className="text-slate-300 text-xs uppercase tracking-wider font-bold">Numéro WhatsApp (Optionnel)</Label>
+                          <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">+257</span>
+                            <Input
+                              id="contact-whatsapp"
+                              name="whatsapp"
+                              autoComplete="tel"
+                              className="h-12 bg-white/5 border-white/10 text-white pl-14 rounded-xl"
+                              placeholder="69 ...."
+                              value={contact.whatsapp}
+                              onChange={(e) => handleContactChange("whatsapp", e.target.value)}
+                            />
                           </div>
                         </div>
 
@@ -358,7 +373,7 @@ const QuoteWizard = ({ isOpen, onClose, initialServiceId }: QuoteWizardProps) =>
                           variant="cta"
                           className="flex-[2] h-12 shadow-lg shadow-accent/20 rounded-xl font-display font-bold group relative overflow-hidden"
                           onClick={handleSubmit}
-                          disabled={!contact.name || !contact.whatsapp || isSubmitting}
+                          disabled={!contact.name || (!contact.email && !contact.whatsapp) || isSubmitting}
                         >
                           <span className="relative z-10 flex items-center justify-center">
                             {isSubmitting ? "Initialisation..." : "Générer mon Devis"}

@@ -709,12 +709,12 @@ app.post('/api/chat-summary', async (req, res) => {
             </div>
         `;
 
-        await transporter.sendMail({
+        transporter.sendMail({
             from: `"${ASSISTANT_NAME} — Kora Agency" <${process.env.EMAIL_USER}>`,
             to: "kandekedonald@gmail.com",
             subject: `[${ASSISTANT_NAME}] Nouveau résumé de conversation`,
             html: html,
-        });
+        }).catch(err => console.error('[CHAT_SUMMARY_ERR]', err.message));
 
         res.json({ success: true, message: "Résumé de chat envoyé." });
     } catch (err) {
