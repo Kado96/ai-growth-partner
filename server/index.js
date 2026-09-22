@@ -545,37 +545,34 @@ const sendAdminNotification = async (type, data) => {
         `;
     }
 
-    try {
-        await transporter.sendMail({
-            from: `"Kora Notifications" <${process.env.EMAIL_USER}>`,
-            to: "kandekedonald@gmail.com",
-            replyTo: data.email || undefined,
-            subject: subject,
-            html: html,
-        });
-        console.log(`[MAIL] Notification envoyée pour : ${type}`);
+    // 1) Lancement asynchrone de la notification admin par e-mail
+    transporter.sendMail({
+        from: `"Kora Notifications" <${process.env.EMAIL_USER}>`,
+        to: "kandekedonald@gmail.com",
+        replyTo: data.email || undefined,
+        subject: subject,
+        html: html,
+    }).then(() => console.log(`[MAIL] Notification admin envoyée pour : ${type}`))
+      .catch(err => console.error('[MAIL] Erreur envoi notification admin :', err.message));
 
-        // NOTIFICATION n8n (Centralisation)
-        const { sendToN8N } = require('./services/n8nService');
-        await sendToN8N(type === 'quote' ? 'new_quote' : 'new_contact', data);
+    // 2) Notification n8n
+    const { sendToN8N } = require('./services/n8nService');
+    sendToN8N(type === 'quote' ? 'new_quote' : 'new_contact', data)
+        .catch(err => console.error('[N8N_ERR]', err.message));
 
-        // NOTIFICATION WHATSAPP DIRECTE (Fallback Meta)
-        const { sendWhatsApp } = require('./services/whatsappService');
-        const waMsg = type === 'quote'
-            ? `🚀 NOUVEAU DEVIS : ${data.name} pour ${data.service} (${data.whatsapp})`
-            : `📧 NOUVEAU CONTACT : ${data.name} (${data.email})`;
-        await sendWhatsApp(waMsg);
+    // 3) Notification WhatsApp
+    const { sendWhatsApp } = require('./services/whatsappService');
+    const waMsg = type === 'quote'
+        ? `🚀 NOUVEAU DEVIS : ${data.name} pour ${data.service} (${data.whatsapp})`
+        : `📧 NOUVEAU CONTACT : ${data.name} (${data.email})`;
+    sendWhatsApp(waMsg).catch(err => console.error('[WA_ERR]', err.message));
 
-        // AUTO-RÉPONSE IA AU CLIENT (si email présent)
-        if (data.email) {
-            sendClientAutoReply(type, data).catch(err => console.error('[AUTO_REPLY_ERR]', err));
-        }
-
-        return true;
-    } catch (error) {
-        console.error("[MAIL] Erreur envoi notifications :", error);
-        return false;
+    // 4) Auto-réponse IA client par e-mail (si email fourni)
+    if (data.email) {
+        sendClientAutoReply(type, data).catch(err => console.error('[AUTO_REPLY_ERR]', err.message));
     }
+
+    return true;
 };
 
 const sendClientAutoReply = async (type, data) => {
