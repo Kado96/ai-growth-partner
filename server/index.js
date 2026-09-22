@@ -693,11 +693,42 @@ app.get('/api/admin/stats', requireAdmin, async (req, res) => {
             }
         });
 
+        // Récupérer les 50 dernières visites détaillées
+        const recentVisitors = await Visitor.findAll({
+            order: [['createdAt', 'DESC']],
+            limit: 50
+        });
+
         res.json({
             totalVisits,
             uniqueVisitors,
-            todayVisits
+            todayVisits,
+            recentVisitors
         });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Endpoint Export Excel (CSV)
+app.get('/api/admin/visitors/export', requireAdmin, async (req, res) => {
+    try {
+        const visitors = await Visitor.findAll({
+            order: [['createdAt', 'DESC']],
+            limit: 1000
+        });
+
+        let csv = 'ID;Date & Heure;IP Visiteur;Page Consulte;Navigateur (User Agent)\n';
+        visitors.forEach(v => {
+            const dateStr = new Date(v.createdAt).toLocaleString('fr-FR');
+            const cleanPath = (v.path || '/').replace(/;/g, ',');
+            const cleanUa = (v.userAgent || '').replace(/;/g, ',').replace(/\n/g, ' ');
+            csv += `${v.id};"${dateStr}";"${v.ip}";"${cleanPath}";"${cleanUa}"\n`;
+        });
+
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', 'attachment; filename="statistiques_visiteurs_kora_agency.csv"');
+        res.send('\uFEFF' + csv); // BOM UTF-8 pour ouverture directe dans Excel
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

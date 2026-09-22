@@ -160,7 +160,7 @@ const Admin = () => {
     }
   };
 
-  const [stats, setStats] = useState<{ totalVisits: number; uniqueVisitors: number; todayVisits: number } | null>(null);
+  const [stats, setStats] = useState<{ totalVisits: number; uniqueVisitors: number; todayVisits: number; recentVisitors?: any[] } | null>(null);
   const [previewBlog, setPreviewBlog] = useState<any | null>(null);
 
   const fetchStats = async () => {
@@ -170,6 +170,25 @@ const Admin = () => {
       });
       setStats(data);
     } catch (e) { console.error('Erreur chargement stats', e); }
+  };
+
+  const handleExportExcel = async () => {
+    try {
+      const response = await axios.get('/api/admin/visitors/export', {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'statistiques_visiteurs_kora_agency.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Fichier Excel télécharge avec succès !");
+    } catch (e) {
+      toast.error("Erreur lors du téléchargement du fichier.");
+    }
   };
 
   useEffect(() => {
@@ -1632,19 +1651,24 @@ const Admin = () => {
 
             {activeTab === 'stats' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-20">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
                       <Activity size={24} />
                     </div>
                     <div>
                       <h2 className="text-2xl font-display font-bold text-white leading-tight">Statistiques de Fréquentation</h2>
-                      <p className="text-slate-400 text-sm">Nombre de personnes ayant consulté votre site web en temps réel.</p>
+                      <p className="text-slate-400 text-sm">Consultez les visites horodatées et téléchargez le registre complet sous Excel.</p>
                     </div>
                   </div>
-                  <Button onClick={fetchStats} variant="outline" size="sm" className="border-white/10 hover:bg-white/5 rounded-full text-xs">
-                    <Activity size={14} className="mr-2 text-accent" /> Rafraîchir
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <Button onClick={handleExportExcel} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs h-10 px-4 gap-2 shadow-lg shadow-emerald-600/20">
+                      <UploadCloud size={16} /> Télécharger en Excel (.csv)
+                    </Button>
+                    <Button onClick={fetchStats} variant="outline" size="sm" className="border-white/10 hover:bg-white/5 rounded-xl text-xs h-10">
+                      <Activity size={14} className="mr-2 text-accent" /> Rafraîchir
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1665,6 +1689,55 @@ const Admin = () => {
                     <p className="text-4xl font-extrabold text-white">{stats ? stats.todayVisits : "..."}</p>
                     <p className="text-xs text-slate-400 mt-2">Nombre de consultations effectuées ce jour</p>
                   </div>
+                </div>
+
+                {/* Tableau Horodaté des Dernières Visites */}
+                <div className="mt-8 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-display font-bold text-white flex items-center gap-2">
+                      <Activity size={18} className="text-accent" /> Historique Horodaté des Dernières Visites
+                    </h3>
+                    <span className="text-xs text-slate-500 font-mono">Dernières consultations</span>
+                  </div>
+
+                  {!stats?.recentVisitors || stats.recentVisitors.length === 0 ? (
+                    <div className="border border-dashed border-white/10 rounded-2xl p-8 text-center text-slate-500 text-sm">
+                      Aucune donnée de visite récente enregistrée.
+                    </div>
+                  ) : (
+                    <div className="border border-white/10 rounded-2xl overflow-hidden bg-slate-900/50 backdrop-blur-xl">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-white/5 border-b border-white/10 text-slate-400 font-mono uppercase tracking-wider text-[10px]">
+                            <tr>
+                              <th className="p-4">Date & Heure</th>
+                              <th className="p-4">Adresse IP</th>
+                              <th className="p-4">Page Consultée</th>
+                              <th className="p-4">Navigateur / Appareil</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/5 text-slate-300 font-mono text-[11px]">
+                            {stats.recentVisitors.map((v: any) => (
+                              <tr key={v.id} className="hover:bg-white/[0.02] transition-colors">
+                                <td className="p-4 text-accent font-bold">
+                                  {new Date(v.createdAt).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'medium' })}
+                                </td>
+                                <td className="p-4 text-white font-bold">{v.ip || 'Anonyme'}</td>
+                                <td className="p-4">
+                                  <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/5 text-slate-200">
+                                    {v.path || '/'}
+                                  </span>
+                                </td>
+                                <td className="p-4 text-slate-500 truncate max-w-xs" title={v.userAgent}>
+                                  {v.userAgent || 'Navigateur Standard'}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
