@@ -27,50 +27,61 @@ const Header = () => {
             </span>
           </a>
 
-          <nav className="hidden md:flex items-center gap-8">
-            {["Nos Services", "Nos Projets", "À Propos", "Blog", "Vidéos", "Contact"].map((item) => {
-              if (item === "Blog") {
-                return (
-                  <a key="blog" href="/blog" className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors relative group">
-                    Blog
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300 rounded-full" />
-                  </a>
-                );
-              }
-              const id = item === "Nos Services" ? "services" : item === "Nos Projets" ? "projects" : item === "À Propos" ? "about" : item === "Vidéos" ? "videos" : "contact";
-              return (
-                <a key={id} href={`/#${id}`} className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors relative group">
-                  {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300 rounded-full" />
-                </a>
-              );
-            })}
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+            {[
+              { label: "Accueil", href: "/" },
+              { label: "Services", href: "/#services" },
+              { label: "Projets", href: "/#projects" },
+              { label: "À Propos", href: "/#about" },
+              { label: "Blog", href: "/blog" },
+              { label: "Vidéos", href: "/#videos" },
+              { label: "Contact", href: "/#contact" }
+            ].map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="font-body text-sm font-medium text-slate-300 hover:text-white transition-colors relative group py-1"
+              >
+                {item.label}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300 rounded-full" />
+              </a>
+            ))}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="cta" size="sm" onClick={() => openQuote()}>Demander un Devis</Button>
+            <Button variant="cta" size="sm" className="font-bold tracking-wide shadow-lg shadow-accent/20" onClick={() => openQuote()}>
+              Demander un Devis
+            </Button>
           </div>
 
-          <button className="md:hidden text-foreground" onClick={() => setIsOpen(!isOpen)}>
+          <button className="md:hidden text-foreground p-2" onClick={() => setIsOpen(!isOpen)} aria-label="Menu">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {isOpen && (
-          <div className="md:hidden pb-4 flex flex-col gap-3 border-t border-border/50 pt-4">
+          <div className="md:hidden pb-6 flex flex-col gap-3 border-t border-white/10 pt-4 animate-in slide-in-from-top-2 duration-300">
             {[
-              { label: "Nos Services", href: "/#services" },
-              { label: "Nos Projets", href: "/#projects" },
+              { label: "Accueil", href: "/" },
+              { label: "Services", href: "/#services" },
+              { label: "Projets", href: "/#projects" },
               { label: "À Propos", href: "/#about" },
               { label: "Blog", href: "/blog" },
               { label: "Vidéos", href: "/#videos" },
-              { label: "Contact", href: "/#contact" },
+              { label: "Contact", href: "/#contact" }
             ].map((item) => (
-              <a key={item.label} href={item.href} className="font-body text-sm text-muted-foreground py-2 hover:text-foreground transition-colors" onClick={() => setIsOpen(false)}>
+              <a
+                key={item.label}
+                href={item.href}
+                className="font-body text-sm font-medium text-slate-300 hover:text-white py-2 px-1 transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
                 {item.label}
               </a>
             ))}
-            <Button variant="cta" size="sm" className="w-fit mt-2" onClick={() => { setIsOpen(false); openQuote(); }}>Demander un Devis</Button>
+            <Button variant="cta" size="sm" className="w-full mt-2 font-bold" onClick={() => { setIsOpen(false); openQuote(); }}>
+              Demander un Devis
+            </Button>
           </div>
         )}
       </div>
