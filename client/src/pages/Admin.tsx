@@ -1628,6 +1628,8 @@ const Admin = () => {
                   </div>
                 </div>
               </div>
+            )}
+
             {activeTab === 'stats' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-20">
                 <div className="flex items-center justify-between mb-4">
