@@ -31,7 +31,7 @@ const Header = () => {
             {["Nos Services", "Nos Projets", "À Propos", "Blog", "Vidéos", "Contact"].map((item) => {
               if (item === "Blog") {
                 return (
-                  <a key="blog" href="/blog/ia-kirundi" className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors relative group">
+                  <a key="blog" href="/blog" className="font-body text-sm text-muted-foreground hover:text-foreground transition-colors relative group">
                     Blog
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300 rounded-full" />
                   </a>
@@ -62,7 +62,7 @@ const Header = () => {
               { label: "Nos Services", href: "/#services" },
               { label: "Nos Projets", href: "/#projects" },
               { label: "À Propos", href: "/#about" },
-              { label: "Blog", href: "/blog/ia-kirundi" },
+              { label: "Blog", href: "/blog" },
               { label: "Vidéos", href: "/#videos" },
               { label: "Contact", href: "/#contact" },
             ].map((item) => (

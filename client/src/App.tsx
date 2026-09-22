@@ -9,6 +9,7 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Admin from "./pages/Admin.tsx";
 import BlogDetail from "./pages/BlogDetail.tsx";
+import BlogList from "./pages/BlogList.tsx";
 
 import { QuoteProvider, useQuote } from "@/hooks/use-quote";
 
@@ -33,6 +34,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/blog" element={<BlogList />} />
               <Route path="/blog/:serviceId" element={<BlogDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
