@@ -1,5 +1,5 @@
 /**
- * 📝 SCRIPT DE CRÉATION ET SEED DES ARTICLES DE BLOG (NOTAMMENT IA KIRUNDI)
+ * 📝 SCRIPT DE CRÉATION ET SEED DE TOUS LES ARTICLES DE BLOG (7 SERVICES KORA AGENCY)
  */
 
 const sequelize = require('../config/database');
@@ -47,6 +47,42 @@ Pour les ONG et institutions d'enquêtes (S&E / KoboToolbox), l'IA en Kirundi pe
 Contactez dès aujourd'hui **Kora Agency** sur WhatsApp au **+257 79 92 88 64** ou via notre formulaire de devis en ligne pour une démonstration sur mesure.`
   },
   {
+    slug: 'apps-android',
+    serviceId: 'apps-android',
+    title: 'Développement d\'Applications Android au Burundi : De la Conception au Déploiement',
+    readingTime: 6,
+    tags: ['Android', 'Mobile', 'App', 'Burundi', 'Kotlin', 'React Native'],
+    author: 'Kora Agency Mobile Lead',
+    content: `![Apps Android Kora Agency](https://sxtnrfzhwgjmzxzztoij.supabase.co/storage/v1/object/public/media/whatsapp-bot.jpg)
+
+# Développement d'Applications Android au Burundi : Digitalisez vos Services
+
+Le smartphone est le moyen d'accès privilégié à Internet au Burundi et en Afrique de l'Est. Concevoir une application Android performante, ergonomique et adaptée aux réseaux locaux est un impératif pour toute entreprise moderne.
+
+---
+
+## 📱 Pourquoi choisir Android pour votre entreprise ?
+
+### 1. Domination du Marché Mobile
+Au Burundi, plus de 90% du trafic mobile provient d'appareils Android. Une application dédiée offre un canal direct et privilégié avec vos utilisateurs et clients.
+
+### 2. Fonctionnement Hors-Ligne (Offline First)
+Nos applications Android intègrent une synchronisation intelligente : elles permettent à vos équipes terrain d'enregistrer des données même sans connexion Internet, puis se synchronisent automatiquement dès le retour du réseau.
+
+### 3. Notifications Push & Engagement
+Gardez vos clients informés de vos promotions, nouveautés ou mises à jour de statut grâce aux notifications push ciblées.
+
+---
+
+## ⚙️ Notre Expertise Android chez Kora Agency
+
+- **Applications B2C / Client** : E-commerce, réservation, fidélité et services.
+- **Applications Métier / B2B** : Gestion de stock terrain, suivi des agents, formulaires de collecte.
+- **Paiements Mobiles Intégrés** : Intégration transparente des passerelles de paiement (Lumicash, Ecocash, AfriPay).
+
+Prêt à concrétiser votre projet d'application mobile ? [Demandez un devis sur mesure](#quote) dès aujourd'hui.`
+  },
+  {
     slug: 'communication-digitale',
     serviceId: 'communication-digitale',
     title: 'Comment Dominer les Réseaux Sociaux au Burundi en 2026',
@@ -59,7 +95,10 @@ Contactez dès aujourd'hui **Kora Agency** sur WhatsApp au **+257 79 92 88 64** 
 
 Le paysage digital burundais évolue rapidement avec une forte pénétration de TikTok, Facebook et Instagram. Pour capter l'attention des prospects, les entreprises doivent adopter une stratégie de contenu vidéo locale et engageante.
 
+---
+
 ## 💡 3 Piliers pour réussir :
+
 1. **Contenu Vidéo court (Reels/TikTok)** avec storytelling local.
 2. **Réponse rapide via WhatsApp Business** et Chatbot IA.
 3. **Publicités ciblées géolocalisées** à Bujumbura et dans les provinces.
@@ -79,7 +118,91 @@ Faites confiance à **Kora Agency** pour gérer votre communication digitale de 
 
 Un site web moderne ne doit pas être une simple vitrine statique : il doit être un générateur de prospects actif 24h/24.
 
+---
+
+## 🌐 Pourquoi faire évoluer votre présence Web ?
+
 Chez **Kora Agency**, nous développons des applications Web ultra-rapides, sécurisées et optimisées pour le référencement Google (SEO) avec intégration de paiement mobile (AfriPay, Lumicash, Ecocash).`
+  },
+  {
+    slug: 'marketplace',
+    serviceId: 'marketplace',
+    title: 'Marketplace Kora : Connecter Vendeurs et Acheteurs avec l\'Assistance IA',
+    readingTime: 6,
+    tags: ['Marketplace', 'E-Commerce', 'IA', 'Ventes', 'Burundi'],
+    author: 'Kora Agency Product Manager',
+    content: `![Marketplace Kora Agency](https://sxtnrfzhwgjmzxzztoij.supabase.co/storage/v1/object/public/media/ai-assistant.jpg)
+
+# Marketplace Kora : Connecter Vendeurs et Acheteurs avec l'Assistance IA
+
+La vente en ligne au Burundi franchit un nouveau cap. Grâce à notre plateforme **Marketplace intégrant un assistant IA**, rapprocher les commerçants et les acheteurs n'a jamais été aussi fluide.
+
+---
+
+## 🛒 Les Avantages de la Marketplace Kora
+
+### 1. Publication Simplifiée guidée par Chatbot
+Les vendeurs peuvent ajouter un produit simplement en discutant avec notre bot WhatsApp ou Web (envoi de photos, description vocale en Kirundi ou texte).
+
+### 2. Recherche Intelligente & Recommandations
+Les utilisateurs trouvent rapidement les articles recherchés grâce à une recherche sémantique propulsée par l'IA.
+
+### 3. Communication Directe et Sécurisée
+Mise en relation instantanée entre acheteur et vendeur avec suivi des commandes et options de livraison localisées.
+
+Digitalisez votre réseau de vente avec la plateforme Marketplace **Kora Agency**.`
+  },
+  {
+    slug: 'collecte-enquetes-se',
+    serviceId: 'collecte-enquetes-se',
+    title: 'Collecte de Données, Enquêtes & Suivi-Évaluation pour ONG et Projets au Burundi',
+    readingTime: 7,
+    tags: ['Data', 'Enquêtes', 'Suivi-Evaluation', 'KoboToolbox', 'ONG', 'Burundi'],
+    author: 'Kora Agency Data Lead',
+    content: `![Collecte & Suivi-Evaluation Kora Agency](https://sxtnrfzhwgjmzxzztoij.supabase.co/storage/v1/object/public/media/content-plan.jpg)
+
+# Collecte de Données, Enquêtes & Suivi-Évaluation (S&E)
+
+Pour les ONG, institutions publiques et programmes de développement, la qualité et la fiabilité des données terrain sont fondamentales pour mesurer l'impact et orienter les décisions stratégiques.
+
+---
+
+## 📊 Notre Approche Complète du Suivi-Évaluation
+
+### 1. Conception des Formulaires & Numérisation (ODK / KoboToolbox)
+Rédaction et paramétrage de questionnaires numérisés avec contrôles de cohérence, géolocalisation GPS et validation des champs en temps réel.
+
+### 2. Collecte Terrain Mobile & Supervision
+Déploiement d'enquêteurs formés équipés d'applications mobiles fonctionnant sans connexion Internet. Suivi en temps réel de la progression des enquêtes grâce à des tableaux de bord interactifs.
+
+### 3. Nettoyage, Analyse & Rapports d'Impact
+Traitement automatisé des données, analyses statistiques rigoureuses et rédaction de rapports complets répondant aux exigences des bailleurs de fonds.
+
+Contactez l'équipe Data de **Kora Agency** pour piloter vos enquêtes et projets S&E.`
+  },
+  {
+    slug: 'quicksales',
+    serviceId: 'quicksales',
+    title: 'QuickSales : La Solution de Gestion et Contrôle pour Boutiques et Magasins',
+    readingTime: 5,
+    tags: ['QuickSales', 'Gestion', 'Stock', 'Boutique', 'Caisse', 'Pharmacie'],
+    author: 'Kora Agency Solutions Lead',
+    content: `![QuickSales Kora Agency](https://sxtnrfzhwgjmzxzztoij.supabase.co/storage/v1/object/public/media/tech-support.jpg)
+
+# QuickSales : Prenez le Contrôle Total de votre Boutique ou Pharmacie
+
+Gestion des stocks confuse, pertes inexpliquées, manque de visibilité sur le chiffre d'affaires quotidien ? **QuickSales** est la solution logicielle conçue spécialement pour répondre aux défis des commerçants et pharmaciens.
+
+---
+
+## 🔑 Fonctionnalités Clés de QuickSales
+
+- **Gestion des Ventes & Caisse Intelligente** : Encaissement rapide, impression de reçus et comptabilité simplifiée.
+- **Suivi des Stocks en Temps Réel** : Alertes automatiques de rupture de stock et péremption de produits.
+- **Tableau de Bord & Rapports d'Activité** : Visualisez vos bénéfices, vos meilleures ventes et la santé financière de vos points de vente où que vous soyez.
+- **Multi-Boutiques** : Centralisez le contrôle de plusieurs points de vente depuis un seul compte.
+
+Demandez une démonstration gratuite de **QuickSales** avec **Kora Agency** dès aujourd'hui.`
   }
 ];
 
@@ -96,7 +219,7 @@ async function seedBlogs() {
         console.log(`🔄 Article mis à jour : /blog/${data.slug}`);
       }
     }
-    console.log('🎉 Seed des articles de blog terminé !');
+    console.log('🎉 Seed de TOUS les articles de blog terminé avec succès !');
   } catch (err) {
     console.error('❌ Erreur seed blogs :', err.message);
   }
