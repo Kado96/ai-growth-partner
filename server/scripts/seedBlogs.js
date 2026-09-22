@@ -1,5 +1,5 @@
 /**
- * 📝 SCRIPT DE CRÉATION ET SEED DE TOUS LES ARTICLES DE BLOG (7 SERVICES KORA AGENCY)
+ * 📝 SCRIPT DE SEED DE 10 ARTICLES DE BLOG COMPLETS POUR KORA AGENCY
  */
 
 const sequelize = require('../config/database');
@@ -203,6 +203,75 @@ Gestion des stocks confuse, pertes inexpliquées, manque de visibilité sur le c
 - **Multi-Boutiques** : Centralisez le contrôle de plusieurs points de vente depuis un seul compte.
 
 Demandez une démonstration gratuite de **QuickSales** avec **Kora Agency** dès aujourd'hui.`
+  },
+  {
+    slug: 'securite-digital-burundi',
+    serviceId: 'developpement-web',
+    title: 'Cybersécurité et Protection des Données pour les Entreprises au Burundi',
+    readingTime: 6,
+    tags: ['Sécurité', 'Cybersécurité', 'Protection', 'Cloud', 'Burundi'],
+    author: 'Kora Agency Security Lead',
+    content: `![Cybersécurité Kora Agency](https://sxtnrfzhwgjmzxzztoij.supabase.co/storage/v1/object/public/media/ads-poster.jpg)
+
+# Cybersécurité et Protection des Données pour les Entreprises au Burundi
+
+Avec la numérisation croissante des services bancaires, administratifs et commerciaux, la cybersécurité est devenue une priorité absolue.
+
+---
+
+## 🛡️ Les Bonnes Pratiques pour Protéger votre Entreprise
+
+1. **Sauvegardes automatiques chiffrées sur le Cloud**.
+2. **Authentification forte à deux facteurs (2FA)**.
+3. **Audit régulier des vulnérabilités applicatives et systèmes**.
+
+Kora Agency accompagne les institutions et PME dans l'audit et la sécurisation de leurs infrastructures informatiques.`
+  },
+  {
+    slug: 'automation-whatsapp-business',
+    serviceId: 'communication-digitale',
+    title: 'Automatiser son Service Client avec WhatsApp Business & Chatbot IA',
+    readingTime: 5,
+    tags: ['WhatsApp', 'Automation', 'Chatbot', 'IA', 'Service Client'],
+    author: 'Kora Agency Automation Lead',
+    content: `![Automation WhatsApp Kora Agency](https://sxtnrfzhwgjmzxzztoij.supabase.co/storage/v1/object/public/media/project-chatbot.jpg)
+
+# Automatiser son Service Client avec WhatsApp Business & Chatbot IA
+
+WhatsApp est le canal de communication numéro 1 au Burundi. Intégrer un agent conversationnel autonome permet de répondre instantanément aux demandes d'informations, devis et commandes de vos clients.
+
+---
+
+## 🤖 Quels Bénéfices pour votre Marque ?
+
+- **Temps de réponse réduit à zéro seconde**.
+- **Disponibilité 24/7 y compris le week-end**.
+- **Centralisation des prospects dans votre base de données CRM**.
+
+Découvrez notre solution d'agent IA connecté à WhatsApp avec Kora Agency.`
+  },
+  {
+    slug: 'paiements-mobiles-integration',
+    serviceId: 'developpement-web',
+    title: 'Intégrer les Paiements Mobiles (Lumicash, Ecocash, AfriPay) dans vos Applications',
+    readingTime: 6,
+    tags: ['Paiement', 'Mobile Money', 'Lumicash', 'Ecocash', 'AfriPay', 'API'],
+    author: 'Kora Agency Fintech Lead',
+    content: `![Paiements Mobiles Kora Agency](https://sxtnrfzhwgjmzxzztoij.supabase.co/storage/v1/object/public/media/agency-pack.jpg)
+
+# Intégrer les Paiements Mobiles (Lumicash, Ecocash, AfriPay) dans vos Applications
+
+Faciliter l'encaissement est la clé de voûte de toute plateforme de vente ou de service digital au Burundi.
+
+---
+
+## 💳 Nos Solutions d'Intégration Fintech
+
+- **APIs de paiement unifiées** pour recevoir les paiements par Lumicash, Ecocash et cartes bancaires via AfriPay.
+- **Webhooks sécurisés** de confirmation de transaction en temps réel.
+- **Rapprochement bancaire automatique** pour vos rapports financiers.
+
+Boostez vos ventes avec nos modules de paiement mobile sur mesure.`
   }
 ];
 

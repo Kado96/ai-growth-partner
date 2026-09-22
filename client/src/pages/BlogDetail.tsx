@@ -82,12 +82,12 @@ const BlogDetail = () => {
         );
     }
 
-    if (!blog || !service) {
+    if (!blog) {
         return (
             <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
                 <h1 className="text-3xl font-display font-bold text-white mb-4">Article introuvable</h1>
-                <Link to="/">
-                    <Button variant="hero">Retour à l'accueil</Button>
+                <Link to="/blog">
+                    <Button variant="hero">Découvrir les autres articles</Button>
                 </Link>
             </div>
         );
