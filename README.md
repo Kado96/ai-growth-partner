@@ -22,22 +22,12 @@ Pour résoudre les erreurs de connexion et lancer le projet :
 > En local, laissez `VITE_API_URL` vide dans `client/.env` (proxy Vite `/api` → `:5001`).
 ---
 
-## ⚡ Procédure Rapide de Commit & Migration Automatique
+## ⚡ Raccourcis / Commands pour Agent (Antigravity, Cursor, Claude)
 
-Chaque `git commit` et `git push` déclenche automatiquement la migration de **toutes vos données et photos** vers **Supabase** et la base de données PostgreSQL en production :
+Vous pouvez taper ces raccourcis directement à votre assistant IA ou exécuter la commande équivalente dans le terminal :
 
-### 1️⃣ Commander un Commit & Déploiement Complet :
-```powershell
-git add .
-git commit -m "update: vos modifications de code et médias"
-git push
-```
-
-### 2️⃣ Déclenchement Automatique :
-* 📦 **GitHub** : Reçoit votre code à jour.
-* 🚀 **Render** : Déploie la nouvelle version et exécute automatiquement `migrateAll.js`.
-* ☁️ **Supabase Storage** : Reçoit et synchronise automatiquement toutes les nouvelles photos du dossier `media/`.
-* 🗄️ **Base de Données** : Synchronise tous les contenus et configurations.
+- **`/github`** ou `npm run github` : Effectue immédiatement un `git add .`, `git commit` et `git push` sur la branche principale GitHub.
+- **`/supabase`** ou `npm run supabase` : Transfère toutes les nouvelles photos et médias vers Supabase Storage (`media/`) et met à jour la base de données.
 
 ---
 

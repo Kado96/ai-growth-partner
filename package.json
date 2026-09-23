@@ -7,6 +7,8 @@
     "build": "cd client && npm run build",
     "start": "cd server && node index.js",
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "github": "git add . && git commit -m \"update: synchronisation automatique\" && git push origin main",
+    "supabase": "node server/scripts/migrateMedia.js && node server/scripts/seedBlogs.js",
     "rebrand": "echo 'Editez server/config.json pour rebrander toute lagence de maniere dynamique.'"
   },
   "devDependencies": {
