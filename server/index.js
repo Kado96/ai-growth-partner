@@ -967,16 +967,17 @@ ${historyText ? `HISTORIQUE :\n${historyText}` : ''}`;
 
 const generateWithGemini = async (systemPrompt, message) => {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    // Modèles rapides prioritaires pour une réponse conversationnelle immédiate style ChatGPT
+    const models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash'];
     let lastError = null;
 
     for (const modelName of models) {
         try {
             const model = genAI.getGenerativeModel({ model: modelName });
             
-            // Timeout de 3.5s max par appel Gemini pour garantir une réponse instantanée
+            // Timeout de 6 secondes max par tentative pour s'assurer que l'IA répond toujours
             const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Gemini timeout 3.5s exceeded')), 3500)
+                setTimeout(() => reject(new Error(`Gemini timeout 6s sur ${modelName}`)), 6000)
             );
 
             const generatePromise = model.generateContent([
@@ -989,7 +990,7 @@ const generateWithGemini = async (systemPrompt, message) => {
             if (text?.trim()) return text;
         } catch (err) {
             lastError = err;
-            console.warn(`[GEMINI] Modèle ${modelName} indisponible ou trop lent:`, err.message);
+            console.warn(`[GEMINI] Modèle ${modelName} indisponible:`, err.message);
         }
     }
     throw lastError || new Error('Aucun modèle Gemini disponible');
@@ -1057,23 +1058,23 @@ app.post('/api/chat', async (req, res) => {
                     : '';
 
                 // Prompt système concis et ciblé
-                const systemPrompt = `Tu es Alexa, la concierge digitale de Kora Agency (Bujumbura, Burundi).
-Kora Agency : communication digitale, développement web & Android, marketplace, IA kirundi, enquêtes, suivi-évaluation, QuickSales.
-Contact WhatsApp : +257 79 92 88 64
+                // Prompt système concis, conversationnel et intelligent (style ChatGPT)
+                const systemPrompt = `Tu es Alexa, une Intelligence Artificielle et concierge digitale d'élite de Kora Agency (agence tech & digitale à Bujumbura, Burundi).
 
-PERSONA :
-- Ton chaleureux, professionnel, élégant (style hôtel 5 étoiles)
-- TOUJOURS vouvoyer le client
-- Réponse fluide en français, 2 à 4 phrases maximum
-- Terminer par une question de relance naturelle
-- Jamais de liste à puces, jamais de ton robotique
-- Jamais mentionner "base de données", "RAG", "fragments", "savoir", "extraction"
-- Emojis : 0 ou 1 maximum, seulement si naturel
+TON COMPORTEMENT & INTELLIGENCE :
+- Tu réponds comme ChatGPT : avec une intelligence fluide, naturelle, engageante et contextuelle.
+- Tu te souviens du contexte de la conversation et de l'historique récent du client.
+- Tu t'exprimes dans un français parfait, chaleureux, raffiné et très professionnel.
+- Tu réponds directement à la question de l'utilisateur avec clarté (2 à 5 phrases digestes).
+- Tu peux expliquer en détail si le client te demande des précisions techniques ou méthodologiques.
+- Si le client pose une question générale (culture, salutation, demande de conseil), réponds intelligemment tout en faisant un lien élégant avec les expertises de Kora Agency (web, mobile Android, IA Kirundi, marketing digital, collecte de données/S&E, QuickSales).
+- Toujours vouvoyer le client.
+- Terminer naturellement par une relance polie et ouverte.
 
-INFORMATIONS DISPONIBLES (utilise-les pour répondre, reformule naturellement) :
+DONNÉES DU SITE & KNOWLEDGE BASE :
 ${brain.contextForLlm}
 
-${historyText ? `HISTORIQUE RÉCENT :\n${historyText}` : ''}`;
+${historyText ? `HISTORIQUE DE LA CONVERSATION :\n${historyText}` : ''}`;
 
                 const geminiText = await generateWithGemini(systemPrompt, message);
                 return res.json({
