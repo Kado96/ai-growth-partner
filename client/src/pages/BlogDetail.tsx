@@ -193,7 +193,10 @@ const BlogDetail = () => {
                                         )
                                     }}
                                 >
-                                    {blog.content}
+                                    {blog.content
+                                        ? blog.content.replace(/!\[(IMAGE-[A-Z]+):(.*?)\]/g, '![$1]($2)')
+                                        : ''
+                                    }
                                 </ReactMarkdown>
                             </div>
 

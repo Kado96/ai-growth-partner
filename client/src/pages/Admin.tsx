@@ -13,6 +13,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription
 } from "@/components/ui/dialog";
+import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
 import { API_URL, loginAdmin, updateConfig, getMediaUrl } from '@/lib/api';
 
@@ -244,22 +245,23 @@ const Admin = () => {
 
   const handleSaveBlog = async () => {
     if ((!newBlog.serviceId && !newBlog.slug) || !newBlog.title || !newBlog.content) {
-      toast.error("Veuillez remplir le titre, le contenu et soit l'ID de service, soit l'adresse URL (slug).");
+      toast.error("Veuillez remplir le titre, le contenu et l'URL personnalisée (slug) ou le service lié.");
       return;
     }
     setIsSavingBlog(true);
     try {
       const payload = {
         ...newBlog,
+        id: newBlog.id || undefined,
         slug: newBlog.slug || newBlog.serviceId, // Fallback automatique
         tags: typeof newBlog.tags === 'string'
-          ? newBlog.tags.split(',').map(t => t.trim())
+          ? newBlog.tags.split(',').map(t => t.trim()).filter(Boolean)
           : newBlog.tags
       };
       await axios.post('/api/blogs', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success("Blog d'expertise enregistré !");
+      toast.success(newBlog.id ? "Article mis à jour avec succès !" : "Nouvel article publié avec succès !");
       setNewBlog({ id: '', slug: '', serviceId: '', title: '', content: '', tags: '', readingTime: 5 });
       fetchBlogs();
     } catch (e) { toast.error("Échec de la sauvegarde du blog."); }
@@ -267,6 +269,7 @@ const Admin = () => {
   };
 
   const handleDeleteBlog = async (id: string) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet article de blog ?")) return;
     try {
       await axios.delete(`/api/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -355,7 +358,8 @@ const Admin = () => {
       client: "Nom du Client",
       description: "Description du projet et des technologies utilisées.",
       impact: "+50% d'efficacité",
-      youtubeId: "dQw4w9WgXcQ"
+      youtubeId: "dQw4w9WgXcQ",
+      imagePath: ""
     };
     const currentProjects = editedConfig.projects?.items || [];
     setEditedConfig({
@@ -903,7 +907,7 @@ const Admin = () => {
                           />
                         </div>
                         <div className="space-y-1">
-                          <label htmlFor={`project-yt-${idx}`} className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">ID Vidéo YouTube (ex: dQw4w9WgXcQ)</label>
+                          <label htmlFor={`project-yt-${idx}`} className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">ID Vidéo YouTube (Optionnel)</label>
                           <Input
                             id={`project-yt-${idx}`}
                             name={`project-yt-${idx}`}
@@ -914,7 +918,32 @@ const Admin = () => {
                               setEditedConfig({ ...editedConfig, projects: { ...editedConfig.projects, items: newItems } });
                             }}
                             className="bg-slate-900 border-white/5"
-                            placeholder="dQw4w9WgXcQ"
+                            placeholder="ex: dQw4w9WgXcQ"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center">
+                            <label htmlFor={`project-img-${idx}`} className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Image / Capture (Alternative à YouTube)</label>
+                            <ImagePickerButton
+                              medias={medias}
+                              onSelect={(path) => {
+                                const newItems = [...(editedConfig.projects?.items || [])];
+                                newItems[idx].imagePath = path;
+                                setEditedConfig({ ...editedConfig, projects: { ...editedConfig.projects, items: newItems } });
+                              }}
+                            />
+                          </div>
+                          <Input
+                            id={`project-img-${idx}`}
+                            name={`project-img-${idx}`}
+                            value={item.imagePath || ''}
+                            onChange={e => {
+                              const newItems = [...(editedConfig.projects?.items || [])];
+                              newItems[idx].imagePath = e.target.value;
+                              setEditedConfig({ ...editedConfig, projects: { ...editedConfig.projects, items: newItems } });
+                            }}
+                            className="bg-slate-900 border-white/5"
+                            placeholder="ex: /media/mon-projet.png"
                           />
                         </div>
                       </div>
@@ -1042,11 +1071,27 @@ const Admin = () => {
 
             {activeTab === 'expertise' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                <div className="flex justify-between items-end">
+                <div className="flex justify-between items-center bg-white/5 p-6 rounded-3xl border border-white/5">
                   <div>
-                    <h2 className="text-2xl font-display font-bold text-white mb-2">Éditeur d'Expertise ✍️</h2>
-                    <p className="text-slate-400 text-sm">Créez des articles riches avec photos pour un impact maximal.</p>
+                    <h2 className="text-2xl font-display font-bold text-white flex items-center gap-3">
+                      Éditeur d'Expertise ✍️
+                      {newBlog.id && (
+                        <span className="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-sans font-bold">
+                          Mode Édition Article
+                        </span>
+                      )}
+                    </h2>
+                    <p className="text-slate-400 text-sm mt-1">Créez, modifiez, prévisualisez et publiez vos articles avec visuels.</p>
                   </div>
+                  {newBlog.id && (
+                    <Button
+                      onClick={() => setNewBlog({ id: '', slug: '', serviceId: '', title: '', content: '', tags: '', readingTime: 5 })}
+                      variant="outline"
+                      className="border-white/10 hover:bg-white/10 text-white rounded-full text-xs font-bold gap-2"
+                    >
+                      <Plus size={14} /> Créer un nouvel article
+                    </Button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1099,13 +1144,19 @@ const Admin = () => {
                           <div className="flex gap-2">
                             <span
                               onClick={() => setNewBlog({ ...newBlog, content: newBlog.content + "\n## Nouveau Titre\n" })}
-                              className="text-[10px] bg-white/5 px-2 py-1 rounded cursor-pointer hover:bg-accent/20 transition-colors"
+                              className="text-[10px] bg-white/5 px-2.5 py-1 rounded-md cursor-pointer hover:bg-accent/20 transition-colors font-bold text-slate-300"
                             >
-                              Titre
+                              + Titre (H2)
                             </span>
                             <span
-                              onClick={() => setNewBlog({ ...newBlog, content: newBlog.content + "**gras**" })}
-                              className="text-[10px] bg-white/5 px-2 py-1 rounded cursor-pointer hover:bg-accent/20 transition-colors"
+                              onClick={() => setNewBlog({ ...newBlog, content: newBlog.content + "\n### Sous-titre\n" })}
+                              className="text-[10px] bg-white/5 px-2.5 py-1 rounded-md cursor-pointer hover:bg-accent/20 transition-colors font-bold text-slate-300"
+                            >
+                              + Sous-titre (H3)
+                            </span>
+                            <span
+                              onClick={() => setNewBlog({ ...newBlog, content: newBlog.content + " **texte en gras** " })}
+                              className="text-[10px] bg-white/5 px-2.5 py-1 rounded-md cursor-pointer hover:bg-accent/20 transition-colors font-bold text-slate-300"
                             >
                               B
                             </span>
@@ -1118,20 +1169,20 @@ const Admin = () => {
                           value={newBlog.content}
                           onChange={(e) => setNewBlog({ ...newBlog, content: e.target.value })}
                           className="bg-slate-900 border-white/10 font-mono text-sm rounded-[2rem] p-6 focus:ring-accent/20 min-h-[400px]"
-                          placeholder="# Introduction... ![IMAGE:/media/ma-photo.jpg]..."
+                          placeholder="# Introduction...\n\nÉcrivez ici le texte de votre article. Utilisez la médiathèque à droite pour poser des visuels..."
                         />
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label htmlFor="blog-tags" className="text-[10px] uppercase font-black text-accent tracking-[0.2em]">Tags (Virgules)</label>
+                          <label htmlFor="blog-tags" className="text-[10px] uppercase font-black text-accent tracking-[0.2em]">Tags (Séparés par virgules)</label>
                           <Input
                             id="blog-tags"
                             name="blog-tags"
                             value={newBlog.tags}
                             onChange={(e) => setNewBlog({ ...newBlog, tags: e.target.value })}
                             className="bg-slate-900 border-white/10 h-12 rounded-xl"
-                            placeholder="Makamba, Stratégie, Vente"
+                            placeholder="Fintech, Mobile Money, Lumicash"
                           />
                         </div>
                         <div className="space-y-2">
@@ -1141,20 +1192,89 @@ const Admin = () => {
                             name="blog-time"
                             type="number"
                             value={newBlog.readingTime}
-                            onChange={(e) => setNewBlog({ ...newBlog, readingTime: parseInt(e.target.value) })}
+                            onChange={(e) => setNewBlog({ ...newBlog, readingTime: parseInt(e.target.value) || 5 })}
                             className="bg-slate-900 border-white/10 h-12 rounded-xl"
                           />
                         </div>
                       </div>
 
-                      <div className="flex gap-4 pt-4">
+                      <div className="flex flex-wrap gap-4 pt-4">
                         <Button
                           onClick={handleSaveBlog}
-                          className="flex-1 bg-accent hover:bg-accent/80 h-14 rounded-2xl font-black uppercase tracking-[0.1em] shadow-xl shadow-accent/10"
+                          className="flex-1 bg-gradient-to-r from-accent to-purple-600 hover:from-accent/90 hover:to-purple-700 h-14 rounded-2xl font-black uppercase tracking-[0.1em] shadow-xl shadow-accent/20 text-white"
                           disabled={isSavingBlog}
                         >
-                          {isSavingBlog ? "Publication..." : "Publier l'Expertise"}
+                          {isSavingBlog ? "Enregistrement..." : (newBlog.id ? "Mettre à jour l'Article" : "Publier l'Article d'Expertise")}
                         </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" className="border-white/10 hover:bg-white/10 h-14 px-6 rounded-2xl font-bold text-xs uppercase tracking-wider text-slate-300">
+                              👁️ Aperçu Direct
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-4xl bg-slate-950 border-white/10 text-white max-h-[85vh] overflow-y-auto custom-scrollbar p-8">
+                            <DialogHeader>
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="px-3 py-1 rounded-full bg-accent/20 text-accent text-[10px] font-black uppercase tracking-widest border border-accent/30">
+                                  {newBlog.serviceId ? `Service: ${newBlog.serviceId}` : 'Article d\'Expertise'}
+                                </span>
+                                <span className="text-xs text-slate-400 font-bold">⏱️ {newBlog.readingTime || 5} min de lecture</span>
+                              </div>
+                              <DialogTitle className="text-3xl font-display font-extrabold text-white mb-2 leading-tight">{newBlog.title || "Titre de l'article"}</DialogTitle>
+                              <DialogDescription className="text-xs text-accent font-bold uppercase tracking-widest">
+                                Aperçu direct (Slug: {newBlog.slug || newBlog.serviceId || 'non-defini'})
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="mt-6 border-t border-white/10 pt-6">
+                              <div className="prose prose-invert prose-lg max-w-none text-slate-300 font-sans leading-relaxed">
+                                <ReactMarkdown
+                                  components={{
+                                    h2: ({ node, ...props }) => <h2 className="font-display font-bold text-2xl text-white mt-8 mb-4 border-b border-white/5 pb-2" {...props} />,
+                                    h3: ({ node, ...props }) => <h3 className="font-display font-bold text-xl text-white mt-6 mb-3" {...props} />,
+                                    p: ({ node, children, ...props }) => {
+                                      return <p className="mb-4 text-slate-300 leading-relaxed" {...props}>{children}</p>;
+                                    },
+                                    ul: ({ node, ...props }) => <ul className="list-disc pl-6 mb-6 space-y-2 text-slate-300" {...props} />,
+                                    li: ({ node, ...props }) => <li {...props} />,
+                                    strong: ({ node, ...props }) => <strong className="text-white font-bold" {...props} />,
+                                    img: ({ node, alt, src, ...props }) => {
+                                      let rawSrc = src || '';
+                                      let rawAlt = alt || '';
+
+                                      // Si le src contient la forme ![IMAGE-RIGHT:/path]
+                                      if (rawAlt.startsWith('IMAGE') || rawSrc.includes('/')) {
+                                        const cleanSrc = rawSrc.startsWith('http') ? rawSrc : getMediaUrl(rawSrc);
+                                        let alignClass = "block my-8 mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10";
+
+                                        if (rawAlt === 'IMAGE-LEFT' || rawSrc.includes('IMAGE-LEFT')) {
+                                          alignClass = "block md:float-left w-full md:w-5/12 mx-auto md:ml-0 md:mr-6 mb-6 md:mt-2 rounded-2xl overflow-hidden shadow-xl border border-white/10 clear-both";
+                                        } else if (rawAlt === 'IMAGE-RIGHT' || rawSrc.includes('IMAGE-RIGHT')) {
+                                          alignClass = "block md:float-right w-full md:w-5/12 mx-auto md:mr-0 md:ml-6 mb-6 md:mt-2 rounded-2xl overflow-hidden shadow-xl border border-white/10 clear-both";
+                                        }
+
+                                        return (
+                                          <span className={alignClass}>
+                                            <img src={cleanSrc} alt="Illustration Article" className="w-full h-auto object-cover max-h-[450px]" />
+                                          </span>
+                                        );
+                                      }
+
+                                      return <img src={getMediaUrl(rawSrc)} alt={rawAlt} className="w-full h-auto rounded-2xl my-4" />;
+                                    },
+                                    blockquote: ({ node, ...props }) => (
+                                      <blockquote className="border-l-4 border-accent bg-accent/5 p-6 my-6 rounded-r-2xl italic text-lg text-white font-serif" {...props} />
+                                    )
+                                  }}
+                                >
+                                  {newBlog.content 
+                                    ? newBlog.content.replace(/!\[(IMAGE-[A-Z]+):(.*?)\]/g, '![$1]($2)')
+                                    : "*Aucun contenu saisi pour le moment.*"
+                                  }
+                                </ReactMarkdown>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                         <Button
                           variant="outline"
                           onClick={() => {
@@ -1162,7 +1282,7 @@ const Admin = () => {
                             navigator.clipboard.writeText(`${newBlog.title}\n\n${plainText}`);
                             toast.success("Contenu copié pour Facebook/WhatsApp (Texte pur)");
                           }}
-                          className="border-white/10 hover:bg-white/5 h-14 px-6 rounded-2xl"
+                          className="border-white/10 hover:bg-white/5 h-14 px-6 rounded-2xl text-slate-400 hover:text-white"
                           title="Copier pour Réseaux Sociaux"
                         >
                           <Share2 size={20} />
@@ -1171,42 +1291,60 @@ const Admin = () => {
                     </div>
                   </div>
 
-                  {/* Right: Media Picker Column - Organized to avoid conflicts */}
+                  {/* Right: Media Picker Column */}
                   <div className="lg:col-span-4 flex flex-col gap-6 max-h-[800px]">
-                    <div className="sidebar-box flex flex-col flex-grow min-h-0">
-                      <div className="flex items-center gap-3 mb-6 border-b border-white/5 pb-4 flex-shrink-0">
-                        <ImageIcon className="text-accent" size={18} />
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Ma Médiathèque</h3>
+                    <div className="sidebar-box flex flex-col flex-grow min-h-0 bg-white/5 p-6 rounded-[32px] border border-white/5">
+                      <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-4 flex-shrink-0">
+                        <div className="flex items-center gap-2">
+                          <ImageIcon className="text-accent" size={18} />
+                          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Ma Médiathèque</h3>
+                        </div>
+                        <div>
+                          <input
+                            type="file"
+                            id="sidebar-media-upload"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleUpload}
+                          />
+                          <label htmlFor="sidebar-media-upload" className="inline-flex items-center justify-center rounded-xl text-[10px] font-black uppercase tracking-wider bg-accent hover:bg-accent/80 text-white gap-1 px-3 py-1.5 cursor-pointer shadow-md transition-all">
+                            <UploadCloud size={12} /> {isUploading ? '...' : '+ Photo'}
+                          </label>
+                        </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-4 pb-20 overflow-y-auto custom-scrollbar pr-2 min-h-[400px]">
-                        {Array.isArray(medias) && medias.map(media => (
-                          <div
-                            key={media.id}
-                            className="relative group w-[calc(50%-8px)] h-40 rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent transition-all flex-shrink-0"
-                          >
-                            <img src={getMediaUrl(media.path)} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
-                            <div className="absolute inset-0 bg-accent/90 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-2 p-3 transition-all">
-                              <span className="text-[10px] font-black text-white uppercase tracking-widest text-center leading-tight">Poser l'image</span>
-                              <div className="flex flex-col gap-1.5 w-full">
-                                <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-LEFT:${media.path}]\n\n` }); toast.info("Image placée à Gauche"); }} className="bg-black/50 hover:bg-black font-bold text-[10px] text-white py-1.5 rounded-lg w-full transition-colors">← Gauche</button>
-                                <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-CENTER:${media.path}]\n\n` }); toast.info("Image au Centre"); }} className="bg-black/50 hover:bg-black font-bold text-[10px] text-white py-1.5 rounded-lg w-full transition-colors">↔ Centre</button>
-                                <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-RIGHT:${media.path}]\n\n` }); toast.info("Image placée à Droite"); }} className="bg-black/50 hover:bg-black font-bold text-[10px] text-white py-1.5 rounded-lg w-full transition-colors">→ Droite</button>
+                      <div className="flex flex-wrap gap-3 pb-4 overflow-y-auto custom-scrollbar pr-1 max-h-[500px]">
+                        {!Array.isArray(medias) || medias.length === 0 ? (
+                          <p className="text-slate-500 text-xs text-center w-full py-10">Aucune image disponible.</p>
+                        ) : (
+                          medias.map(media => (
+                            <div
+                              key={media.id}
+                              className="relative group w-[calc(50%-6px)] h-36 rounded-2xl overflow-hidden border border-white/10 cursor-pointer hover:border-accent transition-all flex-shrink-0 bg-slate-900"
+                            >
+                              <img src={getMediaUrl(media.path)} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt={media.name} />
+                              <div className="absolute inset-0 bg-slate-950/90 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 p-2 transition-all backdrop-blur-xs">
+                                <span className="text-[9px] font-black text-white uppercase tracking-widest text-center leading-tight">Aligner l'Image</span>
+                                <div className="flex flex-col gap-1 w-full">
+                                  <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-LEFT:${media.path}]\n\n` }); toast.info("Image alignée à Gauche"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">← Gauche</button>
+                                  <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-CENTER:${media.path}]\n\n` }); toast.info("Image au Centre"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">↔ Centre</button>
+                                  <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-RIGHT:${media.path}]\n\n` }); toast.info("Image alignée à Droite"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">→ Droite</button>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))
+                        )}
                       </div>
-                      <p className="mt-4 text-[9px] text-slate-500 uppercase font-black text-center tracking-widest flex-shrink-0">Cliquez pour insérer</p>
+                      <p className="mt-3 text-[9px] text-slate-500 uppercase font-black text-center tracking-widest flex-shrink-0">Survoler pour insérer dans l'article</p>
                     </div>
 
-                    <div className="bg-cta/10 border border-cta/20 rounded-[2.5rem] p-8 space-y-4 flex-shrink-0">
-                      <div className="flex items-center gap-2 text-cta">
+                    <div className="bg-accent/10 border border-accent/20 rounded-[2rem] p-6 space-y-2 flex-shrink-0">
+                      <div className="flex items-center gap-2 text-accent">
                         <Lightbulb size={16} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Conseil Makamba</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">Conseil d'Édition</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-relaxed">
-                        Pour un rendu **"Premium"**, ajoutez une image tous les 2 paragraphes. Utilisez les titres (##) pour structurer.
+                      <p className="text-[11px] text-slate-300 leading-relaxed">
+                        Chaque image insérée avec <code>![IMAGE-LEFT:...]</code> s'enroulera harmonieusement avec votre texte, exactement comme sur les grands médias professionnels.
                       </p>
                     </div>
                   </div>
@@ -1214,82 +1352,83 @@ const Admin = () => {
 
                 {/* List of existing blogs */}
                 <div className="mt-12 space-y-6">
-                  <h3 className="text-lg font-serif font-bold text-white flex items-center gap-3">
-                    <BookOpen className="text-accent" size={20} />
-                    Articles Publiés
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-display font-bold text-white flex items-center gap-3">
+                      <BookOpen className="text-accent" size={22} />
+                      Tous les Articles de Blog Publiés ({blogs.length})
+                    </h3>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {Array.isArray(blogs) && blogs.map((blog) => (
-                      <div key={blog.id} className="p-8 rounded-[2.5rem] border border-white/5 bg-white/[0.02] relative group hover:border-accent/30 transition-all">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
-                            <Rocket size={24} />
+                      <div key={blog.id} className="p-6 rounded-[2rem] border border-white/10 bg-slate-900/60 relative group hover:border-accent/40 transition-all flex flex-col justify-between shadow-lg">
+                        <div>
+                          <div className="flex justify-between items-start mb-4">
+                            <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest border border-accent/20">
+                              {blog.serviceId ? `Service: ${blog.serviceId}` : 'Article Général'}
+                            </span>
+                            <div className="flex gap-1.5">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => {
+                                  setNewBlog({
+                                    id: blog.id,
+                                    slug: blog.slug || blog.serviceId,
+                                    serviceId: blog.serviceId || '',
+                                    title: blog.title,
+                                    content: blog.content,
+                                    tags: Array.isArray(blog.tags) ? blog.tags.join(', ') : '',
+                                    readingTime: blog.readingTime
+                                  });
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                  toast.info(`Article "${blog.title}" chargé dans l'éditeur !`);
+                                }}
+                                className="bg-accent text-white hover:bg-accent/80 h-9 px-3 rounded-xl font-bold text-xs gap-1.5 shadow-md shadow-accent/20"
+                              >
+                                ✏️ Éditer
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteBlog(blog.id)}
+                                className="text-red-400 hover:bg-red-500/20 hover:text-red-300 h-9 w-9 rounded-xl"
+                                title="Supprimer l'article"
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-slate-800 text-slate-400 hover:text-white"
-                              onClick={() => {
-                                const url = `${window.location.origin}/blog/${blog.slug || blog.serviceId}`;
-                                window.open(`https://wa.me/?text=${encodeURIComponent('Découvrez mon nouvel article : ' + url)}`, '_blank');
-                              }}
-                            >
-                              <Share2 size={14} className="mr-2" /> Partager WhatsApp
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => {
-                                setNewBlog({
-                                  id: blog.id,
-                                  slug: blog.slug || blog.serviceId,
-                                  serviceId: blog.serviceId || '',
-                                  title: blog.title,
-                                  content: blog.content,
-                                  tags: Array.isArray(blog.tags) ? blog.tags.join(', ') : '',
-                                  readingTime: blog.readingTime
-                                });
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                              }}
-                              className="text-white hover:bg-accent/20 rounded-full"
-                            >
-                              <Settings size={16} />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteBlog(blog.id)}
-                              className="text-red-500 hover:bg-red-500/10 rounded-full"
-                            >
-                              <Trash2 size={16} />
-                            </Button>
+                          <h4 className="font-display font-bold text-lg text-white mb-2 line-clamp-2">{blog.title}</h4>
+                          <p className="text-xs text-slate-400 line-clamp-3 mb-4 leading-relaxed">
+                            {blog.content.replace(/#+ /g, '').replace(/!\[.*\]\(.*\)/g, '').substring(0, 150)}...
+                          </p>
+                        </div>
+
+                        <div className="space-y-3 pt-4 border-t border-white/5">
+                          <div className="flex flex-wrap gap-1.5">
+                            {blog.tags && Array.isArray(blog.tags) && blog.tags.map((tag: string) => (
+                              <span key={tag} className="text-[9px] font-bold text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">#{tag}</span>
+                            ))}
                           </div>
-                        </div>
-                        <h4 className="font-serif font-bold text-xl text-white mb-2 line-clamp-1">{blog.title}</h4>
-                        <p className="text-[10px] text-accent font-black uppercase tracking-widest mb-4">ID Service: {blog.serviceId}</p>
-                        <div className="flex flex-wrap gap-2 mb-6">
-                          {blog.tags && Array.isArray(blog.tags) && blog.tags.slice(0, 3).map((tag: string) => (
-                            <span key={tag} className="text-[9px] font-bold text-slate-500 uppercase tracking-widest border border-white/5 px-2 py-0.5 rounded-md">#{tag}</span>
-                          ))}
-                        </div>
-                        <div className="pt-4 border-t border-white/5 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                          <button
-                            onClick={() => publishToN8n(blog)}
-                            className="w-full py-2 bg-gradient-to-r from-purple-500/10 hover:from-purple-500/20 to-blue-500/10 hover:to-blue-500/20 border border-purple-500/20 text-purple-400 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
-                          >
-                            <Zap size={14} /> Envoyer à n8n
-                          </button>
-                          <div className="flex gap-2 w-full">
-                            <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin + '/blog/' + (blog.slug || blog.serviceId))}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-white/5 hover:bg-[#1877F2]/20 border border-white/5 text-slate-400 hover:text-[#1877F2] py-2 rounded-xl flex justify-center transition-colors">
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+                          <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1">
+                            <span>⏱️ {blog.readingTime || 5} min read</span>
+                            <a
+                              href={`/blog/${blog.slug || blog.serviceId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-accent hover:underline font-bold"
+                            >
+                              Voir sur le site ↗
                             </a>
-                            <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.origin + '/blog/' + (blog.slug || blog.serviceId))}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-white/5 hover:bg-white/10 border border-white/5 text-slate-400 hover:text-white py-2 rounded-xl flex justify-center transition-colors">
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
-                            </a>
-                            <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.origin + '/blog/' + (blog.slug || blog.serviceId))}`} target="_blank" rel="noopener noreferrer" className="flex-1 bg-white/5 hover:bg-[#0A66C2]/20 border border-white/5 text-slate-400 hover:text-[#0A66C2] py-2 rounded-xl flex justify-center transition-colors">
-                              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
-                            </a>
+                          </div>
+                          <div className="pt-2 flex gap-2 w-full opacity-60 group-hover:opacity-100 transition-all">
+                            <button
+                              onClick={() => publishToN8n(blog)}
+                              className="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-300 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all"
+                            >
+                              <Zap size={12} /> Auto-Partage Social (n8n)
+                            </button>
                           </div>
                         </div>
                       </div>

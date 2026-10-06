@@ -6,16 +6,30 @@ const Media = require('../models/Media');
 
 const router = express.Router();
 
-// Configure multer for memory storage
+// Filter only image mime types
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Seules les images (PNG, JPG, WEBP, SVG) sont autorisées !'), false);
+  }
+};
+
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 /**
  * GET /api/media
  */
 router.get('/', async (req, res) => {
   try {
-    const medias = await Media.findAll({ order: [['createdAt', 'DESC']] });
+    const { Op } = require('sequelize');
+    const medias = await Media.findAll({
+      where: {
+        mimeType: { [Op.like]: 'image/%' }
+      },
+      order: [['createdAt', 'DESC']]
+    });
     res.json(medias);
   } catch (error) {
     console.error('Fetch Media Error:', error);
