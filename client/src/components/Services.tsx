@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
@@ -8,7 +9,8 @@ import {
 } from "lucide-react";
 import { useConfig } from "@/hooks/use-config";
 import { useQuote } from "@/hooks/use-quote";
-import { API_URL } from "@/lib/api";
+import { API_URL, getMediaUrl } from "@/lib/api";
+import axios from "axios";
 
 const IconMap: Record<string, any> = {
   Brain, Cog, Lightbulb, Palette, MessageSquare, 
@@ -20,6 +22,21 @@ const IconMap: Record<string, any> = {
 const Services = () => {
   const { config, loading } = useConfig();
   const { openQuote } = useQuote();
+  const [blogs, setBlogs] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL || window.location.origin}/api/blogs`);
+        if (Array.isArray(data)) {
+          setBlogs(data);
+        }
+      } catch (e) {
+        console.error("Erreur chargement blogs dans Services:", e);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
   if (loading || !config) return null;
 
@@ -57,6 +74,11 @@ const Services = () => {
             const isPremium = service.price >= 1000000;
             const sId = service.id || `service-${i}`;
             
+            // Chercher l'article de blog rattaché à ce service pour extraire sa photo dynamique
+            const blogForService = blogs.find((b: any) => b.serviceId === sId || b.slug === sId);
+            const imageMatch = blogForService?.content?.match(/!\[.*?\]\((.*?)\)/);
+            const articleImageUrl = imageMatch ? imageMatch[1] : (blogForService?.image || null);
+
             return (
               <motion.div
                 key={sId}
@@ -73,9 +95,19 @@ const Services = () => {
                 )}
                 
                 <Link to={`/blog/${sId}`} className="relative z-10 flex-grow block">
-                  <div className={`w-14 h-14 rounded-2xl ${isPremium ? 'bg-accent/20' : 'bg-secondary'} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className={isPremium ? "text-accent" : "text-slate-400"} size={28} />
-                  </div>
+                  {articleImageUrl ? (
+                    <div className="w-full h-40 rounded-2xl overflow-hidden mb-6 group-hover:scale-105 transition-transform duration-300 shadow-lg">
+                      <img 
+                        src={getMediaUrl(articleImageUrl)} 
+                        alt={service.title} 
+                        className="w-full h-full object-cover" 
+                      />
+                    </div>
+                  ) : (
+                    <div className={`w-14 h-14 rounded-2xl ${isPremium ? 'bg-accent/20' : 'bg-secondary'} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className={isPremium ? "text-accent" : "text-slate-400"} size={28} />
+                    </div>
+                  )}
                   <h3 className="font-display font-bold text-xl text-foreground mb-3 group-hover:text-accent transition-colors flex items-center gap-2">
                     {service.title}
                     <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
