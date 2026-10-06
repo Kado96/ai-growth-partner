@@ -90,6 +90,7 @@ const PresentationPlayer = () => {
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
       setSceneProgress((prev) => {
         if (prev >= 100) {
           setCurrentScene((c) => (c + 1) % scenes.length);
@@ -99,7 +100,7 @@ const PresentationPlayer = () => {
       });
     }, 180);
     return () => clearInterval(interval);
-  }, [isPlaying, currentScene]);
+  }, [isPlaying]);
 
   const scene = scenes[currentScene];
 
