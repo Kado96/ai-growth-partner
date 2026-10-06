@@ -73,19 +73,9 @@ const Services = () => {
                 )}
                 
                 <Link to={`/blog/${sId}`} className="relative z-10 flex-grow block">
-                  {service.imagePath && service.imagePath !== '' ? (
-                    <div className="w-full h-40 rounded-2xl overflow-hidden mb-6 group-hover:scale-105 transition-transform duration-300 shadow-lg">
-                      <img 
-                        src={service.imagePath.startsWith('http') ? service.imagePath : `${API_URL}${service.imagePath}`} 
-                        alt={service.title} 
-                        className="w-full h-full object-cover" 
-                      />
-                    </div>
-                  ) : (
-                    <div className={`w-14 h-14 rounded-2xl ${isPremium ? 'bg-accent/20' : 'bg-secondary'} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                      <Icon className={isPremium ? "text-accent" : "text-slate-400"} size={28} />
-                    </div>
-                  )}
+                  <div className={`w-14 h-14 rounded-2xl ${isPremium ? 'bg-accent/20' : 'bg-secondary'} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className={isPremium ? "text-accent" : "text-slate-400"} size={28} />
+                  </div>
                   <h3 className="font-display font-bold text-xl text-foreground mb-3 group-hover:text-accent transition-colors flex items-center gap-2">
                     {service.title}
                     <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
