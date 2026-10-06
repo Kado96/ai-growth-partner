@@ -110,7 +110,7 @@ const BlogDetail = () => {
 
                         <div className="flex flex-wrap items-center gap-4 mb-6">
                             <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-semibold uppercase tracking-wider">
-                                {service.category || "Service"}
+                                {service?.category || "Service"}
                             </span>
                             <span className="flex items-center gap-2 text-muted-foreground text-sm">
                                 <Clock size={14} /> {blog.readingTime} min de lecture
@@ -136,18 +136,20 @@ const BlogDetail = () => {
 
                     <div className="grid lg:grid-cols-3 gap-12 lg:gap-16">
                         <div className="lg:col-span-2">
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.2 }}
-                                className="mb-12 rounded-3xl overflow-hidden shadow-2xl"
-                            >
-                                <img
-                                    src={getMediaUrl(service.imagePath)}
-                                    alt={blog.title}
-                                    className="w-full h-auto object-cover"
-                                />
-                            </motion.div>
+                            {service?.imagePath && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="mb-12 rounded-3xl overflow-hidden shadow-2xl"
+                                >
+                                    <img
+                                        src={getMediaUrl(service.imagePath)}
+                                        alt={blog.title}
+                                        className="w-full h-auto object-cover"
+                                    />
+                                </motion.div>
+                            )}
 
                             <div className="prose prose-invert prose-lg max-w-none text-slate-300 font-body leading-relaxed">
                                 <ReactMarkdown
