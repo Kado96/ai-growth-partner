@@ -25,8 +25,9 @@ server/.env.*
 *.sqlite
 database.sqlite3
 
-# Media uploads (local only)
-server/media/
+# Media uploads
+!server/media/
+!client/public/media/
 
 # Sensitive notes
 supabase+email.txt
