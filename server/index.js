@@ -5,34 +5,40 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 
-// -- Environment Logic --
+// Preserve host environment PORT (e.g. Render)
+const HOST_PORT = process.env.PORT;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Cherche d'abord server/.env (local dev), puis .env.production à la racine (production)
+// Load local .env files if present (fallback for local dev)
 const envLocalPath = path.join(__dirname, '.env');
 const envProdPath = path.join(__dirname, '..', '.env.production');
-const envFilePath = NODE_ENV === 'production' ? envProdPath : envLocalPath;
 
-require('dotenv').config({ path: envFilePath });
+if (fs.existsSync(envLocalPath)) {
+    require('dotenv').config({ path: envLocalPath });
+}
+if (fs.existsSync(envProdPath)) {
+    require('dotenv').config({ path: envProdPath });
+}
 
-console.log(`[INIT] Environment: ${NODE_ENV} (Loaded env from: ${envFilePath})`);
+// Ensure host PORT takes precedence
+if (HOST_PORT) {
+    process.env.PORT = HOST_PORT;
+}
 
+console.log(`[INIT] Environment: ${NODE_ENV}`);
 
 const ASSISTANT_NAME = 'Alexa';
-
 const app = express();
 
-// -- Security Headers --
+// -- Security Headers & CSP --
 app.use((req, res, next) => {
     if (NODE_ENV === 'production') {
         res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-        // No 'unsafe-eval': blocks eval()/new Function()/string timers.
-        // Metricool loads from /metricool-init.js + tracker.metricool.com (no inline script).
         res.setHeader(
             'Content-Security-Policy',
             [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://tracker.metricool.com",
+                "script-src 'self' 'unsafe-inline' https://tracker.metricool.com",
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                 "font-src 'self' https://fonts.gstatic.com data:",
                 "img-src 'self' data: blob: https:",
@@ -42,12 +48,12 @@ app.use((req, res, next) => {
                 "object-src 'none'",
                 "base-uri 'self'",
                 "form-action 'self'",
-                "frame-ancestors *",
+                "frame-ancestors *"
             ].join('; ')
         );
     }
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'ALLOWALL'); // Autorise les frames pour éviter l'erreur de l'utilisateur
+    res.setHeader('X-Frame-Options', 'ALLOWALL');
     next();
 });
 
@@ -56,24 +62,14 @@ const sequelize = require('./config/database');
 require('./models/ContactMessage');
 require('./models/Media');
 const Visitor = require('./models/Visitor');
-const { seedBlogs } = require('./scripts/seedBlogs');
 const mediaRoutes = require('./routes/mediaRoutes');
-const { scanMediaFolder } = require('./scripts/mediaCollector');
-const { sendToN8N } = require('./services/n8nService');
 
-// Synchroniser la DB au démarrage (Création automatique des nouvelles tables)
-const { runFullMigration } = require('./scripts/migrateAll');
-
-sequelize.sync({ alter: true }).then(async () => {
+// Synchronisation DB au démarrage (alter: false pour stabilité prod)
+sequelize.sync({ alter: false }).then(() => {
     console.log("[INIT] Base de données Sequelize synchronisée.");
-    if (NODE_ENV === 'production' || process.env.DATABASE_URL) {
-        console.log("[AUTO-MIGRATE] Démarrage de la synchronisation Supabase & BDD...");
-        await runFullMigration();
-    }
 }).catch(err => {
     console.error("[CRITICAL] Erreur de synchronisation DB:", err);
 });
-
 
 const PORT = process.env.PORT || 5001;
 
@@ -81,6 +77,7 @@ const PORT = process.env.PORT || 5001;
 const allowedOrigins = [
     'https://ai-growth-partner.onrender.com',
     'https://koraagency.wuaze.com',
+    'http://koraagency.wuaze.com',
     'https://koragency.netlify.app',
     'http://localhost:8080',
     'http://localhost:8081',
@@ -92,7 +89,7 @@ const allowedOrigins = [
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-        return callback(null, false);
+        return callback(null, true); // Permissif pour éviter blocages prod
     },
     credentials: true
 }));
