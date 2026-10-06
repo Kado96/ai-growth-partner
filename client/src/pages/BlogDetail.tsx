@@ -136,7 +136,7 @@ const BlogDetail = () => {
 
                     <div className="grid lg:grid-cols-3 gap-12 lg:gap-16">
                         <div className="lg:col-span-2">
-                            {service?.imagePath && (
+                            {blog.image && (
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
@@ -144,7 +144,7 @@ const BlogDetail = () => {
                                     className="mb-12 rounded-3xl overflow-hidden shadow-2xl"
                                 >
                                     <img
-                                        src={getMediaUrl(service.imagePath)}
+                                        src={getMediaUrl(blog.image)}
                                         alt={blog.title}
                                         className="w-full h-auto object-cover"
                                     />
