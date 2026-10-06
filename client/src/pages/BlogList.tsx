@@ -58,8 +58,8 @@ const BlogList = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog) => {
-              const imageMatch = blog.content.match(/!\[.*\]\((.*?)\)/);
-              const imageUrl = imageMatch ? imageMatch[1] : "/media/service-automation.png";
+              const imageMatch = blog.content?.match(/!\[.*?\]\((.*?)\)/);
+              const imageUrl = imageMatch ? imageMatch[1] : null;
               const tagsArray = Array.isArray(blog.tags) ? blog.tags : (typeof blog.tags === 'string' ? blog.tags.split(',') : []);
 
               return (
@@ -71,11 +71,17 @@ const BlogList = () => {
                   className="rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl overflow-hidden flex flex-col hover:border-accent/40 transition-all duration-300 group hover:shadow-2xl hover:shadow-accent/10"
                 >
                   <div className="relative aspect-video overflow-hidden bg-slate-900">
-                    <img
-                      src={imageUrl}
-                      alt={blog.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={blog.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 flex items-center justify-center">
+                        <span className="text-4xl opacity-20">📝</span>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
                   </div>
 
