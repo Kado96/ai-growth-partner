@@ -493,28 +493,59 @@ const Admin = () => {
     <div className="min-h-screen bg-[#05070a] text-slate-200">
       {/* Top Header */}
       <header className="border-b border-white/5 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-cta flex items-center justify-center font-bold text-white text-lg">K</div>
-            <div>
-              <h1 className="font-display font-bold text-white leading-tight">Centre de Contrôle</h1>
-              <p className="text-[10px] text-accent font-bold uppercase tracking-widest">Kora Agency v3.0</p>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-20 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-accent to-cta flex items-center justify-center font-bold text-white text-base sm:text-lg flex-shrink-0">K</div>
+            <div className="min-w-0">
+              <h1 className="font-display font-bold text-white leading-tight text-sm sm:text-base truncate">Centre de Contrôle</h1>
+              <p className="text-[9px] sm:text-[10px] text-accent font-bold uppercase tracking-widest hidden sm:block">Kora Agency v3.0</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Button onClick={handleSave} className="bg-white text-black hover:bg-slate-200 gap-2 h-10 px-6 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-xl shadow-white/5">
-              <Save size={16} /> Publier les Changements
+          <div className="flex items-center gap-2">
+            <Button onClick={handleSave} className="bg-white text-black hover:bg-slate-200 gap-1.5 h-8 sm:h-10 px-3 sm:px-6 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-xl shadow-white/5 text-xs sm:text-sm">
+              <Save size={14} /> <span className="hidden sm:inline">Publier les Changements</span><span className="sm:hidden">Publier</span>
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setIsLoggedIn(false)} className="text-slate-400 hover:text-white hover:bg-white/5 rounded-full">
-              <LogOut size={18} />
+            <Button variant="ghost" size="icon" onClick={() => setIsLoggedIn(false)} className="text-slate-400 hover:text-white hover:bg-white/5 rounded-full w-8 h-8 sm:w-10 sm:h-10">
+              <LogOut size={16} />
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-10 flex gap-10">
-        {/* Navigation Sidebar */}
-        <aside className="w-72 flex-shrink-0 space-y-2">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-10">
+        {/* Navigation: horizontal scroll on mobile, sidebar on desktop */}
+        <div className="flex md:hidden overflow-x-auto gap-2 pb-3 mb-4 scrollbar-hide">
+          {[
+            { id: 'messages', label: 'Messages', icon: Inbox },
+            { id: 'branding', label: 'Branding', icon: Globe },
+            { id: 'hero', label: 'Accueil', icon: Layout },
+            { id: 'projects', label: 'Projets', icon: Play },
+            { id: 'services', label: 'Services', icon: Settings },
+            { id: 'methodology', label: 'Méthodo', icon: Layers },
+            { id: 'news', label: 'Ticker', icon: MessageSquare },
+            { id: 'medias', label: 'Médias', icon: ImageIcon },
+            { id: 'social', label: 'n8n', icon: Zap },
+            { id: 'alexa-brain', label: 'Alexa', icon: Brain },
+            { id: 'expertise', label: 'Blogs', icon: BookOpen },
+            { id: 'stats', label: 'Stats', icon: Activity },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all text-[10px] font-bold ${activeTab === tab.id
+                ? 'bg-accent/10 text-accent border border-accent/20'
+                : 'text-slate-400 bg-white/5'
+              }`}
+            >
+              <tab.icon size={16} />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-10">
+        {/* Sidebar (desktop only) */}
+        <aside className="w-72 flex-shrink-0 space-y-2 hidden md:block">
           {[
             { id: 'messages', label: 'Messages & Devis', icon: Inbox },
             { id: 'branding', label: 'Branding & Identité', icon: Globe },
@@ -547,8 +578,8 @@ const Admin = () => {
         </aside>
 
         {/* Content Panel */}
-        <main className="flex-grow p-1 rounded-3xl bg-gradient-to-br from-white/10 to-transparent">
-          <div className="bg-[#0b0f17] rounded-[22px] p-8 min-h-[600px] border border-white/5">
+        <main className="flex-grow p-1 rounded-3xl bg-gradient-to-br from-white/10 to-transparent min-w-0">
+          <div className="bg-[#0b0f17] rounded-[22px] p-4 sm:p-8 min-h-[600px] border border-white/5">
             {activeTab === 'messages' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="flex justify-between items-end">
@@ -1883,6 +1914,7 @@ const Admin = () => {
 
           </div>
         </main>
+        </div> {/* end flex gap-10 (desktop layout) */}
       </div>
     </div>
   );
