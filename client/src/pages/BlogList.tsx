@@ -58,7 +58,8 @@ const BlogList = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog) => {
-              const imageMatch = blog.content?.match(/!\[.*?\]\((.*?)\)/);
+              // Chercher 1ère image Markdown, sinon balise <img> HTML
+              const imageMatch = blog.content?.match(/!\[.*?\]\((.*?)\)/) || blog.content?.match(/<img[^>]+src=["']([^"']+)["']/i);
               const imageUrl = imageMatch ? imageMatch[1] : null;
               const tagsArray = Array.isArray(blog.tags) ? blog.tags : (typeof blog.tags === 'string' ? blog.tags.split(',') : []);
 

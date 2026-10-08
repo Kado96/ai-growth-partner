@@ -74,10 +74,12 @@ const Services = () => {
             const isPremium = service.price >= 1000000;
             const sId = service.id || `service-${i}`;
             
-            // Chercher l'article de blog rattaché à ce service pour extraire sa photo dynamique
-            const blogForService = blogs.find((b: any) => b.serviceId === sId || b.slug === sId);
-            const imageMatch = blogForService?.content?.match(/!\[.*?\]\((.*?)\)/);
-            const articleImageUrl = imageMatch ? imageMatch[1] : (blogForService?.image || null);
+            // Parcourir TOUS les blogs liés à ce service et prendre la 1ère photo trouvée
+            const matchingBlogs = blogs.filter((b: any) => b.serviceId === sId || b.slug === sId);
+            const blogWithImage = matchingBlogs.find((b: any) => /!\[.*?\]\((.*?)\)/.test(b.content || ''));
+            const imageMatch = blogWithImage?.content?.match(/!\[.*?\]\((.*?)\)/);
+            // Fallback : si aucun blog n'a d'image, utiliser l'imagePath du service dans la config
+            const articleImageUrl = imageMatch ? imageMatch[1] : (service.imagePath || null);
 
             return (
               <motion.div
