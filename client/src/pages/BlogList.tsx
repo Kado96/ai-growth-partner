@@ -6,8 +6,11 @@ import axios from "axios";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { useConfig } from "@/hooks/use-config";
+import { getMediaUrl } from "@/lib/api";
 
 const BlogList = () => {
+  const { config } = useConfig();
   const [blogs, setBlogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,7 +63,10 @@ const BlogList = () => {
             {blogs.map((blog) => {
               // Chercher 1ère image Markdown, sinon balise <img> HTML
               const imageMatch = blog.content?.match(/!\[.*?\]\((.*?)\)/) || blog.content?.match(/<img[^>]+src=["']([^"']+)["']/i);
-              const imageUrl = imageMatch ? imageMatch[1] : null;
+              
+              // Fallback sur l'image du service associé si l'article n'a pas d'image en Markdown
+              const service = config?.services?.items?.find((s: any) => s.id === blog.serviceId || s.id === blog.slug);
+              const imageUrl = imageMatch ? imageMatch[1] : (service?.imagePath || null);
               const tagsArray = Array.isArray(blog.tags) ? blog.tags : (typeof blog.tags === 'string' ? blog.tags.split(',') : []);
 
               return (
@@ -74,7 +80,7 @@ const BlogList = () => {
                   <div className="relative aspect-video overflow-hidden bg-slate-900">
                     {imageUrl ? (
                       <img
-                        src={imageUrl}
+                        src={getMediaUrl(imageUrl)}
                         alt={blog.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
