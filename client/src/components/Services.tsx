@@ -91,7 +91,10 @@ const Services = () => {
               }
             }
 
-            const articleImageUrl = extractedBlogImg || service.imagePath || null;
+            // Priority: 1. Image spécifique modifiée dans l'Admin (service.imagePath)
+            //           2. Première image du blog dédié
+            //           3. Première image d'un autre blog associé
+            const articleImageUrl = service.imagePath || extractedBlogImg || null;
 
             return (
               <motion.div
