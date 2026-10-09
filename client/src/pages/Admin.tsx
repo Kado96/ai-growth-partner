@@ -1376,8 +1376,23 @@ const Admin = () => {
                               className="relative group w-[calc(50%-6px)] h-36 rounded-2xl overflow-hidden border border-white/10 cursor-pointer hover:border-accent transition-all flex-shrink-0 bg-slate-900"
                             >
                               <img src={getMediaUrl(media.path)} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt={media.name} />
+                              
+                              {/* Bouton de suppression directe de la photo */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (window.confirm("Voulez-vous vraiment supprimer définitivement cette photo de la médiathèque ?")) {
+                                    handleDeleteMedia(media.id);
+                                  }
+                                }}
+                                className="absolute top-1.5 right-1.5 z-30 p-1.5 rounded-lg bg-red-600/90 hover:bg-red-600 text-white shadow-lg opacity-0 group-hover:opacity-100 transition-all"
+                                title="Supprimer la photo"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+
                               <div className="absolute inset-0 bg-slate-950/90 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 p-2 transition-all backdrop-blur-xs">
-                                <span className="text-[9px] font-black text-white uppercase tracking-widest text-center leading-tight">Aligner l'Image</span>
+                                <span className="text-[9px] font-black text-white uppercase tracking-widest text-center leading-tight pt-4">Aligner l'Image</span>
                                 <div className="flex flex-col gap-1 w-full">
                                   <button onClick={() => { insertAtCursor(`\n\n![IMAGE-LEFT:${media.path}]\n\n`); toast.info("Image alignée à Gauche insérée à la position du curseur"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">← Gauche</button>
                                   <button onClick={() => { insertAtCursor(`\n\n![IMAGE-CENTER:${media.path}]\n\n`); toast.info("Image au Centre insérée à la position du curseur"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">↔ Centre</button>
