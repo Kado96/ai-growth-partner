@@ -34,7 +34,6 @@ const Header = () => {
               { label: "Projets", href: "/#projects" },
               { label: "À Propos", href: "/#about" },
               { label: "Blog", href: "/blog" },
-              { label: "Vidéos", href: "/#videos" },
               { label: "Contact", href: "/#contact" }
             ].map((item) => (
               <a
@@ -67,7 +66,6 @@ const Header = () => {
               { label: "Projets", href: "/#projects" },
               { label: "À Propos", href: "/#about" },
               { label: "Blog", href: "/blog" },
-              { label: "Vidéos", href: "/#videos" },
               { label: "Contact", href: "/#contact" }
             ].map((item) => (
               <a
