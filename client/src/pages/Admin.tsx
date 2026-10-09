@@ -85,7 +85,26 @@ const Admin = () => {
     content: '',
     tags: '',
     readingTime: 5
-  });
+  const blogTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
+
+  const insertAtCursor = (textToInsert: string) => {
+    const textarea = blogTextareaRef.current;
+    if (!textarea) {
+      setNewBlog(prev => ({ ...prev, content: (prev.content || '') + textToInsert }));
+      return;
+    }
+    const start = textarea.selectionStart ?? (newBlog.content || '').length;
+    const end = textarea.selectionEnd ?? (newBlog.content || '').length;
+    const currentContent = newBlog.content || '';
+    const newContent = currentContent.substring(0, start) + textToInsert + currentContent.substring(end);
+    setNewBlog(prev => ({ ...prev, content: newContent }));
+
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = start + textToInsert.length;
+      textarea.setSelectionRange(newPos, newPos);
+    }, 50);
+  };
 
   const publishToN8n = async (blog: any) => {
     try {
@@ -1174,19 +1193,19 @@ const Admin = () => {
                           <label htmlFor="blog-content" className="text-[10px] uppercase font-black text-accent tracking-[0.2em]">Contenu Riche (Markdown)</label>
                           <div className="flex gap-2">
                             <span
-                              onClick={() => setNewBlog({ ...newBlog, content: newBlog.content + "\n## Nouveau Titre\n" })}
+                              onClick={() => insertAtCursor("\n\n## Nouveau Titre\n\n")}
                               className="text-[10px] bg-white/5 px-2.5 py-1 rounded-md cursor-pointer hover:bg-accent/20 transition-colors font-bold text-slate-300"
                             >
                               + Titre (H2)
                             </span>
                             <span
-                              onClick={() => setNewBlog({ ...newBlog, content: newBlog.content + "\n### Sous-titre\n" })}
+                              onClick={() => insertAtCursor("\n\n### Sous-titre\n\n")}
                               className="text-[10px] bg-white/5 px-2.5 py-1 rounded-md cursor-pointer hover:bg-accent/20 transition-colors font-bold text-slate-300"
                             >
                               + Sous-titre (H3)
                             </span>
                             <span
-                              onClick={() => setNewBlog({ ...newBlog, content: newBlog.content + " **texte en gras** " })}
+                              onClick={() => insertAtCursor(" **texte en gras** ")}
                               className="text-[10px] bg-white/5 px-2.5 py-1 rounded-md cursor-pointer hover:bg-accent/20 transition-colors font-bold text-slate-300"
                             >
                               B
@@ -1194,6 +1213,7 @@ const Admin = () => {
                           </div>
                         </div>
                         <Textarea
+                          ref={blogTextareaRef}
                           id="blog-content"
                           name="blog-content"
                           rows={15}
@@ -1357,9 +1377,9 @@ const Admin = () => {
                               <div className="absolute inset-0 bg-slate-950/90 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 p-2 transition-all backdrop-blur-xs">
                                 <span className="text-[9px] font-black text-white uppercase tracking-widest text-center leading-tight">Aligner l'Image</span>
                                 <div className="flex flex-col gap-1 w-full">
-                                  <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-LEFT:${media.path}]\n\n` }); toast.info("Image alignée à Gauche"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">← Gauche</button>
-                                  <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-CENTER:${media.path}]\n\n` }); toast.info("Image au Centre"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">↔ Centre</button>
-                                  <button onClick={() => { setNewBlog({ ...newBlog, content: newBlog.content + `\n\n![IMAGE-RIGHT:${media.path}]\n\n` }); toast.info("Image alignée à Droite"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">→ Droite</button>
+                                  <button onClick={() => { insertAtCursor(`\n\n![IMAGE-LEFT:${media.path}]\n\n`); toast.info("Image alignée à Gauche insérée à la position du curseur"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">← Gauche</button>
+                                  <button onClick={() => { insertAtCursor(`\n\n![IMAGE-CENTER:${media.path}]\n\n`); toast.info("Image au Centre insérée à la position du curseur"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">↔ Centre</button>
+                                  <button onClick={() => { insertAtCursor(`\n\n![IMAGE-RIGHT:${media.path}]\n\n`); toast.info("Image alignée à Droite insérée à la position du curseur"); }} className="bg-white/10 hover:bg-accent font-bold text-[9px] text-white py-1 rounded-md w-full transition-colors">→ Droite</button>
                                 </div>
                               </div>
                             </div>
