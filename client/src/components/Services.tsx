@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useConfig } from "@/hooks/use-config";
 import { useQuote } from "@/hooks/use-quote";
-import { API_URL, getMediaUrl } from "@/lib/api";
+import { API_URL, getMediaUrl, extractBlogImage } from "@/lib/api";
 import axios from "axios";
 
 const IconMap: Record<string, any> = {
@@ -76,10 +76,16 @@ const Services = () => {
             
             // Parcourir TOUS les blogs liés à ce service et prendre la 1ère photo trouvée
             const matchingBlogs = blogs.filter((b: any) => b.serviceId === sId || b.slug === sId);
-            const blogWithImage = matchingBlogs.find((b: any) => /!\[.*?\]\((.*?)\)/.test(b.content || ''));
-            const imageMatch = blogWithImage?.content?.match(/!\[.*?\]\((.*?)\)/);
-            // Fallback : si aucun blog n'a d'image, utiliser l'imagePath du service dans la config
-            const articleImageUrl = imageMatch ? imageMatch[1] : (service.imagePath || null);
+            let extractedBlogImg: string | null = null;
+            for (const b of matchingBlogs) {
+              const img = extractBlogImage(b.content);
+              if (img) {
+                extractedBlogImg = img;
+                break;
+              }
+            }
+            // Fallback : si aucun blog n'a d'image dans son texte, utiliser l'imagePath du service dans la config
+            const articleImageUrl = extractedBlogImg || service.imagePath || null;
 
             return (
               <motion.div

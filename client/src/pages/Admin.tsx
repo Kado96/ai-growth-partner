@@ -85,6 +85,8 @@ const Admin = () => {
     content: '',
     tags: '',
     readingTime: 5
+  });
+
   const blogTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   const insertAtCursor = (textToInsert: string) => {

@@ -23,6 +23,33 @@ export const getMediaUrl = (path: string): string => {
   return `${API_URL}${path}`;
 };
 
+/**
+ * Extrait la première image disponible d'un contenu de blog (Markdown custom, Markdown standard ou HTML).
+ */
+export const extractBlogImage = (content?: string): string | null => {
+  if (!content) return null;
+
+  // 1. Format custom alignment admin: ![IMAGE-LEFT:path], ![IMAGE-CENTER:path], ![IMAGE-RIGHT:path]
+  const customMatch = content.match(/!\[IMAGE-[A-Z]+:(.*?)\]/i);
+  if (customMatch && customMatch[1]) {
+    return customMatch[1].trim();
+  }
+
+  // 2. Format Markdown standard: ![alt](url)
+  const mdMatch = content.match(/!\[.*?\]\((.*?)\)/);
+  if (mdMatch && mdMatch[1]) {
+    return mdMatch[1].trim();
+  }
+
+  // 3. Format balise HTML: <img ... src="url" />
+  const htmlMatch = content.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (htmlMatch && htmlMatch[1]) {
+    return htmlMatch[1].trim();
+  }
+
+  return null;
+};
+
 export const fetchConfig = async () => {
   try {
     const response = await fetch(`${API_URL}/api/config`);

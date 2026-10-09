@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/hooks/use-config";
-import { getMediaUrl } from "@/lib/api";
+import { getMediaUrl, extractBlogImage } from "@/lib/api";
 
 const BlogList = () => {
   const { config } = useConfig();
@@ -61,12 +61,12 @@ const BlogList = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog) => {
-              // Chercher 1ère image Markdown, sinon balise <img> HTML
-              const imageMatch = blog.content?.match(/!\[.*?\]\((.*?)\)/) || blog.content?.match(/<img[^>]+src=["']([^"']+)["']/i);
+              // Extraction intelligente de la 1ère image (Markdown custom, Markdown standard ou HTML)
+              const imageInContent = extractBlogImage(blog.content);
               
-              // Fallback sur l'image du service associé si l'article n'a pas d'image en Markdown
+              // Fallback sur l'image du service associé si l'article n'a pas d'image dans son texte
               const service = config?.services?.items?.find((s: any) => s.id === blog.serviceId || s.id === blog.slug);
-              const imageUrl = imageMatch ? imageMatch[1] : (service?.imagePath || null);
+              const imageUrl = imageInContent || service?.imagePath || null;
               const tagsArray = Array.isArray(blog.tags) ? blog.tags : (typeof blog.tags === 'string' ? blog.tags.split(',') : []);
 
               return (
