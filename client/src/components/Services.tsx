@@ -74,17 +74,23 @@ const Services = () => {
             const isPremium = service.price >= 1000000;
             const sId = service.id || `service-${i}`;
             
-            // Parcourir TOUS les blogs liés à ce service et prendre la 1ère photo trouvée
-            const matchingBlogs = blogs.filter((b: any) => b.serviceId === sId || b.slug === sId);
-            let extractedBlogImg: string | null = null;
-            for (const b of matchingBlogs) {
-              const img = extractBlogImage(b.content);
-              if (img) {
-                extractedBlogImg = img;
-                break;
+            // 1. Trouver le blog dédié (le plus récent correspondant à ce service, exactement comme /api/blogs/:idOrSlug)
+            const dedicatedBlog = blogs.find((b: any) => b.slug === sId || b.serviceId === sId);
+            const dedicatedImg = extractBlogImage(dedicatedBlog?.content);
+
+            // 2. Si le blog dédié a une photo, la prendre. Sinon, chercher dans les autres blogs associés, puis fallback sur service.imagePath
+            let extractedBlogImg: string | null = dedicatedImg;
+            if (!extractedBlogImg) {
+              const matchingBlogs = blogs.filter((b: any) => b.serviceId === sId || b.slug === sId);
+              for (const b of matchingBlogs) {
+                const img = extractBlogImage(b.content);
+                if (img) {
+                  extractedBlogImg = img;
+                  break;
+                }
               }
             }
-            // Fallback : si aucun blog n'a d'image dans son texte, utiliser l'imagePath du service dans la config
+
             const articleImageUrl = extractedBlogImg || service.imagePath || null;
 
             return (
